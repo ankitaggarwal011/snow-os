@@ -54,7 +54,7 @@ kernel: $(patsubst %.s,obj/%.asm.o,$(KERN_SRCS:%.c=obj/%.o)) obj/tarfs.o
 	$(LD) $(LDLAGS) -o $@ -T sys/linker.script $^
 
 obj/tarfs.o: $(BINS)
-	tar --format=ustar -cvf obj/tarfs --no-recursion -C $(ROOTFS) $(shell find $(ROOTFS)/ -name boot -prune -o ! -name .empty -printf "%P\n")
+	tar --format=ustar -cvf obj/tarfs --no-recursion -C $(ROOTFS) $(shell find $(ROOTFS)/ -name boot -prune -o ! -name .gitkeep -printf "%P\n")
 	cd obj && objcopy --input binary --binary-architecture i386 --output elf64-x86-64 tarfs tarfs.o
 
 $(ROOTLIB)/libc.a: $(patsubst %.s,obj/%.asm.o,$(LIBC_SRCS:%.c=obj/%.o))
@@ -90,10 +90,10 @@ obj/%.asm.o: %.s
 .PHONY: submit clean
 
 clean:
-	find $(ROOTLIB) $(ROOTBIN) -type f ! -name .empty -print -delete
+	find $(ROOTLIB) $(ROOTBIN) -type f ! -name .gitkeep -print -delete
 	rm -rfv obj kernel tarfs $(USER).iso $(USER).img $(ROOTBOOT)/kernel/kernel
 
 SUBMITTO=/submit
 submit: clean
-	tar -czvf $(USER).tgz --exclude=.empty --exclude=.*.sw? --exclude=*~ LICENSE README Makefile sys bin crt libc include $(ROOTFS) $(USER)-data.img
+	tar -czvf $(USER).tgz --exclude=.gitkeep --exclude=.*.sw? --exclude=*~ LICENSE README Makefile sys bin crt libc include $(ROOTFS) $(USER)-data.img
 	mv -v $(USER).tgz $(SUBMITTO)/$(USER)-$(ASSIGNMENT)=`date +%F=%T`.tgz
