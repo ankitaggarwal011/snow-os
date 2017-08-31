@@ -7,6 +7,6 @@ int putchar(int c);
 int puts(const char *s);
 int printf(const char *format, ...);
 
-char *readline(const char *prompt);
+char *gets(char *s);
 
 #endif
