@@ -1,5 +1,3 @@
-/* Author: Ankit Aggarwal */
-
 #include<unistd.h>
 #include<string.h>
 #include <fcntl.h>

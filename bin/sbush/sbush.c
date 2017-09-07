@@ -1,5 +1,3 @@
-/* Author: Ankit Aggarwal */
-
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
@@ -30,6 +28,54 @@
 #define SYS_DUP2 33
 #define SYS_MMAP 9
 #define SYS_MUNMAP 11
+
+int cus_strlen(char* str) {
+  if (str == NULL) {
+    return 0;
+  }
+  int i = 0;
+  while(str[i] != '\0') i++;
+  return i;
+}
+
+int cus_strcmp(char *s1, char* s2) {
+  if (s1 == NULL && s2 == NULL) {
+    return 0;
+  }
+  int i = 0;
+  while (s1[i] == s2[i]) {
+    if (s1[i] == '\0') {
+      //compared till the end. Good to go.
+      return 0;
+    }
+    i++;
+  }
+  //loop breaks at position i
+  if (s1[i] == '\0') {
+    int k = 0;
+    while (s2[i++] != '\0') {
+      k++;
+    }
+    return -k;
+  }
+
+  if (s2[i] == '\0') {
+    int k = 0;
+    while (s1[i++] != '\0') {
+      k++;
+    }
+    return k;
+  }
+  return 0;
+}
+
+char* cus_strcat(char *s1, char* s2) {
+    int i, j;
+    for (i = 0; s1[i] != 0; i++);
+    for (j = 0; s2[j] != 0; j++) s1[i+j] = s2[j];
+    s1[i+j] = 0;
+    return s1;
+}
 
 long cus_write(long f, void* buffer, unsigned long size) {
     long return_val;
@@ -282,7 +328,12 @@ int set_env_variables(char** arguments, int num_args, char* envp[]) {
     if (arguments[1][0] == 'P' && arguments[1][1] == 'S' && arguments[1][2] == '1') {
         char** tokens = (char**) malloc(sizeof(char*) * BUF_SIZE);
         parse_split(tokens, arguments[1], '=');
-        strcpy(PS1, tokens[1]);
+        int k = 0;
+        while(tokens[1][k]) {
+            PS1[k] = tokens[1][k];
+            k++;
+        }
+        while(PS1[k]) PS1[k] = 0;
         for (int i = 2; i < num_args; i++) {
             strcat(PS1, " ");
             strcat(PS1, arguments[i]);
@@ -459,6 +510,22 @@ int shell_parse(char* input, int len_input, char* envp[]) {
     return 0;
 }
 
+int shell_execfile(char* filename, char *envp[]) {
+    int fp = open(filename, O_RDONLY);
+    char* script_file = (char*) malloc(sizeof(char) * BUF_SIZE);
+    if (read(fp, script_file, BUF_SIZE) != -1) {
+        char** line_read = (char**) malloc(sizeof(char*) * BUF_SIZE);
+        int num_lines = parse_split(line_read, script_file, '\n');
+        for (int i = 0; i < num_lines; i++) {
+            if (line_read[i][0] != '#' && line_read[i][1] != '!' && (int) strlen(line_read[i]) != 0) {
+                shell_parse(line_read[i], (int) strlen(line_read[i]), envp);
+            }
+        }
+    }
+    close(fp);
+    return 0;
+}
+
 int shell_init(char *envp[]) {
     while (1) {
         char* input = (char*) malloc(sizeof(char) * BUF_SIZE);
@@ -484,6 +551,12 @@ int shell_init(char *envp[]) {
             if (strcmp(input, "exit") == 0) {
                 break;
             }
+            else if (input[0] == '.' && input[1] == '/') {
+                shell_execfile(&input[2], envp);
+            }
+            else if (input[0] == 's' && input[1] == 'b' && input[2] == 'u' && input[3] == 's' && input[4] == 'h' && input[5] == ' ') {
+                shell_execfile(&input[6], envp);
+            }
             else {
                 shell_parse(input, len_input, envp);
             }
@@ -492,22 +565,6 @@ int shell_init(char *envp[]) {
             break;
         }
     }
-    return 0;
-}
-
-int shell_execfile(char* filename, char *envp[]) {
-    int fp = open(filename, O_RDONLY);
-    char* script_file = (char*) malloc(sizeof(char) * BUF_SIZE);
-    if (read(fp, script_file, BUF_SIZE) != -1) {
-        char** line_read = (char**) malloc(sizeof(char*) * BUF_SIZE);
-        int num_lines = parse_split(line_read, script_file, '\n');
-        for (int i = 0; i < num_lines; i++) {
-            if (line_read[i][0] != '#' && line_read[i][1] != '!' && (int) strlen(line_read[i]) != 0) {
-                shell_parse(line_read[i], (int) strlen(line_read[i]), envp);
-            }
-        }
-    }
-    close(fp);
     return 0;
 }
 
