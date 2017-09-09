@@ -8,8 +8,8 @@ qemu-system-x86_64 -curses -drive id=boot,format=raw,file=$USER.img,if=none -dri
 
 Explanation of parameters:
   -curses         use a text console (omit this to use default SDL/VNC console)
-  -cdrom x.iso    connect a CD-ROM and insert CD with x.iso disk
-  -hda x.img      connect a hard drive with x.img disk
+  -drive ...      connect a CD-ROM or hard drive with corresponding image
+  -device ...     configure an AHCI controller for the boot and data disks
   -gdb tcp::9999  listen for "remote" debugging connections on port NNNN
   -S              wait for GDB to connect at startup
   -no-reboot      prevent reboot when OS crashes
