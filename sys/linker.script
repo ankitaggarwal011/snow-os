@@ -1,4 +1,4 @@
-ENTRY(boot)
+    ENTRY(boot)
 SECTIONS
 {
   physbase = 0x200000;

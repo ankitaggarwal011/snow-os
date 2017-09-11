@@ -1,8 +1,13 @@
 #include <sys/kprintf.h>
 #include <sys/stdarg.h>
+#include <sys/string.h>
 
-char* outputWriteAddress = (char*)0xb8000;
-long totalCharsPrinted = 0;
+#define VIDEO_BASE_ADDRESS 0xb8000
+#define VIDEO_MEM_ROWS 25
+#define VIDEO_MEM_COLUMNS 80
+
+long currentRow = 0;
+long currentColumn = 0;
 va_list args;
 typedef enum format_type {
     STRING,
@@ -12,16 +17,24 @@ typedef enum format_type {
 } format_type;
 
 void printSpecial(int argNumber, format_type ft);
+
 void printChar(char c);
-void printString(char* c);
+
+void printString(char *c);
+
 void printHex(long x);
+
 void printLong(long x);
-void printVoid(void* v);
+
+void printVoid(void *v);
+
+char* getAddress(long row, long column) {
+    return (char *) (VIDEO_BASE_ADDRESS + (2 * VIDEO_MEM_COLUMNS * row) + 2 * column);
+}
 
 void kprintf(const char *fmt, ...) {
     va_start(args, fmt);
     const char* c = fmt;
-    int specialCharCount = 0;
     int argNumber = 0;
     while (*c != '\0') {
         if (*c == '%') {
@@ -42,7 +55,6 @@ void kprintf(const char *fmt, ...) {
                 default:
                     break;
             }
-            specialCharCount++;
             c += 2;
         } else {
             printChar(*c);
@@ -68,9 +80,31 @@ void printSpecial(int argNumber, format_type ft) {
 }
 
 void printChar(char c) {
-    *outputWriteAddress = c;
-    outputWriteAddress += 2;
-    totalCharsPrinted++;
+    if (c == '\n') {
+        if (currentRow == VIDEO_MEM_ROWS - 1) {
+            currentRow = 0;
+//            memcpy(getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 1), getAddress(0, 0),
+//                   2 * VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
+        } else {
+            currentRow++;
+        }
+        currentColumn = 0;
+        return;
+    }
+    char *address = getAddress(currentRow, currentColumn);
+    *address = c;
+    if (currentColumn == VIDEO_MEM_COLUMNS - 1) {
+        if (currentRow == VIDEO_MEM_ROWS - 1) {
+            currentRow = 0;
+//            memcpy(getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 1), getAddress(0, 0),
+//                   2 * VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
+        } else {
+            currentRow++;
+        }
+        currentColumn = 0;
+    } else {
+        currentColumn++;
+    }
 }
 
 
@@ -91,11 +125,10 @@ void printLong(long x) {
     }
     if (x < 0) {
         buf[i] = '-';
-        printString((char*) (buf) + i);
+    } else {
+        i++;
     }
-    else {
-        printString((char*) (buf) + i + 1);
-    }
+    printString(buf + i);
 }
 
 void printHex(long x) {
