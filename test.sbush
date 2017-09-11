@@ -1,6 +1,0 @@
-#!/home/ankit/Common/OS/handout-code/rootfs/bin/sbush
-$PATH
-$PS1
-export PATH=/home/ankit/Common/OS/handout-code/rootfs/bin
-cat test
-ls

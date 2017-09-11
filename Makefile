@@ -94,6 +94,6 @@ clean:
 	rm -rfv obj kernel tarfs $(USER).iso $(USER).img $(ROOTBOOT)/kernel/kernel
 
 SUBMITTO=/submit
-submit: clean
-	tar -czvf $(USER).tgz --exclude=.gitkeep --exclude=.*.sw? --exclude=*~ LICENSE README Makefile sys bin crt libc include $(ROOTFS) $(USER)-data.img
+submit: clean $(USER)-data.img
+	tar -czvf $(USER).tgz --exclude=.gitkeep --exclude=.*.sw? --exclude=*~ LICENSE README Makefile Makefile.config sys bin crt libc include $(ROOTFS) $(USER)-data.img
 	mv -v $(USER).tgz $(SUBMITTO)/$(USER)-$(ASSIGNMENT)=`date +%F=%T`.tgz
