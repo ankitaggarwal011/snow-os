@@ -42,7 +42,7 @@ $(USER).iso: $(USER).img kernel
 	mcopy -o -i $(USER).img $@ ::sbunix.iso
 	touch $@
 
-$(USER).img: 
+$(USER).img:
 	mkfs.vfat -n SBUNIX -I -C $@ 16384
 	mcopy -i $@ /usr/lib/syslinux/memdisk $(ROOTBOOT)/syslinux.cfg ::
 	syslinux -i $@
