@@ -3,7 +3,7 @@
 #include <sys/kprintf.h>
 #include <sys/interrupt.h>
 
-extern timer_isr;
+extern void* timer_isr;
 
 struct idtr_struct idtr_t;
 struct idt_struct idt_t[256];
@@ -37,5 +37,6 @@ void config_intr(uint8_t int_n, void* callback) {
 
 void itr_handler(uint8_t int_n) {
     kprintf("Interrupt received\n");
-    register_int[int_n]();
+    void* callback = register_int[int_n];
+    callback();
 }
