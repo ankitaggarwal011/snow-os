@@ -1,4 +1,4 @@
-extern itr_handler
+extern pit_intr_handler
 timer_isr:
     push %rax
     push %rcx

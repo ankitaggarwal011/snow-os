@@ -4,7 +4,6 @@
 #include <sys/kprintf.h>
 #include <sys/pit.h>
 
-extern void* pit_intr_handler;
 uint64_t time_since_boot = 0;
 
 void pit_intr_handler() {
