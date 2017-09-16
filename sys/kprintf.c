@@ -26,8 +26,6 @@ void printHex(long x);
 
 void printLong(long x);
 
-void printVoid(void *v);
-
 char *getAddress(long row, long column) {
     return (char *) (VIDEO_BASE_ADDRESS + 2 * (VIDEO_MEM_COLUMNS * row + column));
 }
@@ -71,10 +69,7 @@ void printSpecial(int argNumber, format_type ft) {
     } else if (ft == INT) {
         printLong(va_arg(args,
         int));
-    } else if (ft == HEX) {
-        printHex(va_arg(args,
-        long));
-    } else if (ft == VOID) {
+    } else if (ft == HEX || ft == VOID) {
         printHex(va_arg(args,
         long));
     }
@@ -167,9 +162,4 @@ void printHex(long x) {
     buf[i--] = 'x';
     buf[i] = '0';
     printString(buf + i);
-}
-
-
-void printVoid(void *v) {
-    printHex(*((long *) v));
 }
