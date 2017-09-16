@@ -7,7 +7,7 @@ timer_isr:
     push %rbp
     push %rsi
     push %rdi
-    call itr_handler
+    call pit_intr_handler
     pop %rdi    
     pop %rsi    
     pop %rbp    

@@ -3,11 +3,11 @@
 #include <sys/kprintf.h>
 #include <sys/interrupt.h>
 
-extern void* timer_isr;
+// extern void* timer_isr;
 
 struct idtr_struct idtr_t;
 struct idt_struct idt_t[256];
-void* register_int[256];
+// void* register_int[256];
 
 void init_idt() {
     idtr_t.limit = sizeof(struct idt_struct) * 256 - 1;
@@ -30,6 +30,7 @@ void set_irq(uint8_t int_n, uint64_t addr, uint16_t selector, uint8_t type_attr)
     idt_t[int_n].zero_2 = 0;
 }
 
+/*
 void config_intr(uint8_t int_n, void* callback) {
     register_int[int_n] = callback;
 }
@@ -40,3 +41,4 @@ void itr_handler(uint8_t int_n) {
     void* callback = register_int[int_n];
     callback();
 }
+*/

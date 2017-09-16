@@ -4,16 +4,17 @@
 #include <sys/kprintf.h>
 #include <sys/pit.h>
 
+extern void* pit_intr_handler;
 uint64_t time_since_boot = 0;
 
-void timer_intr_handler() {
+void pit_intr_handler() {
     time_since_boot++;
     kprintf("%d\n", time_since_boot);
     output_b(PIC_M_CR, PIC_EOI);
 }
 
 void init_pit() {
-    config_intr(IRQ0, &timer_intr_handler);
+    // config_intr(IRQ0, &pit_intr_handler);
 
     uint8_t command_register = 0x36; // 0011 0110
     output_b(PIT_CR, command_register);

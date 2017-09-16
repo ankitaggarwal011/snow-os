@@ -18,5 +18,5 @@ struct idt_struct {
 
 void init_idt();
 void set_irq(uint8_t int_n, uint64_t addr, uint16_t selector, uint8_t type_attr);
-void config_intr(uint8_t int_n, void* callback);
-void itr_handler(uint8_t int_n);
+// void config_intr(uint8_t int_n, void* callback);
+// void itr_handler(uint8_t int_n);
