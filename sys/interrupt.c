@@ -3,7 +3,7 @@
 #include <sys/kprintf.h>
 #include <sys/interrupt.h>
 
-uint64_t timer_isr();
+void timer_isr();
 
 struct idtr_struct idtr_t;
 struct idt_struct idt_t[256];
