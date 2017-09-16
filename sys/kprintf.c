@@ -5,7 +5,7 @@
 #define VIDEO_BASE_ADDRESS 0xb8000
 #define VIDEO_MEM_ROWS 25
 #define VIDEO_MEM_COLUMNS 80
-
+#define DEFAULT_COLOR 7 //white
 long currentRow = 0;
 long currentColumn = 0;
 va_list args;
@@ -28,13 +28,13 @@ void printLong(long x);
 
 void printVoid(void *v);
 
-char* getAddress(long row, long column) {
-    return (char *) (VIDEO_BASE_ADDRESS + (2 * VIDEO_MEM_COLUMNS * row) + 2 * column);
+char *getAddress(long row, long column) {
+    return (char *) (VIDEO_BASE_ADDRESS + 2 * (VIDEO_MEM_COLUMNS * row + column));
 }
 
 void kprintf(const char *fmt, ...) {
     va_start(args, fmt);
-    const char* c = fmt;
+    const char *c = fmt;
     int argNumber = 0;
     while (*c != '\0') {
         if (*c == '%') {
@@ -66,16 +66,27 @@ void kprintf(const char *fmt, ...) {
 
 void printSpecial(int argNumber, format_type ft) {
     if (ft == STRING) {
-        printString(va_arg(args, char*));
+        printString(va_arg(args,
+        char*));
+    } else if (ft == INT) {
+        printLong(va_arg(args,
+        int));
+    } else if (ft == HEX) {
+        printHex(va_arg(args,
+        long));
+    } else if (ft == VOID) {
+        printHex(va_arg(args,
+        long));
     }
-    else if (ft == INT) {
-        printLong(va_arg(args, int));
-    }
-    else if (ft == HEX) {
-        printHex(va_arg(args, long));
-    }
-    else if (ft == VOID) {
-        printVoid(va_arg(args, void*));
+}
+
+void resetMemory(char initValue, char color) {
+    for (int i = 0; i < VIDEO_MEM_ROWS; i++) {
+        for (int j = 0; j < VIDEO_MEM_COLUMNS; j++) {
+            char *address = getAddress(i, j);
+            *address = initValue;
+            *(address + 1) = color;
+        }
     }
 }
 
@@ -83,8 +94,11 @@ void printChar(char c) {
     if (c == '\n') {
         if (currentRow == VIDEO_MEM_ROWS - 1) {
             currentRow = 0;
-//            memcpy(getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 1), getAddress(0, 0),
-//                   2 * VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
+            memcpy(getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 1), getAddress(0, 0),
+                   2 * VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
+            resetMemory(' ', DEFAULT_COLOR);
+
+
         } else {
             currentRow++;
         }
@@ -96,8 +110,9 @@ void printChar(char c) {
     if (currentColumn == VIDEO_MEM_COLUMNS - 1) {
         if (currentRow == VIDEO_MEM_ROWS - 1) {
             currentRow = 0;
-//            memcpy(getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 1), getAddress(0, 0),
-//                   2 * VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
+            memcpy(getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 1), getAddress(0, 0),
+                   2 * VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
+            resetMemory(' ', DEFAULT_COLOR);
         } else {
             currentRow++;
         }
@@ -114,12 +129,16 @@ void printString(char *c) {
     }
 }
 
+long mod(long x) {
+    return x > 0 ? x : -x;
+}
+
 void printLong(long x) {
     char buf[66];
     int i = 65;
     buf[i--] = '\0';
-    long numCopy = x;
-    while(numCopy) {
+    long numCopy = mod(x);
+    while (numCopy) {
         buf[i--] = 48 + numCopy % 10;
         numCopy /= 10;
     }
@@ -135,23 +154,22 @@ void printHex(long x) {
     char buf[19];
     int i = 18;
     buf[i--] = '\0';
-    long numCopy = x;
-    while(numCopy) {
+    long numCopy = mod(x);
+    while (numCopy) {
         int remain = numCopy % 16;
         if (remain < 10) {
             buf[i--] = 48 + remain;
-        }
-        else {
+        } else {
             buf[i--] = 65 + (remain - 10);
         }
         numCopy = numCopy >> 4;
     }
     buf[i--] = 'x';
     buf[i] = '0';
-    printString((char*)(buf) + i);
+    printString(buf + i);
 }
 
 
-void printVoid(void* v) {
-    printHex((long)v);
+void printVoid(void *v) {
+    printHex(*((long *) v));
 }
