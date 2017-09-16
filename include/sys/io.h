@@ -15,4 +15,3 @@
 
 void output_b(uint16_t p, uint8_t v);
 uint8_t input_b(uint16_t p);
-void config_intr(uint8_t intr, void* callback);

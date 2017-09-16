@@ -1,6 +1,8 @@
 #include <sys/defs.h>
 #include <sys/io.h>
+#include <sys/interrupt.h>
 #include <sys/kprintf.h>
+#include <sys/pit.h>
 
 uint64_t time_since_boot = 0;
 
