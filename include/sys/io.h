@@ -1,7 +1,7 @@
 #include <sys/defs.h>
 
 #define PIT_0 0x40
-#define PIT_CR (PIC_0 + 3)
+#define PIT_CR (PIT_0 + 3)
 
 #define PIC_M 0x20
 #define PIC_S 0xA0

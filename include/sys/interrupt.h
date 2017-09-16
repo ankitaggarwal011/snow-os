@@ -14,7 +14,7 @@ struct idt_struct {
     uint16_t offset_2;
     uint32_t offset_3;
     uint32_t zero_2;
-}
+};
 
 void init_idt();
 void set_irq(uint8_t int_n, uint64_t addr, uint16_t selector, uint8_t type_attr);
