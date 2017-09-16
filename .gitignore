@@ -67,3 +67,4 @@ CTestTestfile.cmake
 /*.img
 /rootfs/bin/
 /kernel
+CMakeLists.txt
