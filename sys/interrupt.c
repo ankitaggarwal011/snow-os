@@ -12,7 +12,7 @@ void init_idt() {
     idtr_t.offset = (uint64_t) &idt_t;
 
     memset(&idt_t, 0, sizeof(struct idt_struct) * 256);
-    set_irq(32, (uint64_t) timer_isr, 0x00, 0x8E);
+    set_irq(32, (uint64_t) &timer_isr, 0x00, 0x8E);
 }
 
 void set_irq(uint8_t int_n, uint64_t addr, uint16_t selector, uint8_t type_attr) {
