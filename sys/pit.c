@@ -6,7 +6,7 @@
 
 uint64_t time_since_boot = 0;
 
-void pit_intr_handler() {
+extern void pit_intr_handler() {
     time_since_boot++;
     kprintf("%d\n", time_since_boot);
     output_b(PIC_M_CR, PIC_EOI);
