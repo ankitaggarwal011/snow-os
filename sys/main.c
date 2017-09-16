@@ -32,6 +32,7 @@ void boot(void)
 {
   // note: function changes rsp, local stack variables can't be practically used
   // register char *temp1, *temp2;
+  register char *temp2;
 
   for(temp2 = (char*)0xb8001; temp2 < (char*)0xb8000+160*25; temp2 += 2) *temp2 = 7 /* white */;
   __asm__(
