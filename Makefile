@@ -22,7 +22,7 @@ BINS:=$(addprefix $(ROOTFS)/,$(wildcard bin/*))
 
 all: $(ASSIGNMENT)
 
-project: $(USER).iso $(USER)-data.img
+project: $(USER).img $(USER)-data.img
 
 wp1p1:
 	@$(MAKE) --no-print-directory BIN=rootfs/bin/sbush binary
@@ -36,16 +36,15 @@ wp2: project
 
 wp3: project
 
-$(USER).iso: $(USER).img kernel
+$(USER).iso: kernel
 	cp kernel $(ROOTBOOT)/kernel/kernel
 	mkisofs -r -no-emul-boot -input-charset utf-8 -b boot/cdboot -o $@ $(ROOTFS)/
-	mcopy -o -i $(USER).img $@ ::sbunix.iso
-	touch $@
 
-$(USER).img: 
+$(USER).img: $(USER).iso
 	mkfs.vfat -n SBUNIX -I -C $@ 16384
-	mcopy -i $@ /usr/lib/syslinux/memdisk $(ROOTBOOT)/syslinux.cfg ::
 	syslinux -i $@
+	mcopy -i $@ /usr/lib/syslinux/memdisk $(ROOTBOOT)/syslinux.cfg ::
+	mcopy -i $@ $(USER).iso ::sbunix.iso
 
 $(USER)-data.img:
 	qemu-img create -f raw $@ 16M
