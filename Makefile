@@ -36,15 +36,18 @@ wp2: project
 
 wp3: project
 
-$(USER).iso: kernel
+$(USER).iso: kernel $(ROOTBOOT)/large-file-padding
 	cp kernel $(ROOTBOOT)/kernel/kernel
 	mkisofs -r -no-emul-boot -input-charset utf-8 -b boot/cdboot -o $@ $(ROOTFS)/
 
 $(USER).img: $(USER).iso
-	mkfs.vfat -n SBUNIX -I -C $@ 16384
+	mkfs.vfat -n SBUNIX -I -C $@ 65536
 	syslinux -i $@
 	mcopy -i $@ /usr/lib/syslinux/memdisk $(ROOTBOOT)/syslinux.cfg ::
 	mcopy -i $@ $(USER).iso ::sbunix.iso
+
+$(ROOTBOOT)/large-file-padding:
+	dd if=/dev/zero of=$(ROOTBOOT)/large-file-padding seek=30 bs=1M count=0
 
 $(USER)-data.img:
 	qemu-img create -f raw $@ 16M
