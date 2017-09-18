@@ -17,7 +17,7 @@ void init_pit() {
 
     uint8_t command_register = 0x36; // 0011 0110
     output_b(PIT_CR, command_register);
-    uint16_t f = 1193182 / 50;
+    uint16_t f = 1193182 / 100;
     uint8_t p1 = f & 0x00FF;
     output_b(PIT_0, p1);
     uint8_t p2 = (f >> 8) & 0x00FF;

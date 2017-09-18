@@ -144,8 +144,8 @@ void printHex(long x) {
 }
 
 void printTime(long x) {
-    x /= 1000;
-    char *time_address = getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS - 24);
+    x /= 100;
+    char *time_address = getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS - 40);
     int i = 0, hh = x / 3600, mm = (x / 60) % 60, ss = x % 60;
     char buf[24];
     buf[i--] = '\0'; buf[i--] = 's';
@@ -165,6 +165,11 @@ void printTime(long x) {
     }
     i++;
     char* c = buf + i;
+    char* tsb = "Time since boot: ";
+    while (*tsb != '\0') {
+        *time_address = *(tsb++);
+        time_address += 2;   
+    }
     while (*c != '\0') {
         *time_address = *(c++);
         time_address += 2;
