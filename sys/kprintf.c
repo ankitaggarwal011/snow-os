@@ -13,7 +13,8 @@ typedef enum format_type {
     STRING,
     INT,
     HEX,
-    VOID
+    VOID,
+    TIME
 } format_type;
 
 void printSpecial(int argNumber, format_type ft);
@@ -27,8 +28,6 @@ void printHex(long x);
 void printLong(long x);
 
 void printTime(long x);
-
-void printTimeChar(char c);
 
 char *getAddress(long row, long column) {
     return (char *) (VIDEO_BASE_ADDRESS + 2 * (VIDEO_MEM_COLUMNS * row + column));
@@ -55,7 +54,7 @@ void kprintf(const char *fmt, ...) {
                     printSpecial(argNumber++, VOID);
                     break;
                 case 't':
-                    printTime(argNumber++, INT);
+                    printSpecial(argNumber++, TIME);
                     break;
                 default:
                     break;
@@ -78,6 +77,10 @@ void printSpecial(int argNumber, format_type ft) {
         int));
     } else if (ft == HEX || ft == VOID) {
         printHex(va_arg(args,
+        long));
+    }
+    else if (ft == TIME) {
+        printTime(va_arg(args,
         long));
     }
 }
@@ -122,11 +125,6 @@ void printChar(char c) {
     } else {
         currentColumn++;
     }
-}
-
-void printTimeChar(char c) {
-    char *address = getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 17);
-    *address = c;
 }
 
 void printString(char *c) {
@@ -176,24 +174,21 @@ void printHex(long x) {
 }
 
 void printTime(long x) {
-    char buf[16];
+    char *address = getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 17);
     int i = 0, hh = x / 3600, mm = x / 60, ss = x % 60;
     while (hh) {
-        buf[i++] = 48 + hh % 10;
+        *(address++) = 48 + hh % 10;
         hh /= 10;
     }
-    buf[i++] = 'h'; buf[i++] = ' '; buf[i++] = ':'; buf[i++] = ' ';
+    *(address++) = 'h'; *(address++) = ' '; *(address++) = ':'; *(address++) = ' ';
     while (mm) {
-        buf[i++] = 48 + mm % 10;
+        *(address++) = 48 + mm % 10;
         mm /= 10;
     }
-    buf[i++] = 'm'; buf[i++] = ' '; buf[i++] = ':'; buf[i++] = ' ';
+    *(address++) = 'm'; *(address++) = ' '; *(address++) = ':'; *(address++) = ' ';
     while (ss) {
-        buf[i++] = 48 + ss % 10;
+        *(address++) = 48 + ss % 10;
         ss /= 10;
     }
-    buf[i++] = 's'; buf[i++] = '\0';
-    while (*buf != '\0') {
-        printTimeChar(*(buf++));
-    }
+    *(address++) = 's'; *(address) = '\0';
 }
