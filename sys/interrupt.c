@@ -15,13 +15,8 @@ void init_idt() {
     idtr_t.offset = (uint64_t) idt_t;
 
     memset(&idt_t, 0, sizeof(struct idt_struct) * 256);
-    set_irq(IRQ0, (uint64_t) timer_isr, (uint16_t) 0x18, 0xE);
-    // _x86_load_idt((uint64_t) &idtr_t);
-    __asm__ volatile ("lidt %0" 
-            : 
-            : "m"(idtr_t)
-            );
-    __asm__ volatile ("sti");
+    set_irq(IRQ0, (uint64_t) timer_isr, (uint16_t) 0x8, 0x8E);
+    _x86_load_idt((uint64_t) &idtr_t);
     kprintf("Initialized IDT.\n");
 }
 
