@@ -11,12 +11,16 @@ struct idt_struct idt_t[256];
 // void* register_int[256];
 
 void init_idt() {
-    idtr_t.limit = sizeof(struct idt_struct) * 256;
+    idtr_t.limit = sizeof(struct idt_struct) * 256 - 1;
     idtr_t.offset = (uint64_t) idt_t;
 
     memset(&idt_t, 0, sizeof(struct idt_struct) * 256);
-    set_irq(32, (uint64_t) timer_isr, 0x08, 0x8E);
-    _x86_load_idt(&idtr_t);
+    set_irq(IRQ0, (uint64_t) timer_isr, 0xF0, 0xFC);
+    // _x86_load_idt((uint64_t) &idtr_t);
+    __asm__("lidt %0" 
+            : 
+            : "m"(idtr_t)
+            );
     kprintf("Initialized IDT.\n");
 }
 

@@ -7,7 +7,6 @@
 uint64_t time_since_boot = 0;
 
 extern void pit_intr_handler() {
-    kprintf("Entered interrupt handler.\n");
     time_since_boot++;
     kprintf("%d\n", time_since_boot);
     output_b(PIC_M_CR, PIC_EOI);
