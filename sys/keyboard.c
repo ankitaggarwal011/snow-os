@@ -32,14 +32,8 @@ char getScancode() {
 
 int getBitmask(special_key sk) {
     switch (sk) {
-        case NUMLOCK:
-            return 0b100000;
-
-        case LCNTRL:
-            return 0b1000;
-
-        case RCNTRL:
-            return 0b10000;
+        case CAPS:
+            return 0b1;
 
         case LSHIFT:
             return 0b10;
@@ -47,8 +41,14 @@ int getBitmask(special_key sk) {
         case RSHIFT:
             return 0b100;
 
-        case CAPS:
-            return 0b1;
+        case LCNTRL:
+            return 0b1000;
+
+        case RCNTRL:
+            return 0b10000;
+
+        case NUMLOCK:
+            return 0b100000;
     }
     return 0;
 }
@@ -369,27 +369,33 @@ void printAscii(char sc) {
     // handle special chars first
     switch (scanCode) {
         case 0x2A:
+            kprintf("LSHIFT pressed\n");
             setKey(LSHIFT);
             return;
 
         case 0xAA:
+            kprintf("LSHIFT released\n");
             clearKey(LSHIFT);
             return;
 
         case 0x36:
+            kprintf("RSHIFT pressed\n");
             setKey(RSHIFT);
             return;
 
         case 0xB6:
+            kprintf("RSHIFT pressed\n");
             clearKey(RSHIFT);
             return;
 
         case 0x1D:
+            kprintf("CNTRL pressed\n");
             setKey(LCNTRL);
             setKey(RCNTRL);
             return;
 
         case 0x9D:
+            kprintf("CNTRL cleared\n");
             clearKey(LCNTRL);
             clearKey(RCNTRL);
             return;
@@ -397,8 +403,10 @@ void printAscii(char sc) {
         case 0x3A:
             //handle only capsLock press. No release handling.
             if (isKey(CAPS)) {
+                kprintf("CAPS cleared\n");
                 clearKey(CAPS);
             } else {
+                kprintf("CAPS set\n");
                 setKey(CAPS);
             }
             return;

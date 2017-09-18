@@ -1,7 +1,6 @@
 #include <sys/kprintf.h>
 #include <sys/stdarg.h>
 #include <sys/string.h>
-#include "../include/sys/kprintf.h"
 
 long currentRow = 0;
 long currentColumn = 0;
@@ -190,17 +189,15 @@ void printTime(long x) {
 
 void printInputChar(const char* c) {
     char *address = getAddress(VIDEO_MEM_ROWS, 0);
-    for (int j = 0; j < 20; j+=2) {
+    for (int j = 0; j < 30; j+=2) {
         *(address + j) = ' ';
         *(address + j+1) = 2;
     }
-    char buf[10] = "Input: xx";
-    buf[7] = c[0];
-    buf[8] = c[1]; // if c[1] is '\0' character, string terminates early. No problem
-
+    char buf[15] = "Input: ";
+    char *str = strcat(buf, c);
     int i = 0;
-    while (buf[i]!='\0') {
-        *(address + 2*i) = buf[i];
+    while (str[i]!='\0') {
+        *(address + 2*i) = str[i];
         i++;
     }
 }
