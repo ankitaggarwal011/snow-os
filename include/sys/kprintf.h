@@ -18,6 +18,7 @@ void printChar(char c);
 void printString(char *c);
 void printHex(long x);
 void printLong(long x);
+void resetVideoMemory(char initValue, char color);
 void printTime(long x);
 void kprintf(const char *fmt, ...);
 void printInputChar(const char *c);

@@ -55,7 +55,7 @@ void printSpecial(int argNumber, format_type ft) {
     }
 }
 
-void resetMemory(char initValue, char color) {
+void resetVideoMemory(char initValue, char color) {
     for (int i = 0; i < VIDEO_MEM_ROWS; i++) {
         for (int j = 0; j < VIDEO_MEM_COLUMNS; j++) {
             char *address = getAddress(i, j);
@@ -69,9 +69,9 @@ void printChar(char c) {
     if (c == '\n') {
         if (currentRow == VIDEO_MEM_ROWS - 1) {
             currentRow = 0;
-            memcpy(getAddress(VIDEO_MEM_ROWS , VIDEO_MEM_COLUMNS ), getAddress(0, 0),
+            memcpy(getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS), getAddress(0, 0),
                    2 * VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
-            resetMemory(' ', DEFAULT_COLOR);
+            resetVideoMemory(' ', DEFAULT_COLOR);
 
 
         } else {
@@ -87,7 +87,7 @@ void printChar(char c) {
             currentRow = 0;
             memcpy(getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS), getAddress(0, 0),
                    2 * VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
-            resetMemory(' ', DEFAULT_COLOR);
+            resetVideoMemory(' ', DEFAULT_COLOR);
         } else {
             currentRow++;
         }
@@ -146,9 +146,9 @@ void printHex(long x) {
 void printTime(long x) {
     x /= 100;
     char *time_address = getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS - 40);
-    for (int j = 0; j < 80; j+=2) {
+    for (int j = 0; j < 80; j += 2) {
         *(time_address + j) = ' ';
-        *(time_address + j+1) = 7;
+        *(time_address + j + 1) = 7;
     }
     int i = 0, hh = x / 3600, mm = (x / 60) % 60, ss = x % 60;
     char buf[24];
@@ -187,17 +187,17 @@ void printTime(long x) {
     }
 }
 
-void printInputChar(const char* c) {
+void printInputChar(const char *c) {
     char *address = getAddress(VIDEO_MEM_ROWS, 0);
-    for (int j = 0; j < 30; j+=2) {
+    for (int j = 0; j < 30; j += 2) {
         *(address + j) = ' ';
-        *(address + j+1) = 2;
+        *(address + j + 1) = 2;
     }
     char buf[15] = "Input: ";
     char *str = strcat(buf, c);
     int i = 0;
-    while (str[i]!='\0') {
-        *(address + 2*i) = str[i];
+    while (str[i] != '\0') {
+        *(address + 2 * i) = str[i];
         i++;
     }
 }
