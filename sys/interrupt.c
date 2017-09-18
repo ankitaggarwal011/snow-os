@@ -23,9 +23,8 @@ void init_idt() {
 void set_irq(uint8_t int_n, uint64_t addr, uint16_t selector, uint8_t type_attr) {
     idt_t[int_n].offset_1 = (uint16_t) addr & 0xFFFF;
     idt_t[int_n].selector = selector;
-    idt_t[int_n].ist = 0;
+    idt_t[int_n].zero = 0;
     idt_t[int_n].type_attr = type_attr;
-    idt_t[int_n].p = 1;
     idt_t[int_n].offset_2 = (uint16_t) ((addr >> 16) & 0xFFFF);
     idt_t[int_n].offset_3 = (uint32_t)((addr >> 32) & 0xFFFFFFFF);
     idt_t[int_n].reserved = 0;
