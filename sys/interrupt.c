@@ -15,26 +15,25 @@ void init_idt() {
     idtr_t.offset = (uint64_t) idt_t;
 
     memset(&idt_t, 0, sizeof(struct idt_struct) * 256);
-    set_irq(IRQ0, (uint64_t) timer_isr, 0xF0, 0xFC);
+    set_irq(IRQ0, (uint64_t) timer_isr, (uint16_t) 0x18, 0xE);
     // _x86_load_idt((uint64_t) &idtr_t);
-    __asm__("lidt %0" 
+    __asm__ volatile ("lidt %0" 
             : 
             : "m"(idtr_t)
             );
+    __asm__ volatile ("sti");
     kprintf("Initialized IDT.\n");
 }
 
 void set_irq(uint8_t int_n, uint64_t addr, uint16_t selector, uint8_t type_attr) {
+    idt_t[int_n].offset_1 = (uint16_t) addr & 0xFFFF;
     idt_t[int_n].selector = selector;
+    idt_t[int_n].ist = 0;
     idt_t[int_n].type_attr = type_attr;
-    uint16_t offset_1 = addr & 0xFFFF;
-    uint16_t offset_2 = (addr >> 16) & 0xFFFF;
-    uint32_t offset_3 = (addr >> 32) & 0xFFFFFFFF;
-    idt_t[int_n].offset_1 = offset_1;
-    idt_t[int_n].offset_2 = offset_2;
-    idt_t[int_n].offset_3 = offset_3;
-    idt_t[int_n].zero_1 = 0;
-    idt_t[int_n].zero_2 = 0;
+    idt_t[int_n].p = 1;
+    idt_t[int_n].offset_2 = (uint16_t) ((addr >> 16) & 0xFFFF);
+    idt_t[int_n].offset_3 = (uint32_t)((addr >> 32) & 0xFFFFFFFF);
+    idt_t[int_n].reserved = 0;
 }
 
 /*

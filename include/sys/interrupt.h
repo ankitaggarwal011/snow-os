@@ -9,11 +9,13 @@ struct idtr_struct {
 struct idt_struct {
     uint16_t offset_1;
     uint16_t selector;
-    uint8_t zero_1;
+    uint8_t ist;
     uint8_t type_attr;
+    uint8_t dpl;
+    uint8_t p;
     uint16_t offset_2;
     uint32_t offset_3;
-    uint32_t zero_2;
+    uint32_t reserved;
 } __attribute__((packed));
 
 void init_idt();
