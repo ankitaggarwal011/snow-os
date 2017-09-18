@@ -20,5 +20,5 @@ void printHex(long x);
 void printLong(long x);
 void printTime(long x);
 void kprintf(const char *fmt, ...);
-
+void printInputChar(const char *c);
 #endif

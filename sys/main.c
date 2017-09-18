@@ -51,6 +51,8 @@ void boot(void)
   init_pit();
   init_pic();
   init_idt();
+  char *c = "Ass";
+  printInputChar(c);
   /*
   for(
     temp1 = "!!!!! start() returned !!!!!", temp2 = (char*)0xb8000;
