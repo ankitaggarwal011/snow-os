@@ -13,10 +13,10 @@ uint8_t specialChars = 0x0;
 //bit 1: lshift
 //bit 0: caps: set to on alternate PRESSES.
 
-char getScancode();
+uint8_t getScancode();
 
-char getAsciiCode(char scanCode);
-void printAscii(char c);
+char getAsciiCode(uint8_t scanCode);
+void printAscii(uint8_t sc);
 typedef enum special_key {
     CAPS, LSHIFT, RSHIFT, LCNTRL, RCNTRL, NUMLOCK
 } special_key;
@@ -26,8 +26,8 @@ extern void keyboard_intr_handler() {
     output_b(PIC_M_CR, PIC_EOI);
 }
 
-char getScancode() {
-    return (char) input_b(KB_CNTRL_ADDRESS);
+uint8_t getScancode() {
+    return input_b(KB_CNTRL_ADDRESS);
 }
 
 int getBitmask(special_key sk) {
@@ -73,14 +73,13 @@ int shouldCapitalizeLetters() {
     return isKey(CAPS) ^ isShiftEnabled();
 }
 
-int handleNormalScanCodes(char sc) {
-    int scanCode = (int) sc;
+int handleNormalScanCodes(uint8_t sc) {
     char str[5];
     str[4] = '\0';
     char c;
     char p = '\0';
     char pp = '\0';
-    switch (scanCode) {
+    switch (sc) {
         case 0x02:
             c = isShiftEnabled() ? '!' : '1';
             break;
@@ -364,10 +363,9 @@ int handleNormalScanCodes(char sc) {
     return 1;
 }
 
-void printAscii(char sc) {
-    int scanCode = (int) sc;
+void printAscii(uint8_t sc) {
     // handle special chars first
-    switch (scanCode) {
+    switch (sc) {
         case 0x2A:
             kprintf("LSHIFT pressed\n");
             setKey(LSHIFT);
@@ -419,14 +417,19 @@ void printAscii(char sc) {
             }
             return;
     }
-    int handled = handleNormalScanCodes(sc);
-    if (!handled) {
-        if (sc > 0x80) {
-            handleNormalScanCodes(sc - 0x80);
-        } else {
-            handleNormalScanCodes(sc + 0x80);
-        }
+    if (sc > 0x80) {
+        handleNormalScanCodes(sc-0x80);
+    } else {
+        handleNormalScanCodes(sc);
     }
+//    int handled = handleNormalScanCodes(sc);
+//    if (!handled) {
+//        if (sc > 0x80) {
+//            handleNormalScanCodes(sc - 0x80);
+//        } else {
+//            handleNormalScanCodes(sc + 0x80);
+//        }
+//    }
 }
 
 
@@ -434,20 +437,20 @@ void printAscii(char sc) {
 void init_keyboard() {
 //    disable_interrupts();
     //test PS2 controller
-    output_b(0x64, 0xAA);
-    while (!input_b(0x64 & 0b1));
-    uint8_t controller_status = input_b(0x60);
-    if (controller_status != 0x55) {
-        kprintf("KB Cntrl faulty. Status: %d\n", controller_status);
-        return;
-    }
-    //test 1st PS/2 port for keyboard
-    output_b(0x64, 0xAB);
-    while (!input_b(0x64 & 0b1));
-    uint8_t port_status = input_b(0x60);
-    if (port_status != 0x00) {
-        kprintf("KB Port faulty. Status: %d\n", controller_status);
-        return;
-    }
+//    output_b(0x64, 0xAA);
+//    while (!input_b(0x64 & 0b1));
+//    uint8_t controller_status = input_b(0x60);
+//    if (controller_status != 0x55) {
+//        kprintf("KB Cntrl faulty. Status: %d\n", controller_status);
+//        return;
+//    }
+//    //test 1st PS/2 port for keyboard
+//    output_b(0x64, 0xAB);
+//    while (!input_b(0x64 & 0b1));
+//    uint8_t port_status = input_b(0x60);
+//    if (port_status != 0x00) {
+//        kprintf("KB Port faulty. Status: %d\n", controller_status);
+//        return;
+//    }
 //    enable_interrupts();
 }
