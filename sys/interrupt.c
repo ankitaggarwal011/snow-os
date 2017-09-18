@@ -4,6 +4,7 @@
 #include <sys/interrupt.h>
 
 extern void timer_isr();
+extern void _x86_load_idt();
 
 struct idtr_struct idtr_t;
 struct idt_struct idt_t[256];
@@ -15,6 +16,7 @@ void init_idt() {
 
     memset(&idt_t, 0, sizeof(struct idt_struct) * 256);
     set_irq(32, (uint64_t) timer_isr, 0x08, 0x8E);
+    _x86_load_idt((uint64_t) &idt_t);
     kprintf("Initialized IDT.\n");
 }
 
