@@ -163,9 +163,9 @@ void printTime(long x) {
         hh /= 10;
     }
     i++;
-    while (*(buf + i) != '\0') {
-        *time_address = *(buf + i);
+    char* c = buf + i;
+    while (*c != '\0') {
+        *time_address = *(c++);
         time_address += 2;
-        (buf + i)++;
     }
 }
