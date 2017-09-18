@@ -69,7 +69,7 @@ void printChar(char c) {
     if (c == '\n') {
         if (currentRow == VIDEO_MEM_ROWS - 1) {
             currentRow = 0;
-            memcpy(getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 1), getAddress(0, 0),
+            memcpy(getAddress(VIDEO_MEM_ROWS , VIDEO_MEM_COLUMNS ), getAddress(0, 0),
                    2 * VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
             resetMemory(' ', DEFAULT_COLOR);
 
@@ -85,7 +85,7 @@ void printChar(char c) {
     if (currentColumn == VIDEO_MEM_COLUMNS - 1) {
         if (currentRow == VIDEO_MEM_ROWS - 1) {
             currentRow = 0;
-            memcpy(getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 1), getAddress(0, 0),
+            memcpy(getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS), getAddress(0, 0),
                    2 * VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
             resetMemory(' ', DEFAULT_COLOR);
         } else {
