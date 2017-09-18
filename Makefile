@@ -41,6 +41,7 @@ $(USER).iso: kernel $(ROOTBOOT)/large-file-padding
 	mkisofs -r -no-emul-boot -input-charset utf-8 -b boot/cdboot -o $@ $(ROOTFS)/
 
 $(USER).img: $(USER).iso
+	rm -f $@
 	mkfs.vfat -n SBUNIX -I -C $@ 65536
 	syslinux -i $@
 	mcopy -i $@ /usr/lib/syslinux/memdisk $(ROOTBOOT)/syslinux.cfg ::
