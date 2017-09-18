@@ -26,6 +26,10 @@ void printHex(long x);
 
 void printLong(long x);
 
+void printTime(long x);
+
+void printTimeChar(char c);
+
 char *getAddress(long row, long column) {
     return (char *) (VIDEO_BASE_ADDRESS + 2 * (VIDEO_MEM_COLUMNS * row + column));
 }
@@ -49,6 +53,9 @@ void kprintf(const char *fmt, ...) {
                     break;
                 case 'p':
                     printSpecial(argNumber++, VOID);
+                    break;
+                case 't':
+                    printTime(argNumber++, INT);
                     break;
                 default:
                     break;
@@ -117,6 +124,10 @@ void printChar(char c) {
     }
 }
 
+void printTimeChar(char c) {
+    char *address = getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 17);
+    *address = c;
+}
 
 void printString(char *c) {
     while (*c != '\0') {
@@ -162,4 +173,27 @@ void printHex(long x) {
     buf[i--] = 'x';
     buf[i] = '0';
     printString(buf + i);
+}
+
+void printTime(long x) {
+    char buf[16];
+    int i = 0, hh = x / 3600, mm = x / 60, ss = x % 60;
+    while (hh) {
+        buf[i++] = 48 + hh % 10;
+        hh /= 10;
+    }
+    buf[i++] = 'h'; buf[i++] = ' '; buf[i++] = ':'; buf[i++] = ' ';
+    while (mm) {
+        buf[i++] = 48 + mm % 10;
+        mm /= 10;
+    }
+    buf[i++] = 'm'; buf[i++] = ' '; buf[i++] = ':'; buf[i++] = ' ';
+    while (ss) {
+        buf[i++] = 48 + ss % 10;
+        ss /= 10;
+    }
+    buf[i++] = 's'; buf[i++] = '\0';
+    while (*buf != '\0') {
+        printTimeChar(*(buf++));
+    }
 }

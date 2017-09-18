@@ -8,7 +8,7 @@ uint64_t time_since_boot = 0;
 
 extern void pit_intr_handler() {
     time_since_boot++;
-    kprintf("%d\n", time_since_boot);
+    kprintf("%t", time_since_boot);
     output_b(PIC_M_CR, PIC_EOI);
 }
 
@@ -22,5 +22,5 @@ void init_pit() {
     output_b(PIT_0, p1);
     uint8_t p2 = (f >> 8) & 0x00FF;
     output_b(PIT_0, p2);
-    kprintf("Initialized PIT.\n");
+    // kprintf("Initialized PIT.\n");
 }

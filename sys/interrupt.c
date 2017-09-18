@@ -17,7 +17,7 @@ void init_idt() {
     memset(&idt_t, 0, sizeof(struct idt_struct) * 256);
     set_irq(IRQ0, (uint64_t) timer_isr, (uint16_t) 0x8, 0x8E);
     _x86_load_idt((uint64_t) &idtr_t);
-    kprintf("Initialized IDT.\n");
+    // kprintf("Initialized IDT.\n");
 }
 
 void set_irq(uint8_t int_n, uint64_t addr, uint16_t selector, uint8_t type_attr) {
