@@ -1,7 +1,6 @@
 .text
 .global timer_isr
 timer_isr:
-    cli
     push %rax
     push %rcx
     push %rdx
