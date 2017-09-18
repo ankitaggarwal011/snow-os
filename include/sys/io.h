@@ -12,6 +12,7 @@
 #define PIC_EOI 0x20
 
 #define IRQ0 32
+#define IRQ1 33
 
 void output_b(uint16_t p, uint8_t v);
 uint8_t input_b(uint16_t p);

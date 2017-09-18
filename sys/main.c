@@ -6,6 +6,7 @@
 #include <sys/pit.h>
 #include <sys/pic.h>
 #include <sys/interrupt.h>
+#include <sys/keyboard.h>
 
 #define INITIAL_STACK_SIZE 4096
 uint8_t initial_stack[INITIAL_STACK_SIZE]__attribute__((aligned(16)));
@@ -51,6 +52,7 @@ void boot(void)
   init_pit();
   init_pic();
   init_idt();
+  init_keyboard();
   char *c = "Ass";
   printInputChar(c);
   /*
