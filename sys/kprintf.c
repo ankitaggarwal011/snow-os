@@ -175,20 +175,20 @@ void printHex(long x) {
 
 void printTime(long x) {
     char *address = getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 17);
-    int i = 0, hh = x / 3600, mm = x / 60, ss = x % 60;
+    int hh = x / 3600, mm = x / 60, ss = x % 60;
     while (hh) {
-        *(address++) = 48 + hh % 10;
+        *(address+=2) = 48 + hh % 10;
         hh /= 10;
     }
-    *(address++) = 'h'; *(address++) = ' '; *(address++) = ':'; *(address++) = ' ';
+    *(address+=2) = 'h'; *(address+=2) = ' '; *(address+=2) = ':'; *(address+=2) = ' ';
     while (mm) {
-        *(address++) = 48 + mm % 10;
+        *(address+=2) = 48 + mm % 10;
         mm /= 10;
     }
-    *(address++) = 'm'; *(address++) = ' '; *(address++) = ':'; *(address++) = ' ';
+    *(address+=2) = 'm'; *(address+=2) = ' '; *(address+=2) = ':'; *(address+=2) = ' ';
     while (ss) {
-        *(address++) = 48 + ss % 10;
+        *(address+=2) = 48 + ss % 10;
         ss /= 10;
     }
-    *(address++) = 's'; *(address) = '\0';
+    *(address+=2) = 's'; *(address) = '\0';
 }
