@@ -2,31 +2,9 @@
 #include <sys/stdarg.h>
 #include <sys/string.h>
 
-#define VIDEO_BASE_ADDRESS 0xb8000
-#define VIDEO_MEM_ROWS 25
-#define VIDEO_MEM_COLUMNS 80
-#define DEFAULT_COLOR 7 //white
 long currentRow = 0;
 long currentColumn = 0;
 va_list args;
-typedef enum format_type {
-    STRING,
-    INT,
-    HEX,
-    VOID
-} format_type;
-
-void printSpecial(int argNumber, format_type ft);
-
-void printChar(char c);
-
-void printString(char *c);
-
-void printHex(long x);
-
-void printLong(long x);
-
-void printVoid(void *v);
 
 char *getAddress(long row, long column) {
     return (char *) (VIDEO_BASE_ADDRESS + 2 * (VIDEO_MEM_COLUMNS * row + column));
@@ -71,10 +49,7 @@ void printSpecial(int argNumber, format_type ft) {
     } else if (ft == INT) {
         printLong(va_arg(args,
         int));
-    } else if (ft == HEX) {
-        printHex(va_arg(args,
-        long));
-    } else if (ft == VOID) {
+    } else if (ft == HEX || ft == VOID) {
         printHex(va_arg(args,
         long));
     }
@@ -122,7 +97,6 @@ void printChar(char c) {
     }
 }
 
-
 void printString(char *c) {
     while (*c != '\0') {
         printChar(*(c++));
@@ -169,7 +143,35 @@ void printHex(long x) {
     printString(buf + i);
 }
 
-
-void printVoid(void *v) {
-    printHex(*((long *) v));
+void printTime(long x) {
+    x /= 100;
+    char *time_address = getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS - 40);
+    int i = 0, hh = x / 3600, mm = (x / 60) % 60, ss = x % 60;
+    char buf[24];
+    buf[i--] = '\0'; buf[i--] = 's';
+    while (ss) {
+        buf[i--] = 48 + ss % 10;
+        ss /= 10;
+    }
+    buf[i--] = ' '; buf[i--] = ':'; buf[i--] = ' '; buf[i--] = 'm';
+    while (mm) {
+        buf[i--] = 48 + mm % 10;
+        mm /= 10;
+    }
+    buf[i--] = ' '; buf[i--] = ':'; buf[i--] = ' '; buf[i--] = 'h';
+    while (hh) {
+        buf[i--] = 48 + hh % 10;
+        hh /= 10;
+    }
+    i++;
+    char* c = buf + i;
+    char* tsb = "Time since boot: ";
+    while (*tsb != '\0') {
+        *time_address = *(tsb++);
+        time_address += 2;   
+    }
+    while (*c != '\0') {
+        *time_address = *(c++);
+        time_address += 2;
+    }
 }
