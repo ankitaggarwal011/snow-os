@@ -174,8 +174,8 @@ void printHex(long x) {
 }
 
 void printTime(long x) {
-    char *address = getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 17);
-    int hh = x / 3600, mm = x / 60, ss = x % 60;
+    char *address = getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 18);
+    int hh = x / 3600, mm = (x / 60) % 60, ss = x % 60;
     while (hh) {
         *(address+=2) = 48 + hh % 10;
         hh /= 10;
