@@ -10,8 +10,6 @@ char *getAddress(long row, long column) {
     return (char *) (VIDEO_BASE_ADDRESS + 2 * (VIDEO_MEM_COLUMNS * row + column));
 }
 
-char *time_address = getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS - 18);
-
 void kprintf(const char *fmt, ...) {
     va_start(args, fmt);
     const char *c = fmt;
@@ -146,6 +144,7 @@ void printHex(long x) {
 }
 
 void printTime(long x) {
+    char *time_address = getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS - 18);
     int i = 0, hh = x / 3600, mm = (x / 60) % 60, ss = x % 60;
     char buf[24];
     buf[i--] = '\0'; buf[i--] = 's';
@@ -167,6 +166,6 @@ void printTime(long x) {
     while (*(buf + i) != '\0') {
         *time_address = *(buf + i);
         time_address += 2;
-        buf++;
+        (buf + i)++;
     }
 }
