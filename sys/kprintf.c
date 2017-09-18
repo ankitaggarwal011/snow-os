@@ -112,10 +112,10 @@ void printLong(long x) {
     int i = 65;
     buf[i--] = '\0';
     long numCopy = mod(x);
-    while (numCopy) {
+    do {
         buf[i--] = 48 + numCopy % 10;
         numCopy /= 10;
-    }
+    } while (numCopy);
     if (x < 0) {
         buf[i] = '-';
     } else {
@@ -129,7 +129,7 @@ void printHex(long x) {
     int i = 18;
     buf[i--] = '\0';
     long numCopy = mod(x);
-    while (numCopy) {
+    do {
         int remain = numCopy % 16;
         if (remain < 10) {
             buf[i--] = 48 + remain;
@@ -137,7 +137,7 @@ void printHex(long x) {
             buf[i--] = 65 + (remain - 10);
         }
         numCopy = numCopy >> 4;
-    }
+    } while (numCopy);
     buf[i--] = 'x';
     buf[i] = '0';
     printString(buf + i);
@@ -146,29 +146,40 @@ void printHex(long x) {
 void printTime(long x) {
     x /= 100;
     char *time_address = getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS - 40);
+    for (int j = 0; j < 80; j+=2) {
+        *(time_address + j) = ' ';
+        *(time_address + j+1) = 7;
+    }
     int i = 0, hh = x / 3600, mm = (x / 60) % 60, ss = x % 60;
     char buf[24];
-    buf[i--] = '\0'; buf[i--] = 's';
-    while (ss) {
+    buf[i--] = '\0';
+    buf[i--] = 's';
+    do {
         buf[i--] = 48 + ss % 10;
         ss /= 10;
-    }
-    buf[i--] = ' '; buf[i--] = ':'; buf[i--] = ' '; buf[i--] = 'm';
-    while (mm) {
+    } while (ss);
+    buf[i--] = ' ';
+    buf[i--] = ':';
+    buf[i--] = ' ';
+    buf[i--] = 'm';
+    do {
         buf[i--] = 48 + mm % 10;
         mm /= 10;
-    }
-    buf[i--] = ' '; buf[i--] = ':'; buf[i--] = ' '; buf[i--] = 'h';
-    while (hh) {
+    } while (mm);
+    buf[i--] = ' ';
+    buf[i--] = ':';
+    buf[i--] = ' ';
+    buf[i--] = 'h';
+    do {
         buf[i--] = 48 + hh % 10;
         hh /= 10;
-    }
+    } while (hh);
     i++;
-    char* c = buf + i;
-    char* tsb = "Time since boot: ";
+    char *c = buf + i;
+    char *tsb = "Time since boot: ";
     while (*tsb != '\0') {
         *time_address = *(tsb++);
-        time_address += 2;   
+        time_address += 2;
     }
     while (*c != '\0') {
         *time_address = *(c++);
