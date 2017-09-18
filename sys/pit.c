@@ -8,7 +8,7 @@ uint64_t time_since_boot = 0;
 
 extern void pit_intr_handler() {
     time_since_boot++;
-    kprintf("%t", time_since_boot);
+    printTime(time_since_boot);
     output_b(PIC_M_CR, PIC_EOI);
 }
 

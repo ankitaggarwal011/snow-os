@@ -2,36 +2,15 @@
 #include <sys/stdarg.h>
 #include <sys/string.h>
 
-#define VIDEO_BASE_ADDRESS 0xb8000
-#define VIDEO_MEM_ROWS 25
-#define VIDEO_MEM_COLUMNS 80
-#define DEFAULT_COLOR 7 //white
 long currentRow = 0;
 long currentColumn = 0;
 va_list args;
-typedef enum format_type {
-    STRING,
-    INT,
-    HEX,
-    VOID,
-    TIME
-} format_type;
-
-void printSpecial(int argNumber, format_type ft);
-
-void printChar(char c);
-
-void printString(char *c);
-
-void printHex(long x);
-
-void printLong(long x);
-
-void printTime(long x);
 
 char *getAddress(long row, long column) {
     return (char *) (VIDEO_BASE_ADDRESS + 2 * (VIDEO_MEM_COLUMNS * row + column));
 }
+
+char *time_address = getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS - 18);
 
 void kprintf(const char *fmt, ...) {
     va_start(args, fmt);
@@ -52,9 +31,6 @@ void kprintf(const char *fmt, ...) {
                     break;
                 case 'p':
                     printSpecial(argNumber++, VOID);
-                    break;
-                case 't':
-                    printSpecial(argNumber++, TIME);
                     break;
                 default:
                     break;
@@ -77,10 +53,6 @@ void printSpecial(int argNumber, format_type ft) {
         int));
     } else if (ft == HEX || ft == VOID) {
         printHex(va_arg(args,
-        long));
-    }
-    else if (ft == TIME) {
-        printTime(va_arg(args,
         long));
     }
 }
@@ -174,21 +146,27 @@ void printHex(long x) {
 }
 
 void printTime(long x) {
-    char *address = getAddress(VIDEO_MEM_ROWS - 1, VIDEO_MEM_COLUMNS - 18);
-    int hh = x / 3600, mm = (x / 60) % 60, ss = x % 60;
-    while (hh) {
-        *(address+=2) = 48 + hh % 10;
-        hh /= 10;
-    }
-    *(address+=2) = 'h'; *(address+=2) = ' '; *(address+=2) = ':'; *(address+=2) = ' ';
-    while (mm) {
-        *(address+=2) = 48 + mm % 10;
-        mm /= 10;
-    }
-    *(address+=2) = 'm'; *(address+=2) = ' '; *(address+=2) = ':'; *(address+=2) = ' ';
+    int i = 0, hh = x / 3600, mm = (x / 60) % 60, ss = x % 60;
+    char buf[24];
+    buf[i--] = '\0'; buf[i--] = 's';
     while (ss) {
-        *(address+=2) = 48 + ss % 10;
+        buf[i--] = 48 + ss % 10;
         ss /= 10;
     }
-    *(address+=2) = 's'; *(address) = '\0';
+    buf[i--] = ' '; buf[i--] = ':'; buf[i--] = ' '; buf[i--] = 'm';
+    while (mm) {
+        buf[i--] = 48 + mm % 10;
+        mm /= 10;
+    }
+    buf[i--] = ' '; buf[i--] = ':'; buf[i--] = ' '; buf[i--] = 'h';
+    while (hh) {
+        buf[i--] = 48 + hh % 10;
+        hh /= 10;
+    }
+    i++;
+    while (*(buf + i) != '\0') {
+        *time_address = *(buf + i);
+        time_address += 2;
+        buf++;
+    }
 }
