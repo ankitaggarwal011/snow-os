@@ -4,6 +4,7 @@
 #include <sys/interrupt.h>
 
 extern void timer_isr();
+extern void keyboard_isr();
 extern void _x86_load_idt();
 
 struct idtr_struct idtr_t;
@@ -16,6 +17,7 @@ void init_idt() {
 
     memset(&idt_t, 0, sizeof(struct idt_struct) * 256);
     set_irq(IRQ0, (uint64_t) timer_isr, (uint16_t) 0x8, 0x8E);
+    set_irq(IRQ1, (uint64_t) keyboard_isr, (uint16_t) 0x8, 0x8E);
     _x86_load_idt((uint64_t) &idtr_t);
     // kprintf("Initialized IDT.\n");
 }
