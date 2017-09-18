@@ -144,7 +144,8 @@ void printHex(long x) {
 }
 
 void printTime(long x) {
-    char *time_address = getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS - 18);
+    x /= 1000;
+    char *time_address = getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS - 24);
     int i = 0, hh = x / 3600, mm = (x / 60) % 60, ss = x % 60;
     char buf[24];
     buf[i--] = '\0'; buf[i--] = 's';
