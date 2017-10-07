@@ -10,13 +10,14 @@ typedef enum format_type {
     STRING,
     INT,
     HEX,
-    VOID
+    VOID,
+    CHAR
 } format_type;
 
 void printSpecial(int argNumber, format_type ft);
 void printChar(char c);
 void printString(char *c);
-void printHex(long x);
+void printHex(long x, int include_prefix);
 void printLong(long x);
 void resetVideoMemory(char initValue, char color);
 void printTime(long x);

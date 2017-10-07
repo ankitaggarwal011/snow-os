@@ -16,8 +16,13 @@ void kprintf(const char *fmt, ...) {
     int argNumber = 0;
     while (*c != '\0') {
         if (*c == '%') {
+            int handled = 1;
             //special character case
             switch (*(c + 1)) {
+                case 'c':
+                    printSpecial(argNumber++, CHAR);
+                    break;
+
                 case 's':
                     printSpecial(argNumber++, STRING);
                     break;
@@ -31,9 +36,13 @@ void kprintf(const char *fmt, ...) {
                     printSpecial(argNumber++, VOID);
                     break;
                 default:
-                    break;
+                    handled = 0;
             }
-            c += 2;
+            if (handled) {
+                c += 2;
+            } else {
+                c += 1;
+            }
         } else {
             printChar(*c);
             c++;
@@ -49,9 +58,15 @@ void printSpecial(int argNumber, format_type ft) {
     } else if (ft == INT) {
         printLong(va_arg(args,
         int));
-    } else if (ft == HEX || ft == VOID) {
+    } else if (ft == HEX) {
         printHex(va_arg(args,
-        long));
+        long), 0);
+    } else if (ft == VOID) {
+        printHex(va_arg(args,
+        long), 1);
+    } else if (ft == CHAR) {
+        printChar(va_arg(args,
+        int));
     }
 }
 
@@ -124,7 +139,7 @@ void printLong(long x) {
     printString(buf + i);
 }
 
-void printHex(long x) {
+void printHex(long x, int include_prefix) {
     char buf[19];
     int i = 18;
     buf[i--] = '\0';
@@ -138,6 +153,10 @@ void printHex(long x) {
         }
         numCopy = numCopy >> 4;
     } while (numCopy);
+    if (!include_prefix) {
+        printString(buf + i + 1);
+        return;
+    }
     buf[i--] = 'x';
     buf[i] = '0';
     printString(buf + i);
