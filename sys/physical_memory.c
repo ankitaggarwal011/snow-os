@@ -1,7 +1,7 @@
 #include <sys/defs.h>
 #include <sys/kprintf.h>
 
-#define PHYS_OFFSET 0x3E8000UL
+#define PHYS_OFFSET 0x1F4000
 #define PAGE_SIZE 4096
 #define MIN_PAGES 10
 
@@ -16,8 +16,8 @@ uint64_t max_pages_available = 0, pages_used = 0, base_addr = 0x0, physical_mem_
 
 void init_physical_memory(uint64_t physfree, uint64_t base, uint64_t length) {
     uint64_t page_number = 0;
-    base_addr = base + PHYS_OFFSET; // 4M offset for physical pages
-    physical_mem_size = length - PHYS_OFFSET;
+    base_addr = physfree + PHYS_OFFSET; // 2M offset
+    physical_mem_size = length - (physfree - base) - PHYS_OFFSET;
     max_pages_available = physical_mem_size / PAGE_SIZE; // 4k for each page
     memset((uint64_t *)base_addr, 0x0, physical_mem_size);
     for (uint64_t i = base_addr; i < physical_mem_size; i += PAGE_SIZE) {
