@@ -8,6 +8,7 @@
 #include <sys/interrupt.h>
 #include <sys/keyboard.h>
 #include <sys/string.h>
+#include <sys/physical_memory.h>
 
 #define INITIAL_STACK_SIZE 4096
 uint8_t initial_stack[INITIAL_STACK_SIZE]__attribute__((aligned(16)));
@@ -24,20 +25,19 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
          smap < (struct smap_t *) ((char *) modulep + modulep[1] + 2 * 4); ++smap) {
         if (smap->type == 1 /* memory */ && smap->length != 0) {
             kprintf("Available Physical Memory [%p-%p]\n", smap->base, smap->base + smap->length);
+            init_physical_memory((uint64_t) physfree, smap->base, smap->length);
         }
     }
     kprintf("physfree %p\n", (uint64_t) physfree);
     kprintf("tarfs in [%p:%p]\n", &_binary_tarfs_start, &_binary_tarfs_end);
-    int a = 523;
-    kprintf("Test: %d %c %x %p",a, 'a',a, &a);
     while (1);
 }
 
 void boot(void) {
     // note: function changes rsp, local stack variables can't be practically used
     // register char *temp1, *temp2;
-//    register char *temp2;
-//    for (temp2 = (char *) 0xb8001; temp2 < (char *) 0xb8000 + 160 * 25; temp2 += 2) *temp2 = 7 /* white */;
+    // register char *temp2;
+    // for (temp2 = (char *) 0xb8001; temp2 < (char *) 0xb8000 + 160 * 25; temp2 += 2) *temp2 = 7 /* white */;
     __asm__(
     "cli;"
             "movq %%rsp, %0;"
@@ -46,11 +46,11 @@ void boot(void) {
     :"r"(&initial_stack[INITIAL_STACK_SIZE])
     );
     init_gdt();
+    init_idt();
     init_pit();
     init_pic();
-    init_idt();
-    init_keyboard();
     resetVideoMemory(' ', 7);
+    init_keyboard();
     start(
             (uint32_t * )((char *) (uint64_t) loader_stack[3] + (uint64_t) & kernmem - (uint64_t) & physbase),
             (uint64_t * ) & physbase,

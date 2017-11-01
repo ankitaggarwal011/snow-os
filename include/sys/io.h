@@ -16,3 +16,5 @@
 
 void output_b(uint16_t p, uint8_t v);
 uint8_t input_b(uint16_t p);
+void output_l(uint16_t p, uint32_t v);
+uint32_t input_l(uint16_t p);

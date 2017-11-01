@@ -1,6 +1,8 @@
 #ifndef __KPRINTF_H
 #define __KPRINTF_H
 
+#include <sys/defs.h>
+
 #define VIDEO_BASE_ADDRESS 0xb8000
 #define VIDEO_MEM_ROWS 24
 #define VIDEO_MEM_COLUMNS 80

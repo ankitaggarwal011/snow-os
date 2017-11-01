@@ -3,6 +3,8 @@
 
 #define NULL ((void*)0)
 
+#define memcpy __builtin_memcpy
+
 typedef unsigned long  uint64_t;
 typedef          long   int64_t;
 typedef unsigned int   uint32_t;
@@ -18,5 +20,7 @@ typedef int64_t ssize_t;
 typedef uint64_t off_t;
 
 typedef uint32_t pid_t;
+
+void* memset(void* a, int v, size_t b);
 
 #endif

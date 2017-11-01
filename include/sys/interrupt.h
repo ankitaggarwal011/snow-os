@@ -1,5 +1,4 @@
 #include <sys/defs.h>
-#define memset __builtin_memset
 
 struct idtr_struct {
     uint16_t limit;
