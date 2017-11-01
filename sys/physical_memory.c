@@ -11,14 +11,14 @@ struct physical_page {
     struct physical_page *next;
 }__attribute__((__packed__));
 
-physical_page *free_list;
+struct physical_page *free_list;
 struct physical_page page_descriptor[MAX_PAGES];
 uint64_t max_pages_available = 0, pages_used = 0, base_addr = 0x0, physical_mem_size = 0;
 
 void init_physical_memory(uint64_t physfree, uint64_t base, uint64_t length) {
     physical_mem_size = base + length;
-    max_pages_available = (physical_mem_size - physfree) / PAGE_SIZE; // 4k for each page
-    memset((uint64_t *)physfree, 0x0, max_pages_available * PAGE_SIZE);
+    max_pages_available = (physical_mem_size - physfree - PAGES_OFFSET * PAGE_SIZE) / PAGE_SIZE; // 4k for each page
+    memset((uint64_t *)physfree, 0x0, (max_pages_available + PAGES_OFFSET) * PAGE_SIZE);
     for (uint64_t pg = 0; pg < max_pages_available; pg++) {
         page_descriptor[pg].page_number = pg;
         if (pg < max_pages_available - 1) {
@@ -29,7 +29,7 @@ void init_physical_memory(uint64_t physfree, uint64_t base, uint64_t length) {
         }
     }
     kprintf("Base address: %p, memory size: %d, max pages available: %d\n", base_addr, physical_mem_size, max_pages_available);
-    kprintf("Free list starts from: %p", free_list);
+    kprintf("Free list starts from: %p\n", free_list->page_number * PAGE_SIZE);
 }
 
 uint64_t get_free_pages_count() {

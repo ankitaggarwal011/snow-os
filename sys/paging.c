@@ -7,5 +7,5 @@
 uint64_t cr3;
 
 void init_paging(uint64_t kernmem, uint64_t physbase) {
-    uint64_t cr3 = get_free_page();
+    cr3 = get_free_page();
 }
