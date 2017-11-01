@@ -28,7 +28,7 @@ void init_physical_memory(uint64_t physfree, uint64_t base, uint64_t length) {
             free_list = &page_descriptor[pg];
         }
     }
-    kprintf("Base address: %p, memory size: %d, max pages available: %d\n", base_addr, physical_mem_size, get_free_pages_count());
+    kprintf("Base address: %p, memory size: %d, max pages available: %d\n", base_addr, physical_mem_size, max_pages_available);
     kprintf("Free list starts from: %p\n", free_list->page_number * PAGE_SIZE);
 }
 
@@ -57,7 +57,8 @@ uint64_t get_free_pages(uint64_t num_of_pages) {
     return free_pages;
 }
 
-void add_back_free_pages(uint64_t page_number, uint64_t num_of_pages) {
+void add_back_free_pages(uint64_t page_addr, uint64_t num_of_pages) {
+    uint64_t page_number = page_addr / PAGE_SIZE;
     struct physical_page *prev_free_list = free_list;
     free_list = &page_descriptor[page_number];
     page_descriptor[page_number + num_of_pages].next = prev_free_list;
