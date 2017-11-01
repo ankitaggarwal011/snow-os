@@ -35,6 +35,9 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
     // init_paging((uint64_t) &kernmem, (uint64_t) physbase);
     kprintf("physfree %p\n", (uint64_t) physfree);
     kprintf("tarfs in [%p:%p]\n", &_binary_tarfs_start, &_binary_tarfs_end);
+    uint64_t new_page = get_free_page();
+    kprintf("New page address: %x", new_page);
+    add_back_free_pages(new_page, 1);
     while (1);
 }
 
