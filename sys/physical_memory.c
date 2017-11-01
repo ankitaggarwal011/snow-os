@@ -28,8 +28,13 @@ void init_physical_memory(uint64_t physfree, uint64_t base, uint64_t length) {
             free_list = &page_descriptor[pg];
         }
     }
-    kprintf("Base address: %p, memory size: %d, max pages available: %d\n", base_addr, physical_mem_size, max_pages_available);
+    kprintf("Base address: %p, memory size: %d, max pages available: %d\n", base_addr, physical_mem_size, get_free_pages_count());
     kprintf("Free list starts from: %p\n", free_list->page_number * PAGE_SIZE);
+    uint64_t new_page = get_free_page();
+    kprintf("New page address: %x", new_page);
+    kprintf("After allocating new page, free list starts from: %p\n", free_list->page_number * PAGE_SIZE);
+    add_back_free_pages(new_page, 1);
+    kprintf("After adding the page back, free list starts from: %p\n", free_list->page_number * PAGE_SIZE);
 }
 
 uint64_t get_free_pages_count() {
