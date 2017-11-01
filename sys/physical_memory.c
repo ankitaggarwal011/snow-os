@@ -32,7 +32,7 @@ uint64_t get_free_pages_count() {
     return max_pages_available - pages_used;
 }
 
-physical_page* get_free_page() {
+uint64_t get_free_page() {
     if (get_free_pages_count() < MIN_PAGES) {
         return NULL;
     }
@@ -43,7 +43,7 @@ physical_page* get_free_page() {
     return (uint64_t) free_page;
 }
 
-physical_page* get_free_pages(uint64_t num_of_pages) {
+uint64_t get_free_pages(uint64_t num_of_pages) {
     if (get_free_pages_count() - num_of_pages < MIN_PAGES) {
         return NULL;
     }
