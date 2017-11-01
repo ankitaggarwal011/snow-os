@@ -16,6 +16,7 @@ uint32_t *loader_stack;
 extern char kernmem, physbase;
 
 void start(uint32_t *modulep, void *physbase, void *physfree) {
+    uint64_t base = 0x0, length = 0;
     struct smap_t {
         uint64_t base, length;
         uint32_t type;
@@ -25,9 +26,11 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
          smap < (struct smap_t *) ((char *) modulep + modulep[1] + 2 * 4); ++smap) {
         if (smap->type == 1 /* memory */ && smap->length != 0) {
             kprintf("Available Physical Memory [%p-%p]\n", smap->base, smap->base + smap->length);
-            init_physical_memory((uint64_t) physfree, smap->base, smap->length);
+            base = smap->base;
+            length = smap->length;
         }
     }
+    init_physical_memory((uint64_t) physfree, base, length);
     kprintf("physfree %p\n", (uint64_t) physfree);
     kprintf("tarfs in [%p:%p]\n", &_binary_tarfs_start, &_binary_tarfs_end);
     while (1);

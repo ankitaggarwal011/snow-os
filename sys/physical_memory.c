@@ -21,7 +21,7 @@ void init_physical_memory(uint64_t physfree, uint64_t base, uint64_t length) {
     max_pages_available = physical_mem_size / PAGE_SIZE; // 4k for each page
     memset((uint64_t *)base_addr, 0x0, physical_mem_size);
     for (uint64_t i = base_addr; i < physical_mem_size; i += PAGE_SIZE) {
-        physical_page page = {base_addr, page_number, NULL};
+        physical_page page = {i, page_number, NULL};
         free_list->next = &page;
         page_number++;
     }
@@ -34,7 +34,7 @@ uint64_t get_free_pages_count() {
 
 uint64_t get_free_page() {
     if (get_free_pages_count() < MIN_PAGES) {
-        return NULL;
+        return 0x0;
     }
     physical_page* free_page = free_list;
     free_list = free_list->next;
@@ -45,7 +45,7 @@ uint64_t get_free_page() {
 
 uint64_t get_free_pages(uint64_t num_of_pages) {
     if (get_free_pages_count() - num_of_pages < MIN_PAGES) {
-        return NULL;
+        return 0x0;
     }
     uint64_t pages = num_of_pages - 1;
     physical_page* free_pages = free_list;
