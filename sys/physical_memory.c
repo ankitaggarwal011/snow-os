@@ -5,6 +5,12 @@
 #define PAGE_SIZE 4096
 #define MIN_PAGES 10
 
+typedef struct physical_page {
+    uint64_t addr;
+    uint64_t index;
+    struct physical_page *next;
+} physical_page;
+
 physical_page *free_list;
 uint64_t max_pages_available = 0, pages_used = 0, base_addr = 0x0, physical_mem_size = 0;
 
