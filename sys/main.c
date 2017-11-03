@@ -31,15 +31,13 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
             length = smap->length;
         }
     }
-    init_physical_memory((uint64_t) physfree, base, length);
-    init_paging((uint64_t) &kernmem, (uint64_t) physbase, (uint64_t) physfree);
+    
     kprintf("physfree %p\n", (uint64_t) physfree);
     kprintf("tarfs in [%p:%p]\n", &_binary_tarfs_start, &_binary_tarfs_end);
-    /*
-    uint64_t new_page = get_free_page();
-    kprintf("New page address: %x\n", new_page);
-    add_back_free_pages(new_page, 1);
-    */
+
+    init_physical_memory((uint64_t) physfree, base, length);
+    init_paging((uint64_t) &kernmem, (uint64_t) physbase, (uint64_t) physfree);
+
     while (1);
 }
 
