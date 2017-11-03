@@ -9,7 +9,7 @@
 #include <sys/keyboard.h>
 #include <sys/string.h>
 #include <sys/physical_memory.h>
-// #include <sys/paging.h>
+#include <sys/paging.h>
 
 #define INITIAL_STACK_SIZE 4096
 uint8_t initial_stack[INITIAL_STACK_SIZE]__attribute__((aligned(16)));
