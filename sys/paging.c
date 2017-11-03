@@ -74,11 +74,12 @@ void _cr3() {
 
 void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
     uint64_t kernel_pages = (physfree - physbase) / PAGE_SIZE;
+    // kprintf("Kernel pages: %d\n", kernel_pages);
     cr3 = get_free_page();
     pml4_t = (uint64_t *) (kernmem + cr3);
     pml4_t[510] = cr3 | 3; // page is present and writable
     setup_page_tables(kernmem);
-    map_virtual_to_physical(kernmem, physbase, kernel_pages, kernmem);
+    map_virtual_to_physical(kernmem, physbase, kernel_pages, kernmem + get_free_pages_count());
     map_video_memory(kernmem + PHYS_VIDEO_MEM, PHYS_VIDEO_MEM);
     _cr3(cr3);
 }
