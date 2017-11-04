@@ -29,7 +29,7 @@ void setup_page_tables(uint64_t virtual, uint64_t physical) {
     pte_t[offset_pte] = physical | 3UL;
 }
 
-void set_new_cr3(cr3_addr) {
+void set_new_cr3(uint64_t cr3_addr) {
     __asm__ __volatile__ (
         "movq %0, %%cr3;" 
         :: 
