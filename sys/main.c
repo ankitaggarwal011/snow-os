@@ -40,6 +40,8 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
     init_physical_memory((uint64_t) physfree, base, length);
     init_paging((uint64_t) &kernmem, (uint64_t) physbase, (uint64_t) physfree);
 
+    kprintf("Paging works!");
+
     while (1);
 }
 

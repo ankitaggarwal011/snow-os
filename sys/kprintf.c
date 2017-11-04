@@ -1,12 +1,13 @@
+#include <sys/defs.h>
 #include <sys/kprintf.h>
 #include <sys/stdarg.h>
 #include <sys/string.h>
 
-long currentRow = 0;
-long currentColumn = 0;
+uint64_t currentRow = 0;
+uint64_t currentColumn = 0;
 va_list args;
 
-char *getAddress(long row, long column) {
+char *getAddress(uint64_t row, uint64_t column) {
     return (char *) (VIDEO_BASE_ADDRESS + 2 * (VIDEO_MEM_COLUMNS * row + column));
 }
 
@@ -60,10 +61,10 @@ void printSpecial(int argNumber, format_type ft) {
         int));
     } else if (ft == HEX) {
         printHex(va_arg(args,
-        long), 0);
+        uint64_t), 0);
     } else if (ft == VOID) {
         printHex(va_arg(args,
-        long), 1);
+        uint64_t), 1);
     } else if (ft == CHAR) {
         printChar(va_arg(args,
         int));
@@ -118,15 +119,15 @@ void printString(char *c) {
     }
 }
 
-long mod(long x) {
+uint64_t mod(uint64_t x) {
     return x > 0 ? x : -x;
 }
 
-void printLong(long x) {
+void printLong(uint64_t x) {
     char buf[66];
     int i = 65;
     buf[i--] = '\0';
-    long numCopy = mod(x);
+    uint64_t numCopy = mod(x);
     do {
         buf[i--] = 48 + numCopy % 10;
         numCopy /= 10;
@@ -139,11 +140,11 @@ void printLong(long x) {
     printString(buf + i);
 }
 
-void printHex(long x, int include_prefix) {
+void printHex(uint64_t x, int include_prefix) {
     char buf[19];
     int i = 18;
     buf[i--] = '\0';
-    long numCopy = mod(x);
+    uint64_t numCopy = mod(x);
     do {
         int remain = numCopy % 16;
         if (remain < 10) {
@@ -162,7 +163,7 @@ void printHex(long x, int include_prefix) {
     printString(buf + i);
 }
 
-void printTime(long x) {
+void printTime(uint64_t x) {
     x /= 100;
     char *time_address = getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS - 40);
     for (int j = 0; j < 80; j += 2) {
