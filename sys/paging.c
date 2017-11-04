@@ -6,7 +6,7 @@
 #define PHYS_VIDEO_MEM 0xB8000
 #define ENTRIES 512
 
-uint64_t cr3_addr, *pml4_t, kernel_virtual_base;
+uint64_t *pml4_t, kernel_virtual_base;
 
 void setup_page_tables(uint64_t virtual, uint64_t physical) {
     uint64_t *pdpe_t = NULL, *pde_t = NULL, *pte_t = NULL;
@@ -16,23 +16,20 @@ void setup_page_tables(uint64_t virtual, uint64_t physical) {
              offset_pml4 = 0x1FF & (virtual >> 39);
     if ((pml4_t[offset_pml4] & 1UL) != 1UL) { // it is not present
         pml4_t[offset_pml4] = get_free_page() | 3UL; // page is present and writable
-        kprintf("PDPE: %x\n", pml4_t[offset_pml4]);
     }
     pdpe_t = (uint64_t*) (kernel_virtual_base + pml4_t[offset_pml4]);
     if ((pdpe_t[offset_pdpe] & 1UL) != 1UL) {
         pdpe_t[offset_pdpe] = get_free_page() | 3UL;
-        kprintf("PDE: %x\n", pdpe_t[offset_pdpe]);
     }
     pde_t = (uint64_t*) (kernel_virtual_base + pdpe_t[offset_pdpe]);
     if ((pde_t[offset_pde] & 1UL) != 1UL) {
         pde_t[offset_pde] = get_free_page() | 3UL;
-        kprintf("PTE: %x\n", pde_t[offset_pde]);
     }
     pte_t = (uint64_t*) (kernel_virtual_base + pde_t[offset_pde]);
     pte_t[offset_pte] = physical | 3UL;
 }
 
-void _cr3() {
+void set_new_cr3(cr3_addr) {
     __asm__ __volatile__ (
         "movq %0, %%cr3;" 
         :: 
@@ -41,16 +38,14 @@ void _cr3() {
 }
 
 void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
-    uint64_t i = 0x0;
+    uint64_t cr3_addr = get_free_page(), i = 0x0;
     kernel_virtual_base = kernmem - physbase;
-    cr3_addr = get_free_page();
     pml4_t = (uint64_t *) (kernel_virtual_base + cr3_addr);
-    kprintf("PML4: %x\n", pml4_t);
     pml4_t[510] = cr3_addr | 3UL;
     while (physbase + i < physfree) {
         setup_page_tables(kernmem + i, physbase + i);
         i += PAGE_SIZE;
     }
     setup_page_tables(kernel_virtual_base + PHYS_VIDEO_MEM, PHYS_VIDEO_MEM);
-    _cr3();
+    set_new_cr3(cr3_addr);
 }
