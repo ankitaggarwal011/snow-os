@@ -22,5 +22,6 @@ typedef uint64_t off_t;
 typedef uint32_t pid_t;
 
 void* memset(void* a, int v, size_t b);
+void* memset_byte(void* a, uint64_t v, uint64_t b);
 
 #endif
