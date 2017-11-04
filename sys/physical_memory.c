@@ -19,7 +19,7 @@ void init_physical_memory(uint64_t physfree, uint64_t base, uint64_t length) {
     physical_mem_size = base + length;
     max_free_pages_available = (physical_mem_size - physfree - PAGES_OFFSET * PAGE_SIZE) / PAGE_SIZE; // 4k for each page
     max_pages_available = physical_mem_size / PAGE_SIZE;
-    memset_byte((uint64_t *)physfree, (uint64_t) 0x0, (uint64_t)((max_pages_available + PAGES_OFFSET) * PAGE_SIZE));
+    memset_byte((uint64_t *)physfree, (uint64_t) 0x0, (uint64_t)(((max_pages_available + PAGES_OFFSET) * PAGE_SIZE) / 8));
     for (uint64_t pg = 0; pg < max_pages_available; pg++) {
         page_descriptor[pg].page_number = pg;
         if (pg < max_pages_available - 1) {
