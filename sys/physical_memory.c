@@ -1,7 +1,7 @@
 #include <sys/defs.h>
 #include <sys/kprintf.h>
 
-#define PAGES_OFFSET 1000
+#define PAGES_OFFSET 0
 #define PAGE_SIZE 4096
 #define MIN_PAGES 10
 #define MAX_PAGES 262144
@@ -19,7 +19,6 @@ void init_physical_memory(uint64_t physfree, uint64_t base, uint64_t length) {
     physical_mem_size = base + length;
     max_free_pages_available = (physical_mem_size - physfree - PAGES_OFFSET * PAGE_SIZE) / PAGE_SIZE; // 4k for each page
     max_pages_available = physical_mem_size / PAGE_SIZE;
-    memset_byte((uint64_t *)physfree, (uint64_t) 0x0, (uint64_t)(((max_pages_available + PAGES_OFFSET) * PAGE_SIZE) / 8));
     for (uint64_t pg = 0; pg < max_pages_available; pg++) {
         page_descriptor[pg].page_number = pg;
         if (pg < max_pages_available - 1) {
@@ -29,8 +28,8 @@ void init_physical_memory(uint64_t physfree, uint64_t base, uint64_t length) {
             free_list = &page_descriptor[pg];
         }
     }
-    // kprintf("Base address: %p, memory size: %d, max pages available: %d, max free pages available: %d\n", base_addr, physical_mem_size, max_pages_available, max_free_pages_available);
-    // kprintf("Free list starts from: %p\n", free_list->page_number * PAGE_SIZE);
+    kprintf("Base address: %p, memory size: %d, max pages available: %d, max free pages available: %d\n", base_addr, physical_mem_size, max_pages_available, max_free_pages_available);
+    kprintf("Free list starts from: %p\n", free_list->page_number * PAGE_SIZE);
 }
 
 uint64_t get_free_pages_count() {
@@ -44,6 +43,7 @@ uint64_t get_free_page() {
     uint64_t free_page = free_list->page_number * PAGE_SIZE;
     free_list = free_list->next;
     pages_used++;
+    memset((uint64_t *) free_page, 0x0, PAGE_SIZE);
     // kprintf("After allocating new page, free list starts from: %p\n", free_list->page_number * PAGE_SIZE);
     return free_page;
 }
@@ -55,6 +55,7 @@ uint64_t get_free_pages(uint64_t num_of_pages) {
     uint64_t free_pages = free_list->page_number * PAGE_SIZE;
     free_list = &page_descriptor[free_list->page_number + num_of_pages];
     pages_used += num_of_pages;
+    memset((uint64_t *) free_pages, 0x0, num_of_pages * PAGE_SIZE);
     return free_pages;
 }
 

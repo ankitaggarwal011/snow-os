@@ -9,6 +9,7 @@
 uint64_t *pml4_t, kernel_virtual_base;
 
 void setup_page_tables(uint64_t virtual, uint64_t physical) {
+    // kprintf("Virtual: %x, Physical: %x\n", virtual, physical);
     uint64_t *pdpe_t = NULL, *pde_t = NULL, *pte_t = NULL;
     uint32_t offset_pte = 0x1FF & (virtual >> 12),
              offset_pde = 0x1FF & (virtual >> 21),
@@ -34,12 +35,13 @@ void set_new_cr3(uint64_t cr3_addr) {
     __asm__ __volatile__ (
         "movq %0, %%cr3;" 
         :: 
-        "r"(cr3_addr)
+        "=r"(cr3_addr)
     );
 }
 
 void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
     uint64_t cr3_addr = get_free_page(), i = 0x0;
+    kprintf("Kernel pages: %d\n", (physfree - physbase) / PAGE_SIZE);
     kernel_virtual_base = kernmem - physbase;
     pml4_t = (uint64_t *) cr3_addr;
     pml4_t[510] = cr3_addr | 3UL;
