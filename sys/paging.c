@@ -16,18 +16,18 @@ void setup_page_tables(uint64_t virtual, uint64_t physical) {
              offset_pdpe = 0x1FF & (virtual >> 30),
              offset_pml4 = 0x1FF & (virtual >> 39);
     if ((pml4_t[offset_pml4] & 1UL) != 1UL) { // it is not present
-        pml4_t[offset_pml4] = get_free_page() | 3UL; // page is present and writable
+        pml4_t[offset_pml4] = (get_free_page() << 12) | 3UL; // page is present and writable
     }
-    pdpe_t = (uint64_t*) pml4_t[offset_pml4];
+    pdpe_t = (uint64_t*) (pml4_t[offset_pml4] >> 12);
     if ((pdpe_t[offset_pdpe] & 1UL) != 1UL) {
-        pdpe_t[offset_pdpe] = get_free_page() | 3UL;
+        pdpe_t[offset_pdpe] = (get_free_page() << 12) | 3UL;
     }
-    pde_t = (uint64_t*) pdpe_t[offset_pdpe];
+    pde_t = (uint64_t*) (pdpe_t[offset_pdpe] >> 12);
     if ((pde_t[offset_pde] & 1UL) != 1UL) {
-        pde_t[offset_pde] = get_free_page() | 3UL;
+        pde_t[offset_pde] = (get_free_page() << 12) | 3UL;
     }
-    pte_t = (uint64_t*) pde_t[offset_pde];
-    pte_t[offset_pte] = physical | 3UL;
+    pte_t = (uint64_t*) (pde_t[offset_pde] >> 12);
+    pte_t[offset_pte] = (physical << 12) | 3UL;
     // kprintf("PML4: %p, PDPE: %p, PDE: %p, PTE: %p, Physical: %p\n", pml4_t, pdpe_t, pde_t, pte_t, pte_t[offset_pte]);
 }
 
@@ -40,7 +40,7 @@ void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
     kprintf("Kernel pages: %d\n", (physfree - physbase) / PAGE_SIZE);
     kernel_virtual_base = kernmem - physbase;
     pml4_t = (uint64_t *) cr3_addr;
-    pml4_t[510] = cr3_addr | 3UL;
+    pml4_t[510] = (cr3_addr << 12) | 3UL;
     while (physbase + i < physfree) {
         setup_page_tables(kernmem + i, physbase + i);
         i += PAGE_SIZE;

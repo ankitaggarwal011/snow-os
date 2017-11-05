@@ -27,7 +27,7 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
          smap < (struct smap_t *) ((char *) modulep + modulep[1] + 2 * 4); ++smap) {
         if (smap->type == 1 /* memory */ && smap->length != 0) {
             kprintf("Available Physical Memory [%p-%p]\n", smap->base, smap->base + smap->length);
-            if (smap->base >= physbase) {
+            if (smap->base <= (uint64_t) physfree && smap->base + smap->length > (uint64_t) physfree) {
                 base = smap->base;
                 length = smap->length;
             }
