@@ -4,7 +4,7 @@
 #define PAGES_OFFSET 0
 #define PAGE_SIZE 4096
 #define MIN_PAGES 10
-#define MAX_PAGES 262144
+#define MAX_PAGES 25000
 
 struct physical_page {
     uint64_t page_number;
