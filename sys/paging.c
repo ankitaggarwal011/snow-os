@@ -17,15 +17,15 @@ void setup_page_tables(uint64_t virtual, uint64_t physical) {
     if ((pml4_t[offset_pml4] & 1UL) != 1UL) { // it is not present
         pml4_t[offset_pml4] = get_free_page() | 3UL; // page is present and writable
     }
-    pdpe_t = (uint64_t*) (kernel_virtual_base + pml4_t[offset_pml4]);
+    pdpe_t = (uint64_t*) pml4_t[offset_pml4];
     if ((pdpe_t[offset_pdpe] & 1UL) != 1UL) {
         pdpe_t[offset_pdpe] = get_free_page() | 3UL;
     }
-    pde_t = (uint64_t*) (kernel_virtual_base + pdpe_t[offset_pdpe]);
+    pde_t = (uint64_t*) pdpe_t[offset_pdpe];
     if ((pde_t[offset_pde] & 1UL) != 1UL) {
         pde_t[offset_pde] = get_free_page() | 3UL;
     }
-    pte_t = (uint64_t*) (kernel_virtual_base + pde_t[offset_pde]);
+    pte_t = (uint64_t*) pde_t[offset_pde];
     pte_t[offset_pte] = physical | 3UL;
     // kprintf("PML4: %p, PDPE: %p, PDE: %p, PTE: %p, Physical: %p\n", pml4_t, pdpe_t, pde_t, pte_t, pte_t[offset_pte]);
 }
@@ -41,7 +41,7 @@ void set_new_cr3(uint64_t cr3_addr) {
 void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
     uint64_t cr3_addr = get_free_page(), i = 0x0;
     kernel_virtual_base = kernmem - physbase;
-    pml4_t = (uint64_t *) (kernel_virtual_base + cr3_addr);
+    pml4_t = (uint64_t *) cr3_addr;
     pml4_t[510] = cr3_addr | 3UL;
     while (physbase + i < physfree) {
         setup_page_tables(kernmem + i, physbase + i);
