@@ -27,6 +27,7 @@ void setup_page_tables(uint64_t virtual, uint64_t physical) {
     }
     pte_t = (uint64_t*) (kernel_virtual_base + pde_t[offset_pde]);
     pte_t[offset_pte] = physical | 3UL;
+    // kprintf("PML4: %p, PDPE: %p, PDE: %p, PTE: %p, Physical: %p\n", pml4_t, pdpe_t, pde_t, pte_t, pte_t[offset_pte]);
 }
 
 void set_new_cr3(uint64_t cr3_addr) {
