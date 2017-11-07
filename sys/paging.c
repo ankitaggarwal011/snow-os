@@ -53,12 +53,12 @@ void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
     uint64_t cr3_addr = get_free_page(), v_i = kernmem, p_i = physbase;
     kernel_virtual_base = kernmem - physbase;
     pml4_t = (uint64_t *) (kernel_virtual_base + cr3_addr);
-    while (p_i < (physfree + get_free_pages_count() * PAGE_SIZE)) {
+    while (p_i < physfree) {
         setup_page_tables(v_i, p_i);
-        setup_page_tables(p_i, p_i); // 1 : 1 mapping
         v_i += PAGE_SIZE;
         p_i += PAGE_SIZE;
     }
     setup_page_tables(kernel_virtual_base + PHYS_VIDEO_MEM, PHYS_VIDEO_MEM);
+    kprintf("Free pages now: %d\n", get_free_pages_count());
     set_new_cr3(cr3_addr);
 }

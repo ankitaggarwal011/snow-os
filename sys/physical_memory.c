@@ -1,10 +1,9 @@
 #include <sys/defs.h>
 #include <sys/kprintf.h>
 
-#define PAGES_OFFSET 0
 #define PAGE_SIZE 4096
 #define MIN_PAGES 10
-#define MAX_PAGES 25000
+#define MAX_PAGES 30000
 
 struct physical_page {
     uint64_t page_number;
@@ -17,14 +16,14 @@ uint64_t max_pages_available = 0, max_free_pages_available = 0, pages_used = 0, 
 
 void init_physical_memory(uint64_t physfree, uint64_t base, uint64_t length) {
     physical_mem_size = base + length;
-    max_free_pages_available = (physical_mem_size - physfree - PAGES_OFFSET * PAGE_SIZE) / PAGE_SIZE; // 4k for each page
+    max_free_pages_available = (physical_mem_size - physfree) / PAGE_SIZE; // 4k for each page
     max_pages_available = physical_mem_size / PAGE_SIZE;
     for (uint64_t pg = 0; pg < max_pages_available; pg++) {
         page_descriptor[pg].page_number = pg;
         if (pg < max_pages_available - 1) {
             page_descriptor[pg].next = &page_descriptor[pg + 1];
         }
-        if (pg * PAGE_SIZE == physfree + PAGES_OFFSET * PAGE_SIZE) {
+        if (pg * PAGE_SIZE == physfree) {
             free_list = &page_descriptor[pg];
         }
     }
