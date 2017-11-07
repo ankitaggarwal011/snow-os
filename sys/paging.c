@@ -53,8 +53,7 @@ void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
     uint64_t cr3_addr = get_free_page(), v_i = kernmem, p_i = physbase;
     kernel_virtual_base = kernmem - physbase;
     pml4_t = (uint64_t *) (kernel_virtual_base + cr3_addr);
-    pml4_t[510] = cr3_addr | 3UL;
-    while (p_i < physfree) {
+    while (p_i < (physfree + get_free_pages_count() * PAGE_SIZE)) { // 1:1 mapping
         setup_page_tables(v_i, p_i);
         v_i += PAGE_SIZE;
         p_i += PAGE_SIZE;

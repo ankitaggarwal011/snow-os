@@ -41,6 +41,12 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
     init_paging((uint64_t) &kernmem, (uint64_t) physbase, (uint64_t) physfree);
 
     kprintf("Paging works!");
+ 
+    // Testing 1:1 mapping
+    char *test;
+    test = (char*) 0xffffffff80290000;
+    test[0] = 'a'; test[1] = '\0';
+    kprintf("Testing 1:1 mapping: %s\n", test);
 
     while (1);
 }
