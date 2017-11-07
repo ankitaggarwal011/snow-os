@@ -44,7 +44,7 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
  
     // Testing 1:1 mapping
     char *test;
-    test = (char*) 0xffffffff80290000;
+    test = (char*) (kernmem - (uint64_t) physfree + get_free_page());
     test[0] = 'a'; test[1] = '\0';
     kprintf("Testing 1:1 mapping: %s\n", test);
 
