@@ -24,7 +24,7 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
     }__attribute__((packed)) *smap;
     while (modulep[0] != 0x9001) modulep += modulep[1] + 2;
     for (smap = (struct smap_t *) (modulep + 2);
-         smap < (struct smap_t *) ((char *) modulep + modulep[1] + 2 * 4); ++smap) {
+        smap < (struct smap_t *) ((char *) modulep + modulep[1] + 2 * 4); ++smap) {
         if (smap->type == 1 /* memory */ && smap->length != 0) {
             kprintf("Available Physical Memory [%p-%p]\n", smap->base, smap->base + smap->length);
             if (smap->base <= (uint64_t) physfree && smap->base + smap->length > (uint64_t) physfree) {
@@ -40,13 +40,11 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
     init_physical_memory((uint64_t) physfree, base, length);
     init_paging((uint64_t) &kernmem, (uint64_t) physbase, (uint64_t) physfree);
 
-    kprintf("Paging works!");
- 
-    // Testing 1:1 mapping
-    char *test;
-    test = (char*) (0xffffffff80000000 + get_free_page());
+    kprintf("Paging works!\n");
+    
+    char *test = (char*) kmalloc(2);
     test[0] = 'a'; test[1] = '\0';
-    kprintf("Testing 1:1 mapping: %s\n", test);
+    kprintf("Testing: %s\n", test);
 
     while (1);
 }
