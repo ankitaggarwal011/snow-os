@@ -5,6 +5,7 @@
 #define PAGE_SIZE 4096
 #define PHYS_VIDEO_MEM 0xB8000
 #define ENTRIES 512
+#define PAGES_USED_FOR_PT 10
 
 uint64_t *pml4_t, kernel_virtual_base;
 
@@ -53,7 +54,7 @@ void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
     uint64_t cr3_addr = get_free_page(), v_i = kernmem, p_i = physbase;
     kernel_virtual_base = kernmem - physbase;
     pml4_t = (uint64_t *) (kernel_virtual_base + cr3_addr);
-    while (p_i <= (physfree + 10 * 4096)) {
+    while (p_i <= (physfree + PAGES_USED_FOR_PT * PAGE_SIZE)) {
         setup_page_tables(v_i, p_i);
         v_i += PAGE_SIZE;
         p_i += PAGE_SIZE;

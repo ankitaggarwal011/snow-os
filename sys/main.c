@@ -44,7 +44,8 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
     
     char *test = (char*) kmalloc(2);
     test[0] = 'a'; test[1] = '\0';
-    kprintf("Testing: %s\n", test);
+    kprintf("Testing kmalloc: %s\n", test);
+    kprintf("kmalloc works!\n");
 
     while (1);
 }
