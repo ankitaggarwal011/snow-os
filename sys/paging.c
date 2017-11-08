@@ -53,7 +53,7 @@ void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
     uint64_t cr3_addr = get_free_page(), v_i = kernmem, p_i = physbase;
     kernel_virtual_base = kernmem - physbase;
     pml4_t = (uint64_t *) (kernel_virtual_base + cr3_addr);
-    while (p_i <= physfree) {
+    while (p_i <= (physfree + 10 * 4096)) {
         setup_page_tables(v_i, p_i);
         v_i += PAGE_SIZE;
         p_i += PAGE_SIZE;
@@ -64,7 +64,13 @@ void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
 
 void* kmalloc(uint32_t bytes_required) {
     uint32_t no_of_pages = (bytes_required / PAGE_SIZE) + 1;
-    uint64_t ph_addr = get_free_pages(no_of_pages);
-    setup_page_tables(kernel_virtual_base + ph_addr, ph_addr);
-    return (void*) (kernel_virtual_base + ph_addr);
+    uint64_t allocated_addr = 0x0;
+    for (uint32_t i = 0; i < no_of_pages; i++) {
+        uint64_t ph_addr = get_free_page();
+        if (i == 0) {
+            allocated_addr = ph_addr;
+        }
+        setup_page_tables(kernel_virtual_base + allocated_addr + i * PAGE_SIZE, ph_addr);
+    }
+    return (void*) (kernel_virtual_base + allocated_addr);
 }

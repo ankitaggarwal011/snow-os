@@ -12,12 +12,13 @@ struct physical_page {
 
 struct physical_page *free_list;
 struct physical_page page_descriptor[MAX_PAGES];
-uint64_t max_pages_available = 0, max_free_pages_available = 0, pages_used = 0, base_addr = 0x0, physical_mem_size = 0;
+uint64_t max_pages_available = 0, max_free_pages_available = 0, pages_used = 0, base_addr = 0x0, physical_mem_size = 0, free_page;
 
 void init_physical_memory(uint64_t physfree, uint64_t base, uint64_t length) {
     physical_mem_size = base + length;
     max_free_pages_available = (physical_mem_size - physfree) / PAGE_SIZE; // 4k for each page
     max_pages_available = physical_mem_size / PAGE_SIZE;
+    memset((uint64_t *) physfree, (uint64_t) 0x0, (max_free_pages_available * PAGE_SIZE) / 8);
     for (uint64_t pg = 0; pg < max_pages_available; pg++) {
         page_descriptor[pg].page_number = pg;
         if (pg < max_pages_available - 1) {
@@ -39,10 +40,9 @@ uint64_t get_free_page() {
     if (get_free_pages_count() < MIN_PAGES) {
         return 0x0;
     }
-    uint64_t free_page = free_list->page_number * PAGE_SIZE;
+    free_page = free_list->page_number * PAGE_SIZE;
     free_list = free_list->next;
     pages_used++;
-    memset((uint64_t *) free_page, 0x0, PAGE_SIZE);
     // kprintf("After allocating new page, free list starts from: %p\n", free_list->page_number * PAGE_SIZE);
     return free_page;
 }
@@ -51,11 +51,10 @@ uint64_t get_free_pages(uint64_t num_of_pages) {
     if (get_free_pages_count() - num_of_pages < MIN_PAGES) {
         return 0x0;
     }
-    uint64_t free_pages = free_list->page_number * PAGE_SIZE;
+    free_page = free_list->page_number * PAGE_SIZE;
     free_list = &page_descriptor[free_list->page_number + num_of_pages];
     pages_used += num_of_pages;
-    memset((uint64_t *) free_pages, 0x0, num_of_pages * PAGE_SIZE);
-    return free_pages;
+    return free_page;
 }
 
 void add_back_free_pages(uint64_t page_addr, uint64_t num_of_pages) {
