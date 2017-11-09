@@ -5,7 +5,7 @@
 #define PAGE_SIZE 4096
 #define PHYS_VIDEO_MEM 0xB8000
 #define ENTRIES 512
-#define PAGES_USED_FOR_PT 10
+#define PAGES_USED_FOR_PT 1000
 
 uint64_t *pml4_t, kernel_virtual_base;
 
