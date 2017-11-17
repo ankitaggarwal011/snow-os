@@ -117,7 +117,7 @@ void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
 void* kmalloc(uint32_t bytes_required) {
     uint32_t no_of_pages;
 
-    if (bytes_required % PAGE_SIZE) {gst
+    if (bytes_required % PAGE_SIZE) {
         no_of_pages = (bytes_required / PAGE_SIZE) + 1;
     } else {
         no_of_pages = (bytes_required / PAGE_SIZE);
