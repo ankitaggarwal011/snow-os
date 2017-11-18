@@ -55,19 +55,19 @@ void kprintf(const char *fmt, ...) {
 void printSpecial(int argNumber, format_type ft) {
     if (ft == STRING) {
         printString(va_arg(args,
-        char*));
+                           char * ));
     } else if (ft == INT) {
         printLong(va_arg(args,
-        int));
+                         int));
     } else if (ft == HEX) {
         printHex(va_arg(args,
-        uint64_t), 0);
+                        uint64_t), 0);
     } else if (ft == VOID) {
         printHex(va_arg(args,
-        uint64_t), 1);
+                        uint64_t), 1);
     } else if (ft == CHAR) {
         printChar(va_arg(args,
-        int));
+                         int));
     }
 }
 
@@ -85,8 +85,8 @@ void printChar(char c) {
     if (c == '\n') {
         if (currentRow == VIDEO_MEM_ROWS - 1) {
             currentRow = 0;
-            memcpy(getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS), getAddress(0, 0),
-                   2 * VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
+            memcpy(getAddress(0, 0), getAddress(VIDEO_MEM_ROWS / 2, VIDEO_MEM_COLUMNS / 2),
+                   VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
             resetVideoMemory(' ', DEFAULT_COLOR);
 
 
@@ -101,8 +101,8 @@ void printChar(char c) {
     if (currentColumn == VIDEO_MEM_COLUMNS - 1) {
         if (currentRow == VIDEO_MEM_ROWS - 1) {
             currentRow = 0;
-            memcpy(getAddress(VIDEO_MEM_ROWS, VIDEO_MEM_COLUMNS), getAddress(0, 0),
-                   2 * VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
+            memcpy(getAddress(0, 0), getAddress(VIDEO_MEM_ROWS / 2, VIDEO_MEM_COLUMNS / 2),
+                   VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
             resetVideoMemory(' ', DEFAULT_COLOR);
         } else {
             currentRow++;
