@@ -60,8 +60,9 @@ static uint64_t gdt[MAX_GDT] = {
   0, /*** NULL descriptor ***/
   GDT_CS | P | DPL0 | L, /*** kernel code segment descriptor ***/
   GDT_DS | P | W | DPL0, /*** kernel data segment descriptor ***/
-  GDT_CS | P | DPL3 | L, /*** user code segment descriptor ***/
+  0,                     /*** user data segment descriptor (32-bit) ***/
   GDT_DS | P | W | DPL3, /*** user data segment descriptor ***/
+  GDT_CS | P | DPL3 | L, /*** user code segment descriptor (64-bit) ***/
   0, 0, /*** TSS ***/
 };
 static struct gdtr_t gdtr = { sizeof(gdt), (uint64_t)gdt };
@@ -70,7 +71,7 @@ static struct tss_t tss;
 void _x86_64_asm_lgdt(struct gdtr_t *gdtr, uint64_t cs_idx, uint64_t ds_idx);
 void _x86_64_asm_ltr(uint64_t tss_idx);
 void init_gdt() {
-  struct sys_segment_descriptor *sd = (struct sys_segment_descriptor*)&gdt[5]; // 6th&7th entry in GDT
+  struct sys_segment_descriptor *sd = (struct sys_segment_descriptor*)&gdt[6]; // 7th&8th entry in GDT
   sd->sd_lolimit = sizeof(struct tss_t) - 1;
   sd->sd_lobase = ((uint64_t)&tss);
   sd->sd_type = 9; // TSS
@@ -81,7 +82,7 @@ void init_gdt() {
   sd->sd_hibase = ((uint64_t)&tss) >> 24;
 
   _x86_64_asm_lgdt(&gdtr, 8, 16);
-  _x86_64_asm_ltr(0x28);
+  _x86_64_asm_ltr(0x30);
 }
 
 void set_tss_rsp(void *rsp) {
