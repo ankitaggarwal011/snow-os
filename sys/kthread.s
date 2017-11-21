@@ -44,7 +44,4 @@ switch_to:
     pop %rdx
     pop %rcx
     pop %rax
-    // current rsp value should go to callq
-    //movq %rsp, %rdi
-    //callq set_tss_rsp
     retq

@@ -7,4 +7,7 @@ _jump_usermode:
      pushfq
      pushq $0x2B
      pushq %rdi
+     // current rsp value should go to callq
+     movq %rsp, %rdi
+     callq set_tss_rsp
      iretq

@@ -6,98 +6,62 @@
 #define PHYS_VIDEO_MEM 0xB8000
 #define ENTRIES 512
 
+#define KERNEL_R_W_FLAGS 0x7
+#define USER_R_W_FLAGS 0x7
+
 uint64_t *pml4_t, kernel_virtual_base;
 
-void setup_page_tables(uint64_t virtual, uint64_t physical) {
+void update_page_tables(uint64_t virtual, uint64_t physical, uint16_t flags) {
     uint64_t *pdpe_t = NULL, *pde_t = NULL, *pte_t = NULL;
     uint64_t pdpe, pde, pte;
-    uint32_t offset_pte = 0x1FF & (virtual >> 12),
-             offset_pde = 0x1FF & (virtual >> 21),
-             offset_pdpe = 0x1FF & (virtual >> 30),
-             offset_pml4 = 0x1FF & (virtual >> 39);
-    
+    uint32_t
+    offset_pte = 0x1FF & (virtual >> 12),
+    offset_pde = 0x1FF & (virtual >> 21),
+    offset_pdpe = 0x1FF & (virtual >> 30),
+    offset_pml4 = 0x1FF & (virtual >> 39);
+
     if ((pml4_t[offset_pml4] & 1UL) != 1UL) {
         pdpe = get_free_page();
-    }
-    else {
-        pdpe = pml4_t[offset_pml4] ^ 3UL;
-    }
-    pml4_t[offset_pml4] = pdpe | 3UL; // page is present and writable
-    pdpe_t = (uint64_t *) (kernel_virtual_base + pdpe);
-
-    if ((pdpe_t[offset_pdpe] & 1UL) != 1UL) {
-        pde = get_free_page();
-    }
-    else {
-        pde = pdpe_t[offset_pdpe] ^ 3UL;
-    }
-    pdpe_t[offset_pdpe] = pde | 3UL;
-    pde_t = (uint64_t *) (kernel_virtual_base + pde);
-
-    if ((pde_t[offset_pde] & 1UL) != 1UL) {
-        pte = get_free_page();
-    }
-    else {
-        pte = pde_t[offset_pde] ^ 3UL;
-    }
-    pde_t[offset_pde] = pte | 3UL;
-    pte_t = (uint64_t *) (kernel_virtual_base + pte);
-    pte_t[offset_pte] = physical | 3UL;
-}
-
-void update_page_tables(uint64_t virtual, uint64_t physical, uint64_t flags) {
-    uint64_t *pdpe_t = NULL, *pde_t = NULL, *pte_t = NULL;
-    uint64_t pdpe, pde, pte;
-    uint32_t offset_pte = 0x1FF & (virtual >> 12),
-             offset_pde = 0x1FF & (virtual >> 21),
-             offset_pdpe = 0x1FF & (virtual >> 30),
-             offset_pml4 = 0x1FF & (virtual >> 39);
-    
-    if ((pml4_t[offset_pml4] & 1UL) != 1UL) {
-        pdpe = get_free_page();
-    }
-    else {
+    } else {
         pdpe = pml4_t[offset_pml4] ^ flags;
     }
     pml4_t[offset_pml4] = pdpe | flags; // page is present and writable
-    pdpe_t = (uint64_t *) (kernel_virtual_base + pdpe);
+    pdpe_t = (uint64_t * )(kernel_virtual_base + pdpe);
 
     if ((pdpe_t[offset_pdpe] & 1UL) != 1UL) {
         pde = get_free_page();
-    }
-    else {
+    } else {
         pde = pdpe_t[offset_pdpe] ^ flags;
     }
     pdpe_t[offset_pdpe] = pde | flags;
-    pde_t = (uint64_t *) (kernel_virtual_base + pde);
+    pde_t = (uint64_t * )(kernel_virtual_base + pde);
 
     if ((pde_t[offset_pde] & 1UL) != 1UL) {
         pte = get_free_page();
-    }
-    else {
+    } else {
         pte = pde_t[offset_pde] ^ flags;
     }
     pde_t[offset_pde] = pte | flags;
-    pte_t = (uint64_t *) (kernel_virtual_base + pte);
+    pte_t = (uint64_t * )(kernel_virtual_base + pte);
     pte_t[offset_pte] = physical | flags;
 }
 
 void set_new_cr3(uint64_t cr3_addr) {
-    __asm__ __volatile__ ("movq %0, %%cr3;" :: "r"(cr3_addr));
+    __asm__ __volatile__ ("movq %0, %%cr3;"::"r"(cr3_addr));
 }
 
 void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
     uint64_t cr3_addr = get_free_page(), v_i = kernmem, p_i = physbase;
     kernel_virtual_base = kernmem - physbase;
-    pml4_t = (uint64_t *) (kernel_virtual_base + cr3_addr);
+    pml4_t = (uint64_t * )(kernel_virtual_base + cr3_addr);
     // map all physical memory to virtual memory (identity mapping)
     // better choice for 64 bit systems (used by Linux)
     while (p_i < (physfree + get_free_pages_count() * PAGE_SIZE)) {
-        setup_page_tables(v_i, p_i);
+        update_page_tables(v_i, p_i, KERNEL_R_W_FLAGS);
         v_i += PAGE_SIZE;
         p_i += PAGE_SIZE;
     }
-    setup_page_tables(kernel_virtual_base + PHYS_VIDEO_MEM, PHYS_VIDEO_MEM);
+    update_page_tables(kernel_virtual_base + PHYS_VIDEO_MEM, PHYS_VIDEO_MEM, KERNEL_R_W_FLAGS);
     set_new_cr3(cr3_addr);
     /* this is causing bootloop, can be debugged later, not important at this stage
     // map physical memory from 0x0 to physbase
@@ -114,7 +78,7 @@ void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
     */
 }
 
-void* kmalloc(uint32_t bytes_required) {
+void *kmalloc(uint32_t bytes_required) {
     uint32_t no_of_pages;
 
     if (bytes_required % PAGE_SIZE) {
@@ -131,7 +95,7 @@ void* kmalloc(uint32_t bytes_required) {
         // give contiguous virtual space
         // this might lead to overwriting virtual address used by other process
         // check page bits to avoid that later on
-        setup_page_tables(kernel_virtual_base + allocated_addr + i * PAGE_SIZE, ph_addr);
+        update_page_tables(kernel_virtual_base + allocated_addr + i * PAGE_SIZE, ph_addr, KERNEL_R_W_FLAGS);
     }
-    return (void*) (kernel_virtual_base + allocated_addr);
+    return (void *) (kernel_virtual_base + allocated_addr);
 }
