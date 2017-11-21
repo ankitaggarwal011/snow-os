@@ -6,39 +6,48 @@ extern void switch_to(kthread_t **me, kthread_t *next);
 
 extern void set_rsp(uint64_t val);
 
+extern void _jump_usermode(void *starting_func_addr);
+
 void test_func_1();
 
 void test_func_2();
 
 void schedule();
 
+void user_test_func();
 
 kthread_t *t1, *t2;
 kthread_t *cur = NULL;
 //kthread_t *last = NULL;
 
 void test_func_1() {
-    int i = 0;
+    unsigned int i = 0;
     while (1) {
         i++;
-        if (i % 100 == 0) {
-            kprintf("Func 1: %d ", i);
+        if (i < 100000) {
+            if (i % 10000 == 0) {
+                kprintf("Func 1: %d ", i);
+            }
+            if (i % 20000 == 0) {
+                schedule();
+                _jump_usermode(user_test_func);
+            }
         }
-        if (i % 200 == 0) {
-            schedule();
-        }
+
     }
 }
 
 void test_func_2() {
-    int i = 0;
+    unsigned int i = 0;
     while (1) {
         i++;
-        if (i % 100 == 0) {
-            kprintf("Func 2: %d ", i);
-        }
-        if (i % 200 == 0) {
-            schedule();
+        if (i < 100000) {
+            if (i % 10000 == 0) {
+                kprintf("Func 2: %d ", i);
+            }
+            if (i % 20000 == 0) {
+                schedule();
+            }
         }
     }
 }
@@ -74,6 +83,9 @@ void init_kthreads() {
     t2->rsp_val = &(t2->k_stack[K_STACK_SIZE - 17]);
 }
 
+void user_test_func() {
+    kprintf("In user space\n");
+}
 
 void test_context_switch() {
 //    last = &t1;
