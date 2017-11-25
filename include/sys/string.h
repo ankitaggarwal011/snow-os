@@ -2,6 +2,8 @@
 #define STRING_H
 //typedef unsigned long size_t;
 
+#include <sys/defs.h>
+
 char* strcat(char *s1, const char *s2);
 int kstrcmp(char *s1, char *s2);
 int32_t o_to_d(int n);
