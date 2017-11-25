@@ -4,8 +4,8 @@
 #include <sys/string.h>
 #include <sys/tarfs.h>
 
-struct posix_header_ustar *start = (struct posix_header_ustar*) &_binary_tarfs_start;
-struct posix_header_ustar *end = (struct posix_header_ustar*) &_binary_tarfs_end;
+struct posix_header_ustar *tarfs_start = (struct posix_header_ustar*) &_binary_tarfs_tarfs_start;
+struct posix_header_ustar *tarfs_end = (struct posix_header_ustar*) &_binary_tarfs_tarfs_end;
 
 int atoi(char *str) {
     int sign = 1;
@@ -46,7 +46,7 @@ int o_to_d(int n) {
 }
 
 void print_all_files() {
-    struct posix_header_ustar *s = start;
+    struct posix_header_ustar *s = tarfs_start;
     do {
         int file_size = o_to_d(atoi(s->size));
         
@@ -57,11 +57,11 @@ void print_all_files() {
         } else {
             s++;
         }
-    } while(s < end);
+    } while(s < tarfs_end);
 }
 
 void* get_file(char *filename) {
-    struct posix_header_ustar *s = start;
+    struct posix_header_ustar *s = tarfs_start;
     do {
         int file_size = o_to_d(atoi(s->size));
         char *file = (char*) (s + 1);
@@ -76,7 +76,7 @@ void* get_file(char *filename) {
         } else {
             s++;
         }
-    } while(s < end);
+    } while(s < tarfs_end);
     
     kprintf("File not found.\n");
     return NULL;
