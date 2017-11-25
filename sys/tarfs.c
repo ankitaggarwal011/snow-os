@@ -4,8 +4,8 @@
 #include <sys/string.h>
 #include <sys/tarfs.h>
 
-struct posix_header_ustar *tarfs_start = (struct posix_header_ustar*) &_binary_tarfs_tarfs_start;
-struct posix_header_ustar *tarfs_end = (struct posix_header_ustar*) &_binary_tarfs_tarfs_end;
+struct posix_header_ustar *tarfs_start = (struct posix_header_ustar*) &_binary_tarfs_start;
+struct posix_header_ustar *tarfs_end = (struct posix_header_ustar*) &_binary_tarfs_end;
 
 int atoi(char *str) {
     int sign = 1;
