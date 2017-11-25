@@ -49,7 +49,9 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
     kprintf("Testing kmalloc: %s\n", test);
     kprintf("kmalloc works!\n");
 
-    test_context_switch();
+    // test_context_switch();
+
+    init_tarfs();
     while (1);
 }
 
