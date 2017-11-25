@@ -40,4 +40,6 @@ typedef struct {
   Elf64_Xword   p_align;
 } Elf64_Phdr;
 
+void load_file(char *filename);
+
 #endif

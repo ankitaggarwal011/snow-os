@@ -11,6 +11,7 @@
 #include <sys/physical_memory.h>
 #include <sys/paging.h>
 #include <sys/kthread.h>
+#include <sys/elf64.h>
 
 #define INITIAL_STACK_SIZE 4096
 uint8_t initial_stack[INITIAL_STACK_SIZE]__attribute__((aligned(16)));
@@ -52,6 +53,8 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
     // test_context_switch();
 
     init_tarfs();
+    load_file("bin/sbush");
+    
     while (1);
 }
 

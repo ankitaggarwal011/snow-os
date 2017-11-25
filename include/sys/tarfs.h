@@ -27,10 +27,6 @@ struct posix_header_ustar {
 void init_tarfs();
 void print_all_files();
 void* get_file(char *filename);
-
-int32_t oct_to_dec(int n);
-int32_t atoi(char *p);
-uint64_t pow(int a, int b);
-
+void* get_file_binary(char *filename);
 
 #endif
