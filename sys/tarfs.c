@@ -84,5 +84,5 @@ void* get_file(char *filename) {
 
 void init_tarfs() {
     print_all_files();
-    // get_file(char *filename);
+    kprintf("Location of bin/sbush: %p", get_file("bin/sbush"));
 }
