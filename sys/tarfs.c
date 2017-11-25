@@ -53,7 +53,7 @@ void* get_file_binary(char *filename) {
         int file_size = o_to_d(atoi(s->size));
         char *file = (char*) (s + 1);
         
-        if (s->typeflag == 0 && kstrcmp(filename, s->name) == 0) {
+        if (kstrcmp(filename, s->name) == 0 && atoi(s->typeflag) == 0) {
             kprintf("File found: Name: %s, Size: %d bytes, Type: %s\n", s->name, file_size, s->typeflag);  
             return (void*) file;
         }
