@@ -24,4 +24,13 @@ struct posix_header_ustar {
   char pad[12];
 };
 
+void init_tarfs();
+void print_all_files();
+void* get_file(char *filename);
+
+int32_t oct_to_dec(int n);
+int32_t atoi(char *p);
+uint64_t pow(int a, int b);
+
+
 #endif
