@@ -39,7 +39,7 @@ int o_to_d(int n) {
     while (n > 0) { 
         r = n % 10;
         n /= 10;
-        ans += (rem * pow(8, i));
+        ans += (r * pow(8, i));
         i++;
     }
     return ans;
@@ -49,7 +49,6 @@ void print_all_files() {
     struct posix_header_ustar *s = start;
     do {
         int file_size = o_to_d(atoi(s->size));
-        char *p = (char*) (s + 1);
         
         kprintf("Name: %s, Size: %d bytes, Type: %s\n", s->name, file_size, s->typeflag);
 
@@ -65,11 +64,11 @@ void* get_file(char *filename) {
     struct posix_header_ustar *s = start;
     do {
         int file_size = o_to_d(atoi(s->size));
-        char *p = (char*) (s + 1);
+        char *file = (char*) (s + 1);
         
-        if (kstrcmp(file_name, s->name) == 0) {
+        if (kstrcmp(filename, s->name) == 0) {
             kprintf("File found: Name: %s, Size: %d bytes, Type: %s\n", s->name, file_size, s->typeflag);  
-            return (void*) p;
+            return (void*) file;
         }
        
         if (file_size > 0) {
