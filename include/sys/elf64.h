@@ -1,6 +1,8 @@
 #ifndef _ELF64_H
 #define _ELF64_H
 
+#include <sys/defs.h>
+
 #define EI_NIDENT 16
 
 typedef uint64_t Elf64_Addr;
