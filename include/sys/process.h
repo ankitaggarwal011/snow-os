@@ -22,6 +22,7 @@
 
 int processes[MAX_P];
 
+void init_processes();
 kthread_t* create_process(char *filename);
 int getPID();
 
