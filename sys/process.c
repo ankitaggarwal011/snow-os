@@ -6,6 +6,7 @@
 #include <sys/elf64.h>
 #include <sys/process.h>
 #include <sys/kthread.h>
+#include <sys/paging.h>
 
 int getPID() {
     for(int i = 0; i < MAX_P; i++) {
@@ -27,14 +28,14 @@ kthread_t* create_process(char *filename) {
     kthread_t *new_process = (kthread_t *) kmalloc(sizeof(kthread_t *));
     new_process->pid = getPID();
 
-    new_process->cr3 = (uint64_t) setup_user_page_table();
+    new_process->cr3 = (uint64_t) setup_user_page_tables();
     uint64_t current_cr3 = get_cr3();
     set_new_cr3(new_process->cr3);
     struct mm_struct *process_mm = (struct mm_struct *) kmalloc(sizeof(struct mm_struct));
     new_process->process_mm = process_mm;
 
     void *kernel_stack = (void *)kmalloc(4096);
-    new_process->kernel_stack = ((uint64_t)kernel_stack + 4096 - 16);
+    new_process->k_stack = ((uint64_t)kernel_stack + 4096 - 16);
 
     load_file(new_process, char* filename);
 
