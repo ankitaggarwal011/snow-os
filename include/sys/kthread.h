@@ -1,7 +1,6 @@
 #ifndef PROJECT_KTHREAD_H
 
 #include <sys/defs.h>
-#include <sys/process.h>
 
 #define PROJECT_KTHREAD_H
 #define K_STACK_SIZE 4096

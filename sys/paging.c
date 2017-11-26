@@ -45,10 +45,9 @@ void update_page_tables(uint64_t virt_addr, uint64_t physical_addr, uint16_t fla
 }
 
 uint64_t* set_user_page_tables() {
-    uint64_t *user_pml4 = get_free_page();
-    uint64_t *current_pml4 = get_cr3();
-    current_pml4 = (uint64_t *)((uint64_t) current_pml4 | USER_VADDR);
-    (uint64_t *)((uint64_t) user_pml4 | USER_VADDR)[511] = current_pml4[511];
+    uint64_t *user_pml4 = (uint64_t *) get_free_page();
+    uint64_t *current_pml4 = (uint64_t *)(get_cr3() | USER_VADDR);
+    ((uint64_t *)((uint64_t) user_pml4 | USER_VADDR))[511] = current_pml4[511];
     return user_pml4;
 }
 
