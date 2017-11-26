@@ -17,6 +17,6 @@ void *kmalloc(uint32_t bytes_required);
 
 uint64_t get_cr3();
 
-uint64_t* setup_user_page_tables();
+uint64_t setup_user_page_tables();
 
 #endif
