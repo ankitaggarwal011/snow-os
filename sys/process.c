@@ -28,7 +28,7 @@ kthread_t* create_process(char *filename) {
     kthread_t *new_process = (kthread_t *) kmalloc(sizeof(kthread_t *));
     new_process->pid = getPID();
 
-    new_process->cr3 = (uint64_t) setup_user_page_tables();
+    new_process->cr3 = setup_user_page_tables();
     uint64_t current_cr3 = get_cr3();
     set_new_cr3(new_process->cr3);
     struct mm_struct *process_mm = (struct mm_struct *) kmalloc(sizeof(struct mm_struct));
