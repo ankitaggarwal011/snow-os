@@ -4,10 +4,11 @@
 #include <sys/string.h>
 #include <sys/tarfs.h>
 #include <sys/elf64.h>
+#include <sys/process.h>
 
 void load_file(char *filename) {
-    void *location = get_file_binary("bin/sbush");
-    kprintf("Location of bin/sbush: %p\n", location);
+    void *location = get_file_binary(filename);
+    kprintf("Location of %s: %p\n", filename, location);
     kprintf("Reading ELF64 header:\n");
 
     Elf64_Ehdr *ehdr = (Elf64_Ehdr *) location;
@@ -15,12 +16,28 @@ void load_file(char *filename) {
 
     kprintf("RIP: %x\n", ehdr->e_entry);
     int i = 0;
+    struct vma_struct *vma_map = NULL;
     while (i < ehdr->e_phnum) {
         if (phdr->p_type == 1) {
-            uint64_t vma_start = phdr->p_vaddr;
-            uint64_t vma_end = phdr->p_vaddr + phdr->p_memsz;
-            kprintf("VMA start: %x, VMA end: %x\n", vma_start, vma_end);
+            struct vma_struct *vma = (struct vma_struct*) kmalloc(sizeof(struct vma_struct));
+            vma->start = phdr->p_vaddr;
+            vma->end = phdr->p_vaddr + phdr->p_memsz;
+            vma->flags = phdr->p_flags;
+            vma->next = NULL;
+            if (*vma_map == NULL) {
+                vma_map = vma;
+            }
+            else {
+                vma_map->next = vma;
+            }
         }
+        phdr++;
         i++;
+    }
+    struct vma_struct *test;
+    kprintf("VMAs found: \n");
+    while (*test) {
+        kprintf("VMA start: %x, VMA end: %x\n", test->start, test->end);
+        test = test->next;
     }
 }
