@@ -59,7 +59,7 @@ void load_file(char *filename) {
         vma_map_iter->next = vma_heap;
     }
     else {
-        vma_map = vma;
+        vma_map = vma_heap;
     }
     vma_map_iter = vma_heap;
     struct vma_struct *vma_stack = (struct vma_struct*) kmalloc(sizeof(struct vma_struct));
