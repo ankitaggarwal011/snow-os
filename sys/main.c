@@ -12,6 +12,7 @@
 #include <sys/paging.h>
 #include <sys/kthread.h>
 #include <sys/elf64.h>
+#include <sys/process.h>
 
 #define INITIAL_STACK_SIZE 4096
 uint8_t initial_stack[INITIAL_STACK_SIZE]__attribute__((aligned(16)));
