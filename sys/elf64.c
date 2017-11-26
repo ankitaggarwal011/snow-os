@@ -7,17 +7,15 @@
 #include <sys/elf64.h>
 #include <sys/process.h>
 
-void load_file(char *filename) {
+void load_file(kthread_t* new_process, char *filename) {
     void *location = get_file_binary(filename);
     kprintf("Location of %s: %p\n", filename, location);
     kprintf("Reading ELF64 header:\n");
 
-    struct mm_struct *process = kmalloc(sizeof(struct mm_struct));
-
     Elf64_Ehdr *ehdr = (Elf64_Ehdr *) location;
     Elf64_Phdr *phdr = (Elf64_Phdr *)((uint64_t)ehdr + ehdr->e_phoff);
 
-    kprintf("Task RIP: %x\n", ehdr->e_entry);
+    new_process->rip = ehdr->e_entry;
     int i = 0;
 
     struct vma_struct *vma_map = NULL, *vma_map_iter = NULL;
@@ -73,8 +71,8 @@ void load_file(char *filename) {
     }
     vma_map_iter = vma_stack;
 
-    process->vma_map = vma_map;
-    struct vma_struct *test = process->vma_map;
+    new_process->process_mm->vma_map = vma_map;
+    struct vma_struct *test = new_process->process_mm->vma_map;
     kprintf("VMAs found: \n");
     while (test) {
         kprintf("VMA start: %x, VMA end: %x\n", test->start, test->end);

@@ -4,7 +4,7 @@
 #define HEAP_START 0x08000000
 #define STACK_START 0xF0000000
 
-#define CODE 1
+#define TEXT 1
 #define DATA 2
 #define HEAP 3
 #define STACK 4
@@ -13,6 +13,10 @@
 #define PR 0x4
 #define PW 0x2
 #define PX 0x1
+
+#define MAX_P 50
+
+int processes[MAX_P];
 
 struct vma_struct {
     uint64_t start;
@@ -28,3 +32,6 @@ struct mm_struct {
     uint64_t s_code, e_code;
     uint64_t stack, heap;
 };
+
+kthread_t* create_process(char *filename);
+int getPID();

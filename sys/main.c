@@ -53,7 +53,8 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
     // test_context_switch();
 
     init_tarfs();
-    load_file("bin/sbush");
+    init_processes();
+    create_process("bin/sbush");
     
     while (1);
 }

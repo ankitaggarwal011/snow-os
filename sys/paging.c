@@ -44,6 +44,20 @@ void update_page_tables(uint64_t virt_addr, uint64_t physical_addr, uint16_t fla
     pte_t[offset_pte] = physical_addr | flags;
 }
 
+uint64_t* set_user_page_tables() {
+    uint64_t *user_pml4 = get_free_page();
+    uint64_t *current_pml4 = get_cr3();
+    current_pml4 = (uint64_t *)((uint64_t) current_pml4 | USER_VADDR);
+    (uint64_t *)((uint64_t) user_pml4 | USER_VADDR)[511] = current_pml4[511];
+    return user_pml4;
+}
+
+uint64_t get_cr3() {
+    uint64_t cr3;
+    __asm__ __volatile__("movq %%cr3, %0;":"=r"(cr3));
+    return cr3;
+}
+
 void set_new_cr3(uint64_t cr3_addr) {
     __asm__ __volatile__ ("movq %0, %%cr3;"::"r"(cr3_addr));
 }
