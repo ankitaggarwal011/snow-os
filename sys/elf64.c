@@ -31,7 +31,7 @@ void load_file(char *filename) {
             uint64_t v_addr = (phdr->p_vaddr / PAGE_SIZE) * PAGE_SIZE;
             while(pages--) {
                 uint64_t page = get_free_page();
-                update_page_tables(v_addr, page, 0x7);
+                update_page_tables(v_addr, page, PAGING_USER_R_W_FLAGS);
                 v_addr += PAGE_SIZE;
             }
 
