@@ -8,14 +8,13 @@
 #include <sys/process.h>
 
 void load_file(char *filename) {
-    struct posix_header_ustar *file = (struct posix_header_ustar *) get_file_binary(filename);
-    void *location = (void*) (file + 1);
+    void *location = get_file_binary(filename);
     kprintf("Location of %s: %p\n", filename, location);
     kprintf("Reading ELF64 header:\n");
 
     struct mm_struct *process = kmalloc(sizeof(struct mm_struct));
 
-    Elf64_Ehdr *ehdr = (Elf64_Ehdr *) (location + 1);
+    Elf64_Ehdr *ehdr = (Elf64_Ehdr *) location;
     Elf64_Phdr *phdr = (Elf64_Phdr *)((uint64_t)ehdr + ehdr->e_phoff);
 
     kprintf("Task RIP: %x\n", ehdr->e_entry);
