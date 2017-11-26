@@ -1,4 +1,8 @@
+#ifndef _PROCESS_H
+#define _PROCESS_H
+
 #include <sys/defs.h>
+#include <sys/kthread.h>
 
 #define PAGE_SIZE 4096
 #define HEAP_START 0x08000000
@@ -35,3 +39,5 @@ struct mm_struct {
 
 kthread_t* create_process(char *filename);
 int getPID();
+
+#endif
