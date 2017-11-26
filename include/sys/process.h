@@ -22,21 +22,6 @@
 
 int processes[MAX_P];
 
-struct vma_struct {
-    uint64_t start;
-    uint64_t end;
-    uint64_t type;
-    uint64_t flags;
-    struct vma_struct *next;    
-};
-
-struct mm_struct {
-    struct vma_struct *vma_map;
-    uint64_t s_data, e_data;
-    uint64_t s_code, e_code;
-    uint64_t stack, heap;
-};
-
 kthread_t* create_process(char *filename);
 int getPID();
 
