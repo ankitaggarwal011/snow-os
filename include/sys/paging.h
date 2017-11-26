@@ -1,3 +1,6 @@
+#ifndef _PAGING_H
+#define _PAGING_H
+
 #include <sys/defs.h>
 
 #define PAGING_KERNEL_R_W_FLAGS 0x7 // change to 0x3. 0x7 value is a hack for now
@@ -15,3 +18,5 @@ void *kmalloc(uint32_t bytes_required);
 uint64_t get_cr3();
 
 uint64_t* setup_user_page_tables();
+
+#endif

@@ -1,4 +1,5 @@
-#ifndef PROJECT_KTHREAD_H
+#ifndef _KTHREAD_H
+#define _KTHREAD_H
 
 #include <sys/defs.h>
 
@@ -30,4 +31,4 @@ struct mm_struct {
 
 void test_context_switch();
 
-#endif //PROJECT_KTHREAD_H
+#endif

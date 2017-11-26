@@ -2,6 +2,7 @@
 #define _ELF64_H
 
 #include <sys/defs.h>
+#include <sys/kthread.h>
 
 #define EI_NIDENT 16
 
@@ -42,6 +43,6 @@ typedef struct {
   Elf64_Xword   p_align;
 } Elf64_Phdr;
 
-void load_file(char *filename);
+void load_file(kthread_t* new_process, char *filename);
 
 #endif
