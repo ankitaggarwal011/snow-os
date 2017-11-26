@@ -20,8 +20,7 @@ void load_file(char *filename) {
     kprintf("Task RIP: %x\n", ehdr->e_entry);
     int i = 0;
 
-    struct vma_struct *vma_map = NULL;
-    struct vma_struct *vma_map_iter = vma_map;
+    struct vma_struct *vma_map = NULL, *vma_map_iter;
     while (i < ehdr->e_phnum) {
         if (phdr->p_type == 1) {
             struct vma_struct *vma = (struct vma_struct*) kmalloc(sizeof(struct vma_struct));
@@ -42,6 +41,9 @@ void load_file(char *filename) {
             if (vma_map_iter != NULL) {
                 vma_map_iter->next = vma;
             }
+            else {
+                vma_map = vma;
+            }
             vma_map_iter = vma;
         }
         phdr++;
@@ -52,8 +54,12 @@ void load_file(char *filename) {
     vma_heap->end = HEAP_START + PAGE_SIZE;
     vma_heap->type = HEAP;
     vma_heap->flags = PR | PW;
+    vma_heap->next = NULL;
     if (vma_map_iter != NULL) {
         vma_map_iter->next = vma_heap;
+    }
+    else {
+        vma_map = vma;
     }
     vma_map_iter = vma_heap;
     struct vma_struct *vma_stack = (struct vma_struct*) kmalloc(sizeof(struct vma_struct));
@@ -61,6 +67,7 @@ void load_file(char *filename) {
     vma_stack->end = STACK_START;
     vma_stack->type = STACK;
     vma_stack->flags = PR | PW;
+    vma_stack->next = NULL;
     if (vma_map_iter != NULL) {
         vma_map_iter->next = vma_stack;
     }
