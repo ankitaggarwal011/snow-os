@@ -1,6 +1,7 @@
 #include <sys/defs.h>
 #include <sys/kprintf.h>
 #include <sys/physical_memory.h>
+#include <sys/paging.h>
 #include <sys/string.h>
 #include <sys/tarfs.h>
 #include <sys/elf64.h>
@@ -24,7 +25,7 @@ void load_file(char *filename) {
             vma->end = phdr->p_vaddr + phdr->p_memsz;
             vma->flags = phdr->p_flags;
             vma->next = NULL;
-            if (*vma_map == NULL) {
+            if (vma_map == NULL) {
                 vma_map = vma;
             }
             else {
@@ -36,7 +37,7 @@ void load_file(char *filename) {
     }
     struct vma_struct *test;
     kprintf("VMAs found: \n");
-    while (*test) {
+    while (test) {
         kprintf("VMA start: %x, VMA end: %x\n", test->start, test->end);
         test = test->next;
     }

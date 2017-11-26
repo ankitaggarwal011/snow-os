@@ -5,5 +5,5 @@ struct vma_struct {
     uint64_t end;
     uint64_t type;
     uint64_t flags;
-    vma_struct *next;    
+    struct vma_struct *next;    
 };
