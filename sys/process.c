@@ -34,12 +34,11 @@ kthread_t* create_process(char *filename) {
     struct mm_struct *process_mm = (struct mm_struct *) kmalloc(sizeof(struct mm_struct));
     new_process->process_mm = process_mm;
 
-    void *kernel_stack = (void *)kmalloc(4096);
-    new_process->k_stack = (uint64_t *)((uint64_t)kernel_stack + 4096 - 16);
+    *new_process->k_stack = (uint64_t *)(kmalloc(4096) + 4096 - 16);
 
     load_file(new_process, filename);
 
-    set_new_cr3(current_cr3); 
+    set_new_cr3(current_cr3);
 
     return new_process;
 }
