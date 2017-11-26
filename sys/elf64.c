@@ -64,8 +64,8 @@ void load_file(kthread_t* new_process, char *filename) {
     struct vma_struct *vma_stack = (struct vma_struct*) kmalloc(sizeof(struct vma_struct));
     update_page_tables(STACK_START, get_free_page(), PAGING_USER_R_W_FLAGS);
     uint64_t *stack = (uint64_t*) STACK_START;
-    vma_stack->start = stack + PAGE_SIZE;
-    vma_stack->end = stack;
+    vma_stack->start = (uint64_t) stack + PAGE_SIZE;
+    vma_stack->end = (uint64_t) stack;
     vma_stack->type = STACK;
     vma_stack->flags = PR | PW;
     vma_stack->next = NULL;
