@@ -46,14 +46,15 @@ void update_page_tables(uint64_t virt_addr, uint64_t physical_addr, uint16_t fla
 }
 
 uint64_t setup_user_page_tables() {
-    uint64_t *user_pml4 = (uint64_t *) kmalloc(4096);
-    uint64_t *current_pml4 = (uint64_t *)(get_cr3() + USER_VADDR);
-    user_pml4[511] = current_pml4[511]; // cannot access current_pml4 data?
-    return ((uint64_t) user_pml4 - USER_VADDR);
+    uint64_t page = get_free_page();
+    uint64_t *user_pml4 = (uint64_t *) (page + kernel_virtual_base);
+    uint64_t *current_pml4 = (uint64_t *)(get_cr3() + kernel_virtual_base);
+    user_pml4[511] = current_pml4[511];
+    return page;
 }
 
 void update_user_page_tables(uint64_t virt_addr, uint64_t physical_addr, uint16_t flags) {
-    uint64_t *pml4_t = (uint64_t *)(get_cr3() + USER_VADDR);
+    uint64_t *pml4_t = (uint64_t *)(get_cr3() + kernel_virtual_base);
     uint64_t *pdpe_t = NULL, *pde_t = NULL, *pte_t = NULL;
     uint64_t pdpe, pde, pte;
     uint32_t
