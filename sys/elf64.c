@@ -29,7 +29,7 @@ void load_file(kthread_t* new_process, char *filename) {
             uint64_t v_addr = (phdr->p_vaddr / PAGE_SIZE) * PAGE_SIZE;
             while(pages--) {
                 uint64_t page = get_free_page();
-                update_page_tables(v_addr, page, PAGING_USER_R_W_FLAGS);
+                update_user_page_tables(v_addr, page, PAGING_USER_R_W_FLAGS);
                 v_addr += PAGE_SIZE;
             }
 
@@ -48,7 +48,7 @@ void load_file(kthread_t* new_process, char *filename) {
         i++;
     }
     struct vma_struct *vma_heap = (struct vma_struct*) kmalloc(sizeof(struct vma_struct));
-    update_page_tables(HEAP_START, get_free_page(), PAGING_USER_R_W_FLAGS);
+    update_user_page_tables(HEAP_START, get_free_page(), PAGING_USER_R_W_FLAGS);
     vma_heap->start = HEAP_START;
     vma_heap->end = HEAP_START + PAGE_SIZE;
     vma_heap->type = HEAP;
@@ -62,7 +62,7 @@ void load_file(kthread_t* new_process, char *filename) {
     }
     vma_map_iter = vma_heap;
     struct vma_struct *vma_stack = (struct vma_struct*) kmalloc(sizeof(struct vma_struct));
-    update_page_tables(STACK_START, get_free_page(), PAGING_USER_R_W_FLAGS);
+    update_user_page_tables(STACK_START, get_free_page(), PAGING_USER_R_W_FLAGS);
     uint64_t *stack = (uint64_t*) STACK_START;
     vma_stack->start = (uint64_t) stack + PAGE_SIZE;
     vma_stack->end = (uint64_t) stack;

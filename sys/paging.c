@@ -6,6 +6,7 @@
 #define PAGE_SIZE 4096
 #define PHYS_VIDEO_MEM 0xB8000
 #define ENTRIES 512
+#define MASK 0xFFFFFFFFFFFFF000
 
 uint64_t *pml4_t, kernel_virtual_base;
 
@@ -21,7 +22,7 @@ void update_page_tables(uint64_t virt_addr, uint64_t physical_addr, uint16_t fla
     if ((pml4_t[offset_pml4] & 1UL) != 1UL) {
         pdpe = get_free_page();
     } else {
-        pdpe = pml4_t[offset_pml4] ^ flags;
+        pdpe = pml4_t[offset_pml4] & MASK;
     }
     pml4_t[offset_pml4] = pdpe | flags; // page is present and writable
     pdpe_t = (uint64_t * )(kernel_virtual_base + pdpe);
@@ -29,7 +30,7 @@ void update_page_tables(uint64_t virt_addr, uint64_t physical_addr, uint16_t fla
     if ((pdpe_t[offset_pdpe] & 1UL) != 1UL) {
         pde = get_free_page();
     } else {
-        pde = pdpe_t[offset_pdpe] ^ flags;
+        pde = pdpe_t[offset_pdpe] & MASK;
     }
     pdpe_t[offset_pdpe] = pde | flags;
     pde_t = (uint64_t * )(kernel_virtual_base + pde);
@@ -37,7 +38,7 @@ void update_page_tables(uint64_t virt_addr, uint64_t physical_addr, uint16_t fla
     if ((pde_t[offset_pde] & 1UL) != 1UL) {
         pte = get_free_page();
     } else {
-        pte = pde_t[offset_pde] ^ flags;
+        pte = pde_t[offset_pde] & MASK;
     }
     pde_t[offset_pde] = pte | flags;
     pte_t = (uint64_t * )(kernel_virtual_base + pte);
@@ -49,6 +50,42 @@ uint64_t setup_user_page_tables() {
     uint64_t *current_pml4 = (uint64_t *)(get_cr3() + USER_VADDR);
     user_pml4[511] = current_pml4[511]; // cannot access current_pml4 data?
     return ((uint64_t) user_pml4 - USER_VADDR);
+}
+
+void update_user_page_tables(uint64_t virt_addr, uint64_t physical_addr, uint16_t flags) {
+    uint64_t *pml4_t = (uint64_t *)(get_cr3() + USER_VADDR);
+    uint64_t *pdpe_t = NULL, *pde_t = NULL, *pte_t = NULL;
+    uint64_t pdpe, pde, pte;
+    uint32_t
+    offset_pte = 0x1FF & (virt_addr >> 12),
+    offset_pde = 0x1FF & (virt_addr >> 21),
+    offset_pdpe = 0x1FF & (virt_addr >> 30),
+    offset_pml4 = 0x1FF & (virt_addr >> 39);
+
+    if ((pml4_t[offset_pml4] & 1UL) != 1UL) {
+        pdpe = get_free_page();
+    } else {
+        pdpe = pml4_t[offset_pml4] & MASK;
+    }
+    pml4_t[offset_pml4] = pdpe | flags; // page is present and writable
+    pdpe_t = (uint64_t * )(kernel_virtual_base + pdpe);
+
+    if ((pdpe_t[offset_pdpe] & 1UL) != 1UL) {
+        pde = get_free_page();
+    } else {
+        pde = pdpe_t[offset_pdpe] & MASK;
+    }
+    pdpe_t[offset_pdpe] = pde | flags;
+    pde_t = (uint64_t * )(kernel_virtual_base + pde);
+
+    if ((pde_t[offset_pde] & 1UL) != 1UL) {
+        pte = get_free_page();
+    } else {
+        pte = pde_t[offset_pde] & MASK;
+    }
+    pde_t[offset_pde] = pte | flags;
+    pte_t = (uint64_t * )(kernel_virtual_base + pte);
+    pte_t[offset_pte] = physical_addr | flags;
 }
 
 uint64_t get_cr3() {
