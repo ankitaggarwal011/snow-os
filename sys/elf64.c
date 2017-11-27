@@ -18,7 +18,6 @@ void load_file(kthread_t* new_process, char *filename) {
     new_process->rip = ehdr->e_entry;
     int i = 0;
 
-    struct vma_struct *vma_map = NULL, *vma_map_iter = NULL;
     while (i < ehdr->e_phnum) {
         if (phdr->p_type == 1) {
             struct vma_struct *vma = (struct vma_struct*) kmalloc(sizeof(struct vma_struct));
@@ -44,13 +43,13 @@ void load_file(kthread_t* new_process, char *filename) {
                 vma->type = DATA; 
             }   
 
-            if (vma_map_iter != NULL) {
-                vma_map_iter->next = vma;
+            if (new_process->process_mm->vma_map_iter != NULL) {
+                new_process->process_mm->vma_map_iter->next = vma;
             }
             else {
-                vma_map = vma;
+                new_process->process_mm->vma_map = vma;
             }
-            vma_map_iter = vma;
+            new_process->process_mm->vma_map_iter = vma;
         }
         phdr++;
         i++;
@@ -62,13 +61,13 @@ void load_file(kthread_t* new_process, char *filename) {
     vma_heap->type = HEAP;
     vma_heap->flags = (PR | PW);
     vma_heap->next = NULL;
-    if (vma_map_iter != NULL) {
-        vma_map_iter->next = vma_heap;
+    if (new_process->process_mm->vma_map_iter != NULL) {
+        new_process->process_mm->vma_map_iter->next = vma_heap;
     }
     else {
-        vma_map = vma_heap;
+        new_process->process_mm->vma_map = vma_heap;
     }
-    vma_map_iter = vma_heap;
+    new_process->process_mm->vma_map_iter = vma_heap;
     struct vma_struct *vma_stack = (struct vma_struct*) kmalloc(sizeof(struct vma_struct));
     update_user_page_tables(STACK_START, get_free_page(), PAGING_USER_R_W_FLAGS);
     uint64_t *stack = (uint64_t*) STACK_START;
@@ -77,12 +76,11 @@ void load_file(kthread_t* new_process, char *filename) {
     vma_stack->type = STACK;
     vma_stack->flags = (PR | PW);
     vma_stack->next = NULL;
-    if (vma_map_iter != NULL) {
-        vma_map_iter->next = vma_stack;
+    if (new_process->process_mm->vma_map_iter != NULL) {
+        new_process->process_mm->vma_map_iter->next = vma_stack;
     }
-    vma_map_iter = vma_stack;
+    new_process->process_mm->vma_map_iter = vma_stack;
 
-    new_process->process_mm->vma_map = vma_map;
     struct vma_struct *test = new_process->process_mm->vma_map;
     kprintf("VMAs found: \n");
     while (test) {

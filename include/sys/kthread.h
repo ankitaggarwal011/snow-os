@@ -24,9 +24,7 @@ struct vma_struct {
 
 struct mm_struct {
     struct vma_struct *vma_map;
-    uint64_t s_data, e_data;
-    uint64_t s_code, e_code;
-    uint64_t stack, heap;
+    struct vma_struct *vma_map_iter;
 }__attribute__((__packed__));
 
 void test_context_switch();
