@@ -18,6 +18,4 @@ uint64_t get_cr3();
 
 uint64_t setup_user_page_tables();
 
-void update_user_page_tables(uint64_t virt_addr, uint64_t physical_addr, uint16_t flags);
-
 #endif

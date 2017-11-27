@@ -10,7 +10,7 @@
 
 uint64_t *pml4_t, kernel_virtual_base;
 
-void update_page_tables(uint64_t virt_addr, uint64_t physical_addr, uint16_t flags) {
+void setup_page_tables(uint64_t virt_addr, uint64_t physical_addr, uint16_t flags) {
     uint64_t *pdpe_t = NULL, *pde_t = NULL, *pte_t = NULL;
     uint64_t pdpe, pde, pte;
     uint32_t
@@ -53,7 +53,7 @@ uint64_t setup_user_page_tables() {
     return page;
 }
 
-void update_user_page_tables(uint64_t virt_addr, uint64_t physical_addr, uint16_t flags) {
+void update_page_tables(uint64_t virt_addr, uint64_t physical_addr, uint16_t flags) {
     uint64_t *pml4_t = (uint64_t *)(get_cr3() + kernel_virtual_base);
     uint64_t *pdpe_t = NULL, *pde_t = NULL, *pte_t = NULL;
     uint64_t pdpe, pde, pte;
@@ -106,11 +106,11 @@ void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
     // map all physical memory to virtual memory (identity mapping)
     // better choice for 64 bit systems (used by Linux)
     while (p_i < (physfree + get_free_pages_count() * PAGE_SIZE)) {
-        update_page_tables(v_i, p_i, PAGING_KERNEL_R_W_FLAGS);
+        setup_page_tables(v_i, p_i, PAGING_KERNEL_R_W_FLAGS);
         v_i += PAGE_SIZE;
         p_i += PAGE_SIZE;
     }
-    update_page_tables(kernel_virtual_base + PHYS_VIDEO_MEM, PHYS_VIDEO_MEM, PAGING_KERNEL_R_W_FLAGS);
+    setup_page_tables(kernel_virtual_base + PHYS_VIDEO_MEM, PHYS_VIDEO_MEM, PAGING_KERNEL_R_W_FLAGS);
     set_new_cr3(cr3_addr);
     /* this is causing bootloop, can be debugged later, not important at this stage
     // map physical memory from 0x0 to physbase
