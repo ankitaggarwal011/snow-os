@@ -36,6 +36,14 @@ void load_file(kthread_t* new_process, char *filename) {
             vma->flags = phdr->p_flags;
             vma->type = UNDEFINED;
             vma->next = NULL;
+
+            if(phdr->p_flags == (PR | PX)) {
+                vma->type = TEXT;
+            }
+            else if (phdr->p_flags == (PR | PW)) {
+                vma->type = DATA; 
+            }   
+
             if (vma_map_iter != NULL) {
                 vma_map_iter->next = vma;
             }
@@ -52,7 +60,7 @@ void load_file(kthread_t* new_process, char *filename) {
     vma_heap->start = HEAP_START;
     vma_heap->end = HEAP_START + PAGE_SIZE;
     vma_heap->type = HEAP;
-    vma_heap->flags = PR | PW;
+    vma_heap->flags = (PR | PW);
     vma_heap->next = NULL;
     if (vma_map_iter != NULL) {
         vma_map_iter->next = vma_heap;
@@ -67,7 +75,7 @@ void load_file(kthread_t* new_process, char *filename) {
     vma_stack->start = (uint64_t) stack + PAGE_SIZE;
     vma_stack->end = (uint64_t) stack;
     vma_stack->type = STACK;
-    vma_stack->flags = PR | PW;
+    vma_stack->flags = (PR | PW);
     vma_stack->next = NULL;
     if (vma_map_iter != NULL) {
         vma_map_iter->next = vma_stack;
