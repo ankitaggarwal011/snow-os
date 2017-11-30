@@ -27,6 +27,7 @@ void load_file(kthread_t *new_process, char *filename) {
 
             uint64_t pages = (((vma->end / PAGE_SIZE + 1) * PAGE_SIZE) - ((vma->start / PAGE_SIZE) * PAGE_SIZE)) / PAGE_SIZE;
             uint64_t v_addr = (phdr->p_vaddr / PAGE_SIZE) * PAGE_SIZE;
+            pages++;
             while(pages--) {
                 uint64_t page = get_free_page();
                 update_page_tables(v_addr, page, PAGING_USER_R_W_FLAGS);
