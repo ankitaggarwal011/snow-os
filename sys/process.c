@@ -26,6 +26,7 @@ void init_processes() {
 
 kthread_t* create_process(char *filename) {
     kthread_t *new_process = (kthread_t *) kmalloc(sizeof(kthread_t *));
+    memset(new_process->k_stack, 0, K_STACK_SIZE);
     new_process->pid = getPID();
 
     new_process->cr3 = setup_user_page_tables();

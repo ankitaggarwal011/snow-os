@@ -101,7 +101,6 @@ void test_context_switch() {
 
 void test_user_bin(void *user_binary) {
     kthread_t *t1 = (kthread_t *) user_binary;
-    memset(t1->k_stack, 0, K_STACK_SIZE);
     t1->k_stack[K_STACK_SIZE - 1] = (uint64_t) load_user_func;
     t1->rsp_val = &(t1->k_stack[K_STACK_SIZE - 1]);
     set_new_cr3(t1->cr3);
