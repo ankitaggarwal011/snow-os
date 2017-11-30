@@ -1,7 +1,3 @@
-//
-// Created by Saraj Munjal on 9/18/17.
-//
-
 #include <sys/string.h>
 
 char* strcat(char *s1, const char *s2) {

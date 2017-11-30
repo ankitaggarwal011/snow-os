@@ -11,3 +11,10 @@ void* memset_byte(void* a, uint64_t v, uint64_t b) {
     while(b-- > 0) *p++ = (uint64_t) v;
     return a;
 }
+
+void* memcpy(void *dest, void *src, int bytes) {
+    char *ts = src, *td = dest;
+    while (bytes--)
+        *td++ = *ts++;
+    return dest;
+}
