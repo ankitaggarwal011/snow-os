@@ -56,6 +56,9 @@ void* get_file_binary(char *filename) {
     struct posix_header_ustar *s = tarfs_start;
     kprintf("Printing all available files in the tarfs:\n");
     do {
+        if (!s || s->name[0] == '\0') {
+            break;
+        }
         int file_size = o_to_d(atoi(s->size));
         char *file = (char*) (s + 1);
         
@@ -65,7 +68,7 @@ void* get_file_binary(char *filename) {
         }
        
         if (file_size > 0) {
-            s += (file_size / (sizeof(s) + 1)) + 2;
+            s += (file_size / sizeof(struct posix_header_ustar)) + 2;
         } else {
             s++;
         }
