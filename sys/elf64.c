@@ -7,7 +7,7 @@
 #include <sys/elf64.h>
 #include <sys/process.h>
 
-void load_file(kthread_t* new_process, char *filename) {
+void load_file(kthread_t *new_process, char *filename) {
     void *location = get_file_binary(filename);
     kprintf("Location of %s: %p\n", filename, location);
     kprintf("Reading ELF64 header:\n");
@@ -55,6 +55,7 @@ void load_file(kthread_t* new_process, char *filename) {
         phdr++;
         i++;
     }
+    /*
     struct vma_struct *vma_heap = (struct vma_struct*) kmalloc(sizeof(struct vma_struct));
     update_page_tables(HEAP_START, get_free_page(), PAGING_USER_R_W_FLAGS);
     vma_heap->start = HEAP_START;
@@ -81,14 +82,14 @@ void load_file(kthread_t* new_process, char *filename) {
         vma_map_iter->next = vma_stack;
     }
     vma_map_iter = vma_stack;
-
     new_process->process_mm->vma_map = vma_map;
     struct vma_struct *test = new_process->process_mm->vma_map;
+    */
     kprintf("VMAs found: \n");
     while (test) {
         kprintf("VMA start: %x, VMA end: %x\n", test->start, test->end);
         test = test->next;
     }
 
-    new_process->rsp_val = (uint64_t *)((uint64_t)stack + 4096 - 16);
+    // new_process->rsp_val = (uint64_t *)((uint64_t) stack + 4096 - 16);
 }

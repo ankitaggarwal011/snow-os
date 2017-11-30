@@ -29,4 +29,6 @@ struct mm_struct {
 
 void test_context_switch();
 
+void test_user_bin(void *user_binary);
+
 #endif

@@ -6,6 +6,7 @@ extern void switch_to(kthread_t **me, kthread_t *next);
 
 extern void set_rsp(uint64_t val);
 
+extern void set_rsp_arg1(uint64_t rsp_val, uint64_t arg1);
 extern void _jump_usermode(void *starting_func_addr);
 
 void test_func_1();
@@ -35,6 +36,10 @@ void test_func_1() {
         }
 
     }
+}
+
+void load_user_func(void* func) {
+    _jump_usermode(func);
 }
 
 void test_func_2() {
@@ -92,4 +97,13 @@ void test_context_switch() {
     kprintf("Getting here\n");
     init_kthreads();
     set_rsp((uint64_t) t1->rsp_val);
+}
+
+void test_user_bin(void *user_binary) {
+    kthread *t1 = (kthread_t *) user_binary;
+    void *user_bin_func = t1->rip;
+    memset(t1->k_stack, 0, K_STACK_SIZE);
+    t1->k_stack[K_STACK_SIZE - 1] = (uint64_t) load_user_func;
+    t1->rsp_val = &(t1->k_stack[K_STACK_SIZE - 1]);
+    set_rsp_arg1((uint64_t) t1->rsp_val, (uint64_t) user_bin_func);
 }

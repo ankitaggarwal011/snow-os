@@ -4,6 +4,12 @@ set_rsp:
     movq %rdi, %rsp
     retq
 
+.global set_rsp_arg1
+set_rsp_arg1:
+    movq %rdi, %rsp
+    movq %rsi, %rdi
+    retq
+
 .global switch_to
 switch_to:
     push %rax

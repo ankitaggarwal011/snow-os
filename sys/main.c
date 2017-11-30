@@ -55,7 +55,7 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
 
     init_tarfs();
     init_processes();
-    create_process("bin/sbush");
+    test_user_bin((void *) create_process("bin/sbush"));
     
     while (1);
 }
