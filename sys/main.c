@@ -57,7 +57,7 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
     init_processes();
     kthread_t *user_task = create_process("bin/sbush");
     kprintf("User task RIP: %p\n", user_task);
-    // test_user_bin((void *) user_task);
+    test_user_bin((void *) user_task);
     
     while (1);
 }

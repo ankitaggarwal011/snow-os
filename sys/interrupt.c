@@ -15,6 +15,7 @@ void page_fault_handler() {
     volatile uint64_t addr;
     __asm__ volatile("mov %%cr2, %0" : "=r" (addr));
     kprintf("Page fault at %x\n", addr);
+    while(1);
 }
 
 void init_idt() {
