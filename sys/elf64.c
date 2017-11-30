@@ -38,6 +38,8 @@ void load_file(kthread_t *new_process, char *filename) {
             vma->type = UNDEFINED;
             vma->next = NULL;
 
+            memcpy((void*) vma->start, (void*) ((uint64_t)ehdr + phdr->p_offset), phdr->p_filesz);
+            
             if(phdr->p_flags == (PR | PX)) {
                 vma->type = TEXT;
             }
