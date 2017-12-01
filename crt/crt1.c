@@ -2,5 +2,5 @@
 
 void _start(void) {
   // call main() and exit() here
-  main();
+  main(1, NULL, NULL);
 }
