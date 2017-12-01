@@ -13,6 +13,7 @@
 
 #define IRQ0 32
 #define IRQ1 33
+#define SOFT_INTR 128
 
 void output_b(uint16_t p, uint8_t v);
 uint8_t input_b(uint16_t p);

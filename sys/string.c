@@ -1,6 +1,7 @@
 #include <sys/string.h>
+#include <sys/defs.h>
 
-char* strcat(char *s1, const char *s2) {
+char *strcat(char *s1, const char *s2) {
     char *s = s1;
     while (*s != '\0') {
         s++;
@@ -57,11 +58,24 @@ uint64_t pow(int a, int b) {
 
 int o_to_d(int n) {
     int i = 0, r, ans = 0;
-    while (n > 0) { 
+    while (n > 0) {
         r = n % 10;
         n /= 10;
         ans += (r * pow(8, i));
         i++;
     }
     return ans;
+}
+
+
+size_t strlen(char *s) {
+    if (s == NULL || '\0' == *s) {
+        return 0;
+    }
+    size_t len = 0;
+    while ((*s) != '\0') {
+        s++;
+        len++;
+    }
+    return len;
 }

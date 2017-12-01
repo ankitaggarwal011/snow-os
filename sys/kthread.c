@@ -1,13 +1,17 @@
 #include <sys/kthread.h>
 #include <sys/kprintf.h>
 #include <sys/paging.h>
-
+#include <sys/syscall_codes.h>
+#include <sys/string.h>
+#include <unistd.h>
 extern void switch_to(kthread_t **me, kthread_t *next);
 
 extern void set_rsp(uint64_t val);
 
 extern void set_rsp_arg1(uint64_t rsp_val, uint64_t arg1);
 extern void _jump_usermode(void *starting_func_addr);
+
+extern uint64_t test_syscall();
 
 void test_func_1();
 
@@ -89,7 +93,9 @@ void init_kthreads() {
 }
 
 void user_test_func() {
-    kprintf("In user space\n");
+    char *str = "hellio";
+//    kprintf("In user space\n");
+    write(1, (void *) str, strlen(str));
 }
 
 void test_context_switch() {
@@ -97,6 +103,10 @@ void test_context_switch() {
     kprintf("Getting here\n");
     init_kthreads();
     set_rsp((uint64_t) t1->rsp_val);
+}
+
+kthread_t *get_cur_kthread() {
+    return cur;
 }
 
 void test_user_bin(void *user_binary) {

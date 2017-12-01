@@ -19,7 +19,7 @@ struct vma_struct {
     uint64_t end;
     uint64_t type;
     uint64_t flags;
-    struct vma_struct *next;    
+    struct vma_struct *next;
 }__attribute__((__packed__));
 
 struct mm_struct {
@@ -31,4 +31,6 @@ void test_context_switch();
 
 void test_user_bin(void *user_binary);
 
-#endif
+kthread_t *get_cur_kthread();
+
+#endif //PROJECT_KTHREAD_H
