@@ -32,7 +32,7 @@ switch_to:
     movq %rsp, (%r15) // first argument is self's task struct in rdi. Save rsp in task_struct->rsp_val, which is at the start
     movq %rsi, (%rdi)
     movq (%rsi), %rsp// second argument (in rsi) is next task's struct.
-    // at this point, control has switched to differen't struct's stack. Instructions after this point are exec'd after
+    // at this point, control has switched to different struct's stack. Instructions after this point are execd after
     // control comes back to current struct
     pop %rdi
     pop %r15

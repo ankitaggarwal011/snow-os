@@ -25,5 +25,11 @@ int processes[MAX_P];
 void init_processes();
 kthread_t* create_process(char *filename);
 int getPID();
+uint64_t copy_process(kthread_t *parent_task);
+int fork();
+void init_idle_process();
+void init_scheduler();
+void scheduler();
+void switch_process(kthread_t *last_process, kthread_t *current_process);
 
 #endif

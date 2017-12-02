@@ -116,3 +116,24 @@ void test_user_bin(void *user_binary) {
     set_new_cr3(t1->cr3);
     set_rsp_arg1((uint64_t) t1->rsp_val, (uint64_t) t1->rip);
 }
+
+void go_to_ring3(kthread_t *user_binary) {
+    set_tss_rsp(&(user_binary->k_stack[K_STACK_SIZE - 1]));
+    set_new_cr3(user_binary->cr3);
+
+    __asm__ __volatile__ (
+        "movq %0, %%rax;"
+        "pushq $0x23;"
+        "pushq %%rax;"
+        "pushfq;"
+        "popq %%rax;"
+        "orq $0x200, %%rax;"
+        "pushq %%rax;"
+        "pushq $0x2B;"
+        "pushq %1;"
+        "movq $0x0, %%rdi;"
+        "movq $0x0, %%rsi;" 
+        "iretq;"
+        ::"r"(user_binary->rsp_user),"r"(user_binary->rip)
+    );
+}
