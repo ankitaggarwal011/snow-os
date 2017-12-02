@@ -76,7 +76,7 @@ void schedule() {
     //last updated automatically
     // cur updated automatically
 }
-
+/*
 void init_kthreads() {
     kprintf("Size of kthread is %d\n", sizeof(kthread_t));
     t1 = (kthread_t *) kmalloc(sizeof(kthread_t));
@@ -106,6 +106,7 @@ void test_context_switch() {
     init_kthreads();
     set_rsp((uint64_t) t1->rsp_val);
 }
+*/
 
 kthread_t *get_cur_kthread() {
     return cur;
