@@ -4,11 +4,15 @@
 #include <sys/syscall_codes.h>
 #include <sys/string.h>
 #include <unistd.h>
+#include <sys/vfs.h>
 #include <sys/gdt.h>
+
+extern void switch_to(kthread_t **me, kthread_t *next);
 
 extern void set_rsp(uint64_t val);
 
 extern void set_rsp_arg1(uint64_t rsp_val, uint64_t arg1);
+
 extern void _jump_usermode(void *starting_func_addr);
 
 extern uint64_t test_syscall();
@@ -42,7 +46,7 @@ void test_func_1() {
     }
 }
 
-void load_user_func(void* func) {
+void load_user_func(void *func) {
     _jump_usermode(func);
 }
 
@@ -81,7 +85,14 @@ void init_kthreads() {
     memset(t1->k_stack, 0, K_STACK_SIZE);
     t1->k_stack[K_STACK_SIZE - 1] = (uint64_t) test_func_1;
     t1->rsp_val = &(t1->k_stack[K_STACK_SIZE - 1]);
+    file_object_t *stdin_fo = get_stdin_fo();
+    stdin_fo->ref_count++;
+    t1->fds[0] = stdin_fo;
 
+    file_object_t *stdout_fo = get_stdout_fo();
+
+    stdout_fo->ref_count++;
+    t1->fds[1] = stdout_fo;
     t2 = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(t2->k_stack, 0, K_STACK_SIZE);
     uint64_t def_val = 0x0;
@@ -90,6 +101,10 @@ void init_kthreads() {
         t2->k_stack[K_STACK_SIZE - i - 1] = def_val;
     }
     t2->rsp_val = &(t2->k_stack[K_STACK_SIZE - 17]);
+    stdin_fo->ref_count++;
+    t2->fds[0] = stdin_fo;
+    stdout_fo->ref_count++;
+    t2->fds[1] = stdout_fo;
 }
 
 void user_test_func() {

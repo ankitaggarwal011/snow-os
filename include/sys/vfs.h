@@ -22,4 +22,7 @@ typedef struct file_obj {
     file_sys_impl_t *file_sys_impl;
     uint16_t ref_count;
 } file_object_t;
+
+file_object_t *get_stdin_fo();
+file_object_t *get_stdout_fo();
 #endif //SNOW_OS_VFS_H

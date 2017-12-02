@@ -8,8 +8,8 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
     switch (code) {
         case SYSCALL_WRITE: {
             kthread_t *cur_kt = get_cur_kthread();
-            file_object_t fo = cur_kt->fds[arg2];
-            file_sys_impl_t *fs_impl = fo.file_sys_impl;
+            file_object_t *fo = cur_kt->fds[arg2];
+            file_sys_impl_t *fs_impl = fo->file_sys_impl;
             if (fs_impl == NULL) {
                 kprintf("#%d: this file descriptor isn't handled for write\n", arg2);
                 return;

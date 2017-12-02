@@ -4,6 +4,7 @@
 #include <sys/defs.h>
 #include <sys/vfs.h>
 
+#define PROJECT_KTHREAD_H
 #define K_STACK_SIZE 4096
 #define NUM_FDS 16
 // WARNING: don't add anything at the start of kern_thread struct. Register logic assumes that the offset of rsp_val is 0.
@@ -39,7 +40,5 @@ void test_context_switch();
 void go_to_ring3(kthread_t *user_binary);
 
 kthread_t *get_cur_kthread();
-
 extern void switch_to(kthread_t **me, kthread_t *next);
-
-#endif
+#endif //PROJECT_KTHREAD_H
