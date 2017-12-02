@@ -4,6 +4,8 @@
 #include <sys/syscall_codes.h>
 #include <sys/string.h>
 #include <unistd.h>
+#include <sys/gdt.h>
+
 extern void switch_to(kthread_t **me, kthread_t *next);
 
 extern void set_rsp(uint64_t val);

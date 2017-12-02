@@ -3,10 +3,9 @@
 
 #include <sys/defs.h>
 
-#define PROJECT_KTHREAD_H
 #define K_STACK_SIZE 4096
 typedef struct kern_thread {
-    uint64_t *rsp_val, *rsp_user;
+    uint64_t rsp_val, rsp_user;
     uint64_t k_stack[K_STACK_SIZE];
     int pid;
     uint64_t cr3;
