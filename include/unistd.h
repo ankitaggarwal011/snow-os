@@ -2,6 +2,7 @@
 #define _UNISTD_H
 
 #include <sys/defs.h>
+#include <sys/syscall_codes.h>
 
 //int open(const char *pathname, int flags);
 //int close(int fd);
