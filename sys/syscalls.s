@@ -24,7 +24,7 @@ syscall_isr:
     movq %rcx, %r15
     movq %rdx, %rcx
     movq %r15, %rdx
-    // rcx and rdx sh   ould be interchanged
+    // rcx and rdx should be interchanged
     movq %rbx, %rsi
     movq %rax, %rdi
     call handle_syscall

@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[], char *envp[]) {
   // puts("sbush> ");
-  write(1, "hello", 5);
+  write(1, "hello\n", 6);
   while(1);
   return 0;
 }
