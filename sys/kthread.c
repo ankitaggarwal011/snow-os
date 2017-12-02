@@ -26,7 +26,7 @@ void user_test_func();
 kthread_t *t1, *t2;
 kthread_t *cur = NULL;
 //kthread_t *last = NULL;
-
+/*
 void test_func_1() {
     unsigned int i = 0;
     while (1) {
@@ -76,7 +76,7 @@ void schedule() {
     //last updated automatically
     // cur updated automatically
 }
-/*
+
 void init_kthreads() {
     kprintf("Size of kthread is %d\n", sizeof(kthread_t));
     t1 = (kthread_t *) kmalloc(sizeof(kthread_t));
