@@ -121,7 +121,7 @@ void test_user_bin(void *user_binary) {
 }
 */
 void go_to_ring3(kthread_t *user_binary) {
-    set_tss_rsp((uint64_t) &(user_binary->k_stack[K_STACK_SIZE - 1]));
+    set_tss_rsp(&(user_binary->k_stack[K_STACK_SIZE - 1]));
     set_new_cr3(user_binary->cr3);
 
     __asm__ __volatile__ (

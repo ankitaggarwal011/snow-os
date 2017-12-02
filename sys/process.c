@@ -40,7 +40,7 @@ void scheduler() {
 }
 
 void switch_process(kthread_t *last_process, kthread_t *current_process) {
-    set_tss_rsp((uint64_t) &(current_process->k_stack[K_STACK_SIZE - 1]));
+    set_tss_rsp(&(current_process->k_stack[K_STACK_SIZE - 1]));
 
     __asm__ __volatile__ (
         "sti;"  
@@ -111,7 +111,7 @@ kthread_t* create_process(char *filename) {
 
 uint64_t copy_process(kthread_t *parent_task) {
     kthread_t *child = (kthread_t *) kmalloc(sizeof(kthread_t *));
-    memset(new_process->k_stack, 0, K_STACK_SIZE);
+    memset(parent_task->k_stack, 0, K_STACK_SIZE);
     child->rsp_val = (uint64_t) &(child->k_stack[K_STACK_SIZE - 1]);
     child->pid = getPID();
     child->ppid = parent_task->pid;
@@ -172,7 +172,7 @@ int fork() {
     );
 
     if(current_process == parent_task) {
-        child_task->k_stack = child_task->rsp_val - (parent_task->rsp_val - p_stack);
+        child_task->rsp_val = (uint64_t) &(child_task->k_stack[K_STACK_SIZE - 1]) - (((uint64_t) &(parent_task->k_stack[K_STACK_SIZE - 1])) - p_stack);
             return child_task->pid;
     }
     return 0;
