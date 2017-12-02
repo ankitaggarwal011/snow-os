@@ -111,7 +111,7 @@ void test_context_switch() {
 kthread_t *get_cur_kthread() {
     return cur;
 }
-
+/*
 void test_user_bin(void *user_binary) {
     kthread_t *t1 = (kthread_t *) user_binary;
     t1->k_stack[K_STACK_SIZE - 1] = (uint64_t) load_user_func;
@@ -119,9 +119,9 @@ void test_user_bin(void *user_binary) {
     set_new_cr3(t1->cr3);
     set_rsp_arg1((uint64_t) t1->rsp_val, (uint64_t) t1->rip);
 }
-
+*/
 void go_to_ring3(kthread_t *user_binary) {
-    set_tss_rsp(&(user_binary->k_stack[K_STACK_SIZE - 1]));
+    set_tss_rsp((uint64_t) &(user_binary->k_stack[K_STACK_SIZE - 1]));
     set_new_cr3(user_binary->cr3);
 
     __asm__ __volatile__ (
