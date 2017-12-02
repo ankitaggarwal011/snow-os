@@ -2,6 +2,7 @@
 #include <sys/kprintf.h>
 #include <sys/stdarg.h>
 #include <sys/string.h>
+#include <sys/terminal.h>
 
 uint64_t currentRow = 0;
 uint64_t currentColumn = 0;
@@ -85,7 +86,8 @@ void printChar(char c) {
     if (c == '\n') {
         if (currentRow == VIDEO_MEM_ROWS - 1) {
             currentRow = 0;
-            memcpy(getAddress(0, 0), getAddress(VIDEO_MEM_ROWS / 2, VIDEO_MEM_COLUMNS / 2), VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
+            memcpy(getAddress(0, 0), getAddress(VIDEO_MEM_ROWS / 2, VIDEO_MEM_COLUMNS / 2),
+                   VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
             resetVideoMemory(' ', DEFAULT_COLOR);
 
 
@@ -100,7 +102,8 @@ void printChar(char c) {
     if (currentColumn == VIDEO_MEM_COLUMNS - 1) {
         if (currentRow == VIDEO_MEM_ROWS - 1) {
             currentRow = 0;
-            memcpy(getAddress(0, 0), getAddress(VIDEO_MEM_ROWS / 2, VIDEO_MEM_COLUMNS / 2), VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
+            memcpy(getAddress(0, 0), getAddress(VIDEO_MEM_ROWS / 2, VIDEO_MEM_COLUMNS / 2),
+                   VIDEO_MEM_ROWS * VIDEO_MEM_COLUMNS);
             resetVideoMemory(' ', DEFAULT_COLOR);
         } else {
             currentRow++;
@@ -206,6 +209,7 @@ void printTime(uint64_t x) {
 }
 
 void printInputChar(const char *c) {
+    on_new_char_recvd(c);
     char *address = getAddress(VIDEO_MEM_ROWS, 0);
     for (int j = 0; j < 30; j += 2) {
         *(address + j) = ' ';

@@ -4,6 +4,7 @@
 #include <sys/kprintf.h>
 #include <sys/pit.h>
 #include <sys/keyboard.h>
+#include <sys/terminal.h>
 
 uint8_t specialChars = 0x0;
 //bit 5: Numlock
@@ -16,7 +17,9 @@ uint8_t specialChars = 0x0;
 uint8_t getScancode();
 
 char getAsciiCode(uint8_t scanCode);
+
 void printAscii(uint8_t sc);
+
 typedef enum special_key {
     CAPS, LSHIFT, RSHIFT, LCNTRL, RCNTRL, NUMLOCK
 } special_key;
@@ -125,47 +128,47 @@ int handleNormalScanCodes(uint8_t sc) {
             p = '\\';
             break;//ASCII for tab
         case 0x10:
-            c = shouldCapitalizeLetters() ? 'Q': 'q';
+            c = shouldCapitalizeLetters() ? 'Q' : 'q';
             break;
         case 0x11:
-            c = shouldCapitalizeLetters() ? 'W': 'w';
+            c = shouldCapitalizeLetters() ? 'W' : 'w';
             break;
 
         case 0x12:
-            c = shouldCapitalizeLetters() ? 'E': 'e';
+            c = shouldCapitalizeLetters() ? 'E' : 'e';
             break;
 
         case 0x13:
-            c = shouldCapitalizeLetters() ? 'R': 'r';
+            c = shouldCapitalizeLetters() ? 'R' : 'r';
             break;
 
         case 0x14:
-            c = shouldCapitalizeLetters() ? 'T': 't';
+            c = shouldCapitalizeLetters() ? 'T' : 't';
             break;
 
         case 0x15:
-            c = shouldCapitalizeLetters() ? 'Y': 'y';
+            c = shouldCapitalizeLetters() ? 'Y' : 'y';
             break;
 
         case 0x16:
-            c = shouldCapitalizeLetters() ? 'U': 'u';
+            c = shouldCapitalizeLetters() ? 'U' : 'u';
             break;
 
         case 0x17:
-            c = shouldCapitalizeLetters() ? 'I': 'i';
+            c = shouldCapitalizeLetters() ? 'I' : 'i';
             break;
 
         case 0x18:
-            c = shouldCapitalizeLetters() ? 'O': 'o';
+            c = shouldCapitalizeLetters() ? 'O' : 'o';
             break;
         case 0x19:
-            c = shouldCapitalizeLetters() ? 'P': 'p';
+            c = shouldCapitalizeLetters() ? 'P' : 'p';
             break;
         case 0x1A:
-            c = isShiftEnabled() ? '{': '[';
+            c = isShiftEnabled() ? '{' : '[';
             break;
         case 0x1B:
-            c = isShiftEnabled() ? '}': ']';
+            c = isShiftEnabled() ? '}' : ']';
             break;
         case 0x1C:
             //ENTER
@@ -173,31 +176,31 @@ int handleNormalScanCodes(uint8_t sc) {
             p = '\\';
             break;
         case 0x1E:
-            c = shouldCapitalizeLetters() ? 'A': 'a';
+            c = shouldCapitalizeLetters() ? 'A' : 'a';
             break;
         case 0x1F:
-            c = shouldCapitalizeLetters() ? 'S': 's';
+            c = shouldCapitalizeLetters() ? 'S' : 's';
             break;
         case 0x20:
-            c = shouldCapitalizeLetters() ? 'D': 'd';
+            c = shouldCapitalizeLetters() ? 'D' : 'd';
             break;
         case 0x21:
-            c = shouldCapitalizeLetters() ? 'F': 'f';
+            c = shouldCapitalizeLetters() ? 'F' : 'f';
             break;
         case 0x22:
-            c = shouldCapitalizeLetters() ? 'G': 'g';
+            c = shouldCapitalizeLetters() ? 'G' : 'g';
             break;
         case 0x23:
-            c = shouldCapitalizeLetters() ? 'H': 'h';
+            c = shouldCapitalizeLetters() ? 'H' : 'h';
             break;
         case 0x24:
-            c = shouldCapitalizeLetters() ? 'J': 'j';
+            c = shouldCapitalizeLetters() ? 'J' : 'j';
             break;
         case 0x25:
-            c = shouldCapitalizeLetters() ? 'K': 'k';
+            c = shouldCapitalizeLetters() ? 'K' : 'k';
             break;
         case 0x26:
-            c = shouldCapitalizeLetters() ? 'L': 'l';
+            c = shouldCapitalizeLetters() ? 'L' : 'l';
             break;
         case 0x27:
             c = isShiftEnabled() ? ':' : ';';
@@ -212,38 +215,38 @@ int handleNormalScanCodes(uint8_t sc) {
             c = isShiftEnabled() ? '|' : '\\';
             break;
         case 0x2C:
-            c = shouldCapitalizeLetters() ? 'Z': 'z';
+            c = shouldCapitalizeLetters() ? 'Z' : 'z';
             break;
         case 0x2D:
-            c = shouldCapitalizeLetters() ? 'X': 'x';
+            c = shouldCapitalizeLetters() ? 'X' : 'x';
             break;
         case 0x2E:
-            c = shouldCapitalizeLetters() ? 'C': 'c';
+            c = shouldCapitalizeLetters() ? 'C' : 'c';
             break;
         case 0x2F:
-            c = shouldCapitalizeLetters() ? 'V': 'v';
+            c = shouldCapitalizeLetters() ? 'V' : 'v';
             break;
         case 0x30:
-            c = shouldCapitalizeLetters() ? 'B': 'b';
+            c = shouldCapitalizeLetters() ? 'B' : 'b';
             break;
         case 0x31:
-            c = shouldCapitalizeLetters() ? 'N': 'n';
+            c = shouldCapitalizeLetters() ? 'N' : 'n';
             break;
         case 0x32:
-            c = shouldCapitalizeLetters() ? 'M': 'm';
+            c = shouldCapitalizeLetters() ? 'M' : 'm';
             break;
         case 0x33:
-            c = isShiftEnabled() ? '<': ',';
+            c = isShiftEnabled() ? '<' : ',';
             break;
         case 0x34:
-            c = isShiftEnabled() ? '>': '.';
+            c = isShiftEnabled() ? '>' : '.';
             break;
         case 0x35:
-            c = isShiftEnabled() ? '?': '/';
+            c = isShiftEnabled() ? '?' : '/';
             break;
         case 0x37:
             //keypad star
-            c = isKey(NUMLOCK) ? '*': '\0';
+            c = isKey(NUMLOCK) ? '*' : '\0';
             break;
         case 0x39:
             c = ' ';
@@ -290,43 +293,43 @@ int handleNormalScanCodes(uint8_t sc) {
             pp = 'F';
             break;
         case 0x47:
-            c = isKey(NUMLOCK) ? '7': '\0';
+            c = isKey(NUMLOCK) ? '7' : '\0';
             break;
         case 0x48:
-            c = isKey(NUMLOCK) ? '8': '\0';
+            c = isKey(NUMLOCK) ? '8' : '\0';
             break;
         case 0x49:
-            c = isKey(NUMLOCK) ? '9': '\0';
+            c = isKey(NUMLOCK) ? '9' : '\0';
             break;
         case 0x4A:
-            c = isKey(NUMLOCK) ? '-': '\0';
+            c = isKey(NUMLOCK) ? '-' : '\0';
             break;
         case 0x4B:
-            c = isKey(NUMLOCK) ? '4': '\0';
+            c = isKey(NUMLOCK) ? '4' : '\0';
             break;
         case 0x4C:
-            c = isKey(NUMLOCK) ? '5': '\0';
+            c = isKey(NUMLOCK) ? '5' : '\0';
             break;
         case 0x4D:
-            c = isKey(NUMLOCK) ? '6': '\0';
+            c = isKey(NUMLOCK) ? '6' : '\0';
             break;
         case 0x4E:
-            c = isKey(NUMLOCK) ? '+': '\0';
+            c = isKey(NUMLOCK) ? '+' : '\0';
             break;
         case 0x4F:
-            c = isKey(NUMLOCK) ? '1': '\0';
+            c = isKey(NUMLOCK) ? '1' : '\0';
             break;
         case 0x50:
-            c = isKey(NUMLOCK) ? '2': '\0';
+            c = isKey(NUMLOCK) ? '2' : '\0';
             break;
         case 0x51:
-            c = isKey(NUMLOCK) ? '3': '\0';
+            c = isKey(NUMLOCK) ? '3' : '\0';
             break;
         case 0x52:
-            c = isKey(NUMLOCK) ? '0': '\0';
+            c = isKey(NUMLOCK) ? '0' : '\0';
             break;
         case 0x53:
-            c = isKey(NUMLOCK) ? '.': '\0';
+            c = isKey(NUMLOCK) ? '.' : '\0';
             break;
         case 0x57:
             c = '1';
@@ -341,7 +344,7 @@ int handleNormalScanCodes(uint8_t sc) {
         default:
             c = '\0';
     }
-    if (c =='\0') {
+    if (c == '\0') {
         return 0;
     }
     str[3] = c;
@@ -353,7 +356,7 @@ int handleNormalScanCodes(uint8_t sc) {
     if (pp != '\0') {
         str[i--] = pp;
     }
-    if ((isKey(RCNTRL) | isKey(LCNTRL)) && str[i+1] != '^') {
+    if ((isKey(RCNTRL) | isKey(LCNTRL)) && str[i + 1] != '^') {
         str[i] = '^';
         printInputChar(str + i);
     } else {
@@ -410,12 +413,11 @@ void printAscii(uint8_t sc) {
             return;
     }
     if (sc > 0x80) {
-        handleNormalScanCodes(sc-0x80);
+        handleNormalScanCodes(sc - 0x80);
     } else {
         handleNormalScanCodes(sc);
     }
 }
-
 
 
 void init_keyboard() {

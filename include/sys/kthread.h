@@ -2,8 +2,11 @@
 #define _KTHREAD_H
 
 #include <sys/defs.h>
+#include <sys/vfs.h>
 
 #define K_STACK_SIZE 4096
+#define NUM_FDS 16
+// WARNING: don't add anything at the start of kern_thread struct. Register logic assumes that the offset of rsp_val is 0.
 typedef struct kern_thread {
     uint64_t *rsp_val;
     uint64_t rsp_user;
@@ -15,6 +18,7 @@ typedef struct kern_thread {
     int ppid;
     int num_child;
     struct kern_thread *next;
+    file_object_t fds[NUM_FDS];
 }__attribute__((__packed__)) kthread_t;
 
 struct vma_struct {
