@@ -130,12 +130,9 @@ void go_to_ring3(kthread_t *user_binary) {
         "pushq %%rax;"
         "pushfq;"
         "popq %%rax;"
-        "orq $0x200, %%rax;"
         "pushq %%rax;"
         "pushq $0x2B;"
         "pushq %1;"
-        "movq $0x0, %%rdi;"
-        "movq $0x0, %%rsi;" 
         "iretq;"
         ::"r"(user_binary->rsp_user),"r"(user_binary->rip)
     );
