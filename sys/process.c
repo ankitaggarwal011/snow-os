@@ -148,7 +148,7 @@ int fork() {
     parent_task = current_process;
     // memcpy((void *) &(child_task->k_stack[0]), (void *) &(parent_task->k_stack[0]), 4096);
     for (int i = 0; i < 4096; i++) {
-        *(child_task->k_stack + i) = *(parent_task->k_stack + i)
+        *(child_task->k_stack + i) = *(parent_task->k_stack + i);
     }
 
     set_new_cr3(parent_task->cr3);
