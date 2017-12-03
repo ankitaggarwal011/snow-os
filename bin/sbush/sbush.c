@@ -2,7 +2,7 @@
 #include <unistd.h>
 
 int main(int argc, char *argv[], char *envp[]) {
-  char *welcome = "Welcome to SBUnix!"
+  char *welcome = "Welcome to SBUnix!";
   int bytes = write(1, welcome, sizeof(welcome));
   char tmp[1];
   tmp[0] = '0' + bytes;
