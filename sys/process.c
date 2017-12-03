@@ -122,6 +122,15 @@ uint64_t copy_process(kthread_t *parent_task) {
         struct vma_struct *c_vma = (struct vma_struct *) kmalloc(sizeof(struct vma_struct));
         memcpy(c_vma, p_vma, sizeof(struct vma_struct));
 
+        uint64_t pages = (((c_vma->end / PAGE_SIZE + 1) * PAGE_SIZE) - ((c_vma->start / PAGE_SIZE) * PAGE_SIZE)) / PAGE_SIZE;
+        uint64_t v_addr = (c_vma->start / PAGE_SIZE) * PAGE_SIZE;
+        pages++;
+        while(pages--) {
+            uint64_t page = get_free_page();
+            update_page_tables(v_addr, page, PAGING_USER_R_W_FLAGS);
+            v_addr += PAGE_SIZE;
+        }
+
         if (c_vma_iter != NULL) {
             c_vma_iter->next = c_vma;
         }
