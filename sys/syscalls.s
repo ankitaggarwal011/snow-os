@@ -43,7 +43,7 @@ syscall_isr:
     pop %rbx
     pop %rdx
     pop %rcx
-    pop %rax
+    // pop %rax
     sti
     iretq
 
