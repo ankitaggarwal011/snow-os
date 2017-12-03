@@ -2,6 +2,7 @@
 #include <sys/kprintf.h>
 #include <sys/kthread.h>
 #include <sys/syscall_codes.h>
+#include <sys/process.h>
 
 void handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6) {
     switch (code) {
@@ -14,6 +15,10 @@ void handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t 
             } else {
                 kprintf("Wrong buff for write syscall\n");
             }
+            break;
+        case SYSCALL_FORK:
+            int pid = fork();
+            kprintf("PID: %d\n", pid);
             break;
         default:
             kprintf("Arg1: %x, Arg2: %x, Arg3: %x \n", code, arg2, arg3);
