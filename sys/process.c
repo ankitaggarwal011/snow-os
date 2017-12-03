@@ -60,7 +60,7 @@ void switch_process(kthread_t *last_process, kthread_t *current_process) {
 }
 
 void init_idle_process() {
-    kthread_t *idle = (kthread_t *) kmalloc(sizeof(kthread_t *));
+    kthread_t *idle = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(idle->k_stack, 0, K_STACK_SIZE);
     idle->rsp_val = &(idle->k_stack[K_STACK_SIZE - 1]);
     idle->rsp_user = (uint64_t) &(idle->k_stack[K_STACK_SIZE - 1]);
@@ -75,7 +75,7 @@ void init_idle_process() {
 }
 
 kthread_t* create_process(char *filename) {
-    kthread_t *new_process = (kthread_t *) kmalloc(sizeof(kthread_t *));
+    kthread_t *new_process = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(new_process->k_stack, 0, K_STACK_SIZE);
     new_process->rsp_val = &(new_process->k_stack[K_STACK_SIZE - 1]);
     new_process->pid = getPID();
@@ -100,7 +100,7 @@ kthread_t* create_process(char *filename) {
 }
 
 uint64_t copy_process(kthread_t *parent_task) {
-    kthread_t *child = (kthread_t *) kmalloc(sizeof(kthread_t *));
+    kthread_t *child = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(parent_task->k_stack, 0, K_STACK_SIZE);
     child->rsp_val = &(child->k_stack[K_STACK_SIZE - 1]);
     child->pid = getPID();
