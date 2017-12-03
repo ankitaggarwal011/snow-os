@@ -12,8 +12,8 @@
 kthread_t *current_process;
 
 int getPID() {
-    for(int i = 0; i < MAX_P; i++) {
-        if(processes[i] == 0) {
+    for (int i = 0; i < MAX_P; i++) {
+        if (processes[i] == 0) {
             processes[i] = 1;
             return i;
         }
@@ -22,19 +22,19 @@ int getPID() {
 }
 
 void init_processes() {
-    for(int i = 0; i < MAX_P; i++) {
+    for (int i = 0; i < MAX_P; i++) {
         processes[i] = 0;
     }
 }
 
 void init_scheduler() {
-    while(1) scheduler();
+    while (1) scheduler();
 }
 
 void scheduler() {
     kthread_t *last_process = current_process;
     current_process = current_process->next;
-    if(last_process != current_process) {
+    if (last_process != current_process) {
         switch_process(last_process, current_process);
     }
 }
@@ -45,37 +45,37 @@ void switch_process(kthread_t *last_process, kthread_t *current_process) {
     switch_to(&last_process, current_process);
 
     __asm__ __volatile__ (
-        "movq %0, %%cr3;"
-        ::"r"(current_process->cr3)
+    "movq %0, %%cr3;"
+    ::"r"(current_process->cr3)
     );
 
     __asm__ __volatile__ (
-        "movq $1f, %0;"
-        "pushq %1;"
-        "retq;"
-        "1:\t"
-        :"=g"(last_process->rip)
-        :"r"(current_process->rip)
+    "movq $1f, %0;"
+            "pushq %1;"
+            "retq;"
+            "1:\t"
+    :"=g"(last_process->rip)
+    :"r"(current_process->rip)
     );
 }
 
 void init_idle_process() {
-    kthread_t *idle = (kthread_t *) kmalloc(sizeof(kthread_t *));
+    kthread_t *idle = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(idle->k_stack, 0, K_STACK_SIZE);
     idle->rsp_val = &(idle->k_stack[K_STACK_SIZE - 1]);
-    idle->rsp_user = (uint64_t) &(idle->k_stack[K_STACK_SIZE - 1]);
+    idle->rsp_user = (uint64_t) & (idle->k_stack[K_STACK_SIZE - 1]);
     idle->pid = getPID();
     idle->ppid = 0;
     idle->process_mm = NULL;
     idle->cr3 = (uint64_t) get_cr3();
-    idle->rip = (uint64_t) &init_scheduler;
+    idle->rip = (uint64_t) & init_scheduler;
     idle->next = idle;
     idle->num_child = 0;
     current_process = idle;
 }
 
-kthread_t* create_process(char *filename) {
-    kthread_t *new_process = (kthread_t *) kmalloc(sizeof(kthread_t *));
+kthread_t *create_process(char *filename) {
+    kthread_t *new_process = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(new_process->k_stack, 0, K_STACK_SIZE);
     new_process->rsp_val = &(new_process->k_stack[K_STACK_SIZE - 1]);
     new_process->pid = getPID();
@@ -94,13 +94,13 @@ kthread_t* create_process(char *filename) {
 
     current_process->next = new_process;
     new_process->next = current_process;
-    current_process = new_process; 
+    current_process = new_process;
 
     return new_process;
 }
 
 uint64_t copy_process(kthread_t *parent_task) {
-    kthread_t *child = (kthread_t *) kmalloc(sizeof(kthread_t *));
+    kthread_t *child = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(parent_task->k_stack, 0, K_STACK_SIZE);
     child->rsp_val = &(child->k_stack[K_STACK_SIZE - 1]);
     child->pid = getPID();
@@ -118,14 +118,13 @@ uint64_t copy_process(kthread_t *parent_task) {
 
     struct vma_struct *p_vma = parent_task->process_mm->vma_map, *c_vma_map = NULL, *c_vma_iter = NULL;
 
-    while(p_vma != NULL) {
+    while (p_vma != NULL) {
         struct vma_struct *c_vma = (struct vma_struct *) kmalloc(sizeof(struct vma_struct));
         memcpy(c_vma, p_vma, sizeof(struct vma_struct));
 
         if (c_vma_iter != NULL) {
             c_vma_iter->next = c_vma;
-        }
-        else {
+        } else {
             c_vma_map = c_vma;
         }
         c_vma_iter = c_vma;
@@ -149,21 +148,23 @@ int fork() {
     memcpy((void *) ((uint64_t) child_task->rsp_val - 4096), (void *) ((uint64_t) parent_task->rsp_val - 4096), 4096);
 
     set_new_cr3(parent_task->cr3);
-    
+
     __asm__ __volatile__(
-        "movq $2f, %0;"
-        "2:\t"
-        :"=g"(child_task->rip)
+    "movq $2f, %0;"
+            "2:\t"
+    :"=g"(child_task->rip)
     );
 
     __asm__ __volatile__(
-        "movq %%rsp, %0;"
-        :"=r"(p_stack)
+    "movq %%rsp, %0;"
+    :"=r"(p_stack)
     );
 
-    if(current_process == parent_task) {
-        child_task->rsp_val = (uint64_t *)((uint64_t) &(child_task->k_stack[K_STACK_SIZE - 1]) - (((uint64_t) &(parent_task->k_stack[K_STACK_SIZE - 1])) - p_stack));
-            return child_task->pid;
+    if (current_process == parent_task) {
+        child_task->rsp_val = (uint64_t * )((uint64_t) & (child_task->k_stack[K_STACK_SIZE - 1]) -
+                                                         (((uint64_t) & (parent_task->k_stack[K_STACK_SIZE - 1])) -
+                                                          p_stack));
+        return child_task->pid;
     }
     return 0;
 }
