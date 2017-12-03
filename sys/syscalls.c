@@ -22,9 +22,9 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
             scheduler();
             break;
         case SYSCALL_PID:
-            return get_process_pid;
+            return get_process_pid();
         case SYSCALL_PPID:
-            return get_process_ppid;
+            return get_process_ppid();
         default:
             kprintf("Arg1: %x, Arg2: %x, Arg3: %x \n", code, arg2, arg3);
             kprintf("Arg4: %x, Arg5: %x, Arg6: %x \n", arg4, arg5, arg6);
