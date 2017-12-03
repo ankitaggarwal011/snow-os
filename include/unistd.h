@@ -3,8 +3,8 @@
 
 #include <sys/defs.h>
 #include <sys/syscall_codes.h>
-
-//int open(const char *pathname, int flags);
+#define FILE_OPEN_FLAG_O_DIRECTORY //enforce that file is not a dir
+int open(const char *pathname, int flags);
 //int close(int fd);
 ssize_t read(int fd, void *buf, size_t count);
 ssize_t write(int fd, const void *buf, size_t count);

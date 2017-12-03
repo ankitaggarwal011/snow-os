@@ -50,14 +50,13 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
     test[1] = '\0';
     kprintf("Testing kmalloc: %s\n", test);
     kprintf("kmalloc works!\n");
-
-    // init_tarfs();
-    init_processes();
-    init_idle_process();
-//    test_context_switch();
-    kthread_t *user_task = create_process("bin/sbush");
+    init_tarfs();
+//    init_processes();
+//    init_idle_process();
+    test_context_switch();
+//    kthread_t *user_task = create_process("bin/sbush");
     // kprintf("User task RIP: %p\n", user_task->rip);
-    go_to_ring3(user_task);
+//    go_to_ring3(user_task);
     while (1);
 }
 

@@ -33,3 +33,7 @@ ssize_t read(int fd, const void *buf, size_t count) {
     return (ssize_t) syscall4(SYSCALL_READ, (uint64_t) fd, (uint64_t) buf, (uint64_t) count);
 }
 
+int open(const char *pathname, int flags) {
+    return (int) syscall3(SYSCALL_OPEN, (uint64_t) pathname, (uint64_t) flags);
+}
+

@@ -21,6 +21,7 @@ typedef struct file_obj {
     char *file_path;
     file_sys_impl_t *file_sys_impl;
     uint16_t ref_count;
+    uint32_t offset;
 } file_object_t;
 
 file_object_t *get_stdin_fo();
