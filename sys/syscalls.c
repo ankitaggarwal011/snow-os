@@ -19,6 +19,18 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
             return arg4;
         case SYSCALL_FORK:
             return fork();
+
+        case SYSCALL_READ: {
+            kthread_t *cur_kt = get_cur_kthread();
+            file_object_t *fo = cur_kt->fds[arg2];
+            file_sys_impl_t *fs_impl = fo->file_sys_impl;
+            if (fs_impl == NULL) {
+                kprintf("#%d: this file descriptor isn't handled for read\n", arg2);
+                return;
+            }
+            fs_impl->read_impl((void *) arg3, arg4);
+        }
+            break;
         default:
             kprintf("Arg1: %x, Arg2: %x, Arg3: %x \n", code, arg2, arg3);
             kprintf("Arg4: %x, Arg5: %x, Arg6: %x \n", arg4, arg5, arg6);

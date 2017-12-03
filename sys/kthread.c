@@ -108,9 +108,15 @@ void init_kthreads() {
 }
 
 void user_test_func() {
-    char *str = "hellio";
+//    char *str = "hellio";
 //    kprintf("In user space\n");
-    write(1, (void *) str, strlen(str));
+    char buf[25];
+    ssize_t read_len = read(0, (void *) buf, 10);
+    kprintf("Read result:");
+    for (int i = 0; i < read_len; i++) {
+        kprintf("%c", buf[i]);
+    }
+    kprintf("\n");
 }
 
 void test_context_switch() {
