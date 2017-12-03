@@ -19,7 +19,7 @@ typedef struct kern_thread {
     int ppid;
     int num_child;
     struct kern_thread *next;
-    file_object_t fds[NUM_FDS];
+    file_object_t *fds[NUM_FDS];
 }__attribute__((__packed__)) kthread_t;
 
 struct vma_struct {

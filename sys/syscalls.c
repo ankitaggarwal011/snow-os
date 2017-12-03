@@ -3,6 +3,7 @@
 #include <sys/kthread.h>
 #include <sys/syscall_codes.h>
 #include <sys/process.h>
+#include <sys/vfs.h>
 
 uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6) {
     switch (code) {
@@ -12,7 +13,7 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
             file_sys_impl_t *fs_impl = fo->file_sys_impl;
             if (fs_impl == NULL) {
                 kprintf("#%d: this file descriptor isn't handled for write\n", arg2);
-                return;
+                return 0;
             }
             fs_impl->write_impl((void *) arg3, arg4);
         }
@@ -26,7 +27,7 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
             file_sys_impl_t *fs_impl = fo->file_sys_impl;
             if (fs_impl == NULL) {
                 kprintf("#%d: this file descriptor isn't handled for read\n", arg2);
-                return;
+                return 0;
             }
             fs_impl->read_impl((void *) arg3, arg4);
         }
