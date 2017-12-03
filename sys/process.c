@@ -102,7 +102,7 @@ kthread_t* create_process(char *filename) {
 uint64_t copy_process(kthread_t *parent_task) {
     kthread_t *child = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(parent_task->k_stack, 0, K_STACK_SIZE);
-    child->rsp_val = &(child->k_stack[K_STACK_SIZE - 1]);
+    child->rsp_val = &(child->k_stack[K_STACK_SIZE - 17]);
     child->pid = getPID();
     child->ppid = parent_task->pid;
     child->process_mm = NULL;
@@ -146,7 +146,7 @@ int fork() {
     child_task->next = last;
 
     parent_task = current_process;
-    memcpy((void *) ((uint64_t) child_task->rsp_val - 4096), (void *) ((uint64_t) parent_task->rsp_val - 4096), 4096);
+    memcpy((void *) ((uint64_t) child_task->rsp_val - 4096), (void *) ((uint64_t) parent_task->rsp_val - 4096), 4096 - 16);
 
     set_new_cr3(parent_task->cr3);
     
@@ -162,7 +162,7 @@ int fork() {
     );
 
     if(current_process == parent_task) {
-        child_task->rsp_val = (uint64_t *)((uint64_t) &(child_task->k_stack[K_STACK_SIZE - 1]) - (((uint64_t) &(parent_task->k_stack[K_STACK_SIZE - 1])) - p_stack));
+        child_task->rsp_val = (uint64_t *)((uint64_t) &(child_task->k_stack[K_STACK_SIZE - 1]) - (((uint64_t) &(parent_task->k_stack[K_STACK_SIZE - 1])) + p_stack));
         return 0;
     }
     return child_task->pid;
