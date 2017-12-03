@@ -4,8 +4,6 @@
 #include <sys/defs.h>
 #include <sys/syscall_codes.h>
 
-typedef int pid_t;
-
 extern uint64_t syscall0();
 
 extern uint64_t syscall1(syscall_code_t code);
@@ -30,7 +28,7 @@ ssize_t write(int fd, const void *buf, size_t count);
 //char *getcwd(char *buf, size_t size);
 
 pid_t fork();
-void yield();
+int yield();
 //int execvpe(const char *file, char *const argv[], char *const envp[]);
 //pid_t wait(int *status);
 //int waitpid(int pid, int *status);

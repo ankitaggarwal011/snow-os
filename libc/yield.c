@@ -1,5 +1,5 @@
 #include <unistd.h>
 
-void yield() {
+int yield() {
     return syscall1(SYSCALL_YIELD);
 }
