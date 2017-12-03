@@ -93,9 +93,9 @@ void init_kthreads() {
 }
 
 void user_test_func() {
-    char *str = "hellio";
-//    kprintf("In user space\n");
-    write(1, (void *) str, strlen(str));
+    // char *str = "hellio";
+    // kprintf("In user space\n");
+    // write(1, (void *) str, strlen(str));
 }
 
 void test_context_switch() {
