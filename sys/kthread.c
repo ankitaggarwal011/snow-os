@@ -6,8 +6,6 @@
 #include <unistd.h>
 #include <sys/gdt.h>
 
-extern void switch_to(kthread_t **me, kthread_t *next);
-
 extern void set_rsp(uint64_t val);
 
 extern void set_rsp_arg1(uint64_t rsp_val, uint64_t arg1);
