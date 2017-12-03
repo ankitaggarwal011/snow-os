@@ -2,9 +2,10 @@
 #include <unistd.h>
 
 int main(int argc, char *argv[], char *envp[]) {
-  write(1, "hello\n", 6);
-  int a = fork();
-  write(1, a, 8);
+  int a = write(1, "hello\n", 6);
+  char b[1];
+  b[0] = a - '0';
+  write(1, (char *) b, 1);
   /*
   if (fork() == 0) {
     write(1, "Parent\n", 7);
