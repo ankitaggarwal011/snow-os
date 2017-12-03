@@ -21,6 +21,14 @@ int getPID() {
     return -1;
 }
 
+int get_process_pid() {
+    return current_process->pid;
+}
+
+int get_process_ppid() {
+    return current_process->ppid;
+}
+
 void init_processes() {
     for(int i = 0; i < MAX_P; i++) {
         processes[i] = 0;
