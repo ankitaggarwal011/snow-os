@@ -17,8 +17,7 @@ void handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t 
             }
             break;
         case SYSCALL_FORK:
-            int pid = fork();
-            kprintf("PID: %d\n", pid);
+            kprintf("PID: %d\n", fork());
             break;
         default:
             kprintf("Arg1: %x, Arg2: %x, Arg3: %x \n", code, arg2, arg3);
