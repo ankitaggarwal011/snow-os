@@ -2,7 +2,6 @@
 .global syscall_isr
 syscall_isr:
     cli
-    push %rax
     push %rcx
     push %rdx
     push %rbx
@@ -43,7 +42,6 @@ syscall_isr:
     pop %rbx
     pop %rdx
     pop %rcx
-    // pop %rax
     sti
     iretq
 

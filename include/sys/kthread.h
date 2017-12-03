@@ -5,7 +5,8 @@
 
 #define K_STACK_SIZE 4096
 typedef struct kern_thread {
-    uint64_t rsp_val, rsp_user;
+    uint64_t *rsp_val;
+    uint64_t rsp_user;
     uint64_t k_stack[K_STACK_SIZE];
     int pid;
     uint64_t cr3;
@@ -31,9 +32,8 @@ struct mm_struct {
 
 void test_context_switch();
 
-void test_user_bin(void *user_binary);
 void go_to_ring3(kthread_t *user_binary);
 
 kthread_t *get_cur_kthread();
 
-#endif //PROJECT_KTHREAD_H
+#endif
