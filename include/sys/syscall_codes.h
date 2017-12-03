@@ -12,6 +12,8 @@ typedef enum syscall_code {
     SYSCALL_FORK = 0x8,
     SYSCALL_EXECVPE = 0x9,
     SYSCALL_WAIT = 0xA,
-    SYSCALL_YIELD = 0xB
+    SYSCALL_YIELD = 0xB,
+    SYSCALL_PID = 0xC,
+    SYSCALL_PPID = 0xD
 } syscall_code_t;
 #endif
