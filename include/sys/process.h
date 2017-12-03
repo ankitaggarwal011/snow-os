@@ -32,4 +32,7 @@ void init_scheduler();
 void scheduler();
 void switch_process(kthread_t *last_process, kthread_t *current_process);
 
+int get_process_pid();
+int get_process_ppid();
+
 #endif
