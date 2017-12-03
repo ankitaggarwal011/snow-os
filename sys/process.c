@@ -163,7 +163,7 @@ int fork() {
 
     if(current_process == parent_task) {
         child_task->rsp_val = (uint64_t *)((uint64_t) &(child_task->k_stack[K_STACK_SIZE - 1]) - (((uint64_t) &(parent_task->k_stack[K_STACK_SIZE - 1])) - p_stack));
-            return child_task->pid;
+        return 0;
     }
-    return 0;
+    return child_task->pid;
 }
