@@ -30,7 +30,8 @@ int fork();
 void init_idle_process();
 void init_scheduler();
 void scheduler();
-void switch_process(kthread_t *last_process, kthread_t *current_process);
+void switch_process();
+void go_to_ring3();
 
 int get_process_pid();
 int get_process_ppid();

@@ -99,5 +99,5 @@ void load_file(kthread_t *new_process, char *filename) {
     }
     */
 
-    new_process->rsp_user = (uint64_t)((uint64_t) stack + 4096);
+    new_process->rsp_user = (uint64_t)((uint64_t) stack + 4096 - 16);
 }

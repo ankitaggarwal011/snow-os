@@ -40,34 +40,19 @@ void init_scheduler() {
 }
 
 void scheduler() {
+    switch_process();
+}
+
+void switch_process() {
     if(current_process != current_process->next) {
-        switch_process(current_process, current_process->next);
+        switch_to(&current_process, current_process->next);
     }
 }
 
-void switch_process(kthread_t *last_process, kthread_t *current_process) {
-    set_tss_rsp(&(current_process->k_stack[K_STACK_SIZE - 1]));
-
-    __asm__ __volatile__ (
-        "movq %0, %%cr3;"
-        ::"r"(current_process->cr3)
-    );
-
-    __asm__ __volatile__ (
-        "movq $1f, %0;"
-        "pushq %1;"
-        "retq;"
-        "1:\t"
-        :"=g"(last_process->rip)
-        :"r"(current_process->rip)
-    );
-
-    switch_to(&last_process, current_process);
-}
-
-void init_idle_process() {
+kthread_t* init_idle_process() {
     kthread_t *idle = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(idle->k_stack, 0, K_STACK_SIZE);
+    idle->k_stack[K_STACK_SIZE - 1] = (uint64_t) &init_scheduler;
     idle->rsp_val = &(idle->k_stack[K_STACK_SIZE - 1]);
     idle->rsp_user = (uint64_t) &(idle->k_stack[K_STACK_SIZE - 1]);
     idle->pid = getPID();
@@ -78,12 +63,14 @@ void init_idle_process() {
     idle->next = idle;
     idle->num_child = 0;
     current_process = idle;
+    return idle;
 }
 
 kthread_t* create_process(char *filename) {
     kthread_t *new_process = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(new_process->k_stack, 0, K_STACK_SIZE);
-    new_process->rsp_val = &(new_process->k_stack[K_STACK_SIZE - 1]);
+    new_process->k_stack[K_STACK_SIZE - 1] = (uint64_t) &go_to_ring3;
+    new_process->rsp_val = &(new_process->k_stack[K_STACK_SIZE - 17]);
     new_process->pid = getPID();
     new_process->next = NULL;
     new_process->num_child = 0;
@@ -98,11 +85,26 @@ kthread_t* create_process(char *filename) {
 
     set_new_cr3(current_cr3);
 
-    current_process = new_process;
     current_process->next = new_process;
-    //new_process->next = current_process;
+    new_process->next = current_process;
 
     return new_process;
+}
+
+void go_to_ring3() {
+    set_tss_rsp(&(current_process->k_stack[K_STACK_SIZE - 1]));
+    set_new_cr3(current_process->cr3);
+
+    __asm__ __volatile__ (
+        "movq %0, %%rax;"
+        "pushq $0x23;"
+        "pushq %%rax;"
+        "pushfq;"
+        "pushq $0x2B;"
+        "pushq %1;"
+        "iretq;"
+        ::"r"(current_process->rip),"r"(current_process->rsp_user)
+    );
 }
 
 uint64_t copy_process(kthread_t *parent_task) {
