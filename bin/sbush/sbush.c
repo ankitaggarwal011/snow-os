@@ -4,7 +4,6 @@
 int main(int argc, char *argv[], char *envp[]) {
   char *welcome = "Welcome to SBUnix!\n";
   write(1, welcome, 19);
-  
   /*
   if (fork() == 0) {
     write(1, "Parent\n", 7);
