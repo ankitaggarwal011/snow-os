@@ -2,3 +2,7 @@ References used:-
 1.) OSDev Wiki - http://wiki.osdev.org/Main_Page
 2.) Stackoverflow - https://stackoverflow.com/
 3.) AskUbuntu - https://askubuntu.com/
+
+
+Known Bugs
+1.) array allocations not working in sbush : possibly due to missing BSS section mapping while ELF parsing
