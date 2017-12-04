@@ -7,10 +7,6 @@
 #include <sys/vfs.h>
 #include <sys/gdt.h>
 
-extern void switch_to(kthread_t **me, kthread_t *next);
-
-extern void set_rsp(uint64_t val);
-
 extern void set_rsp_arg1(uint64_t rsp_val, uint64_t arg1);
 
 extern void _jump_usermode(void *starting_func_addr);
@@ -108,15 +104,9 @@ void init_kthreads() {
 }
 
 void user_test_func() {
-//    char *str = "hellio";
-//    kprintf("In user space\n");
-    char buf[25];
-    ssize_t read_len = read(0, (void *) buf, 10);
-    kprintf("Read result:");
-    for (int i = 0; i < read_len; i++) {
-        kprintf("%c", buf[i]);
-    }
-    kprintf("\n");
+    // char *str = "hellio";
+    // kprintf("In user space\n");
+    // write(1, (void *) str, strlen(str));
 }
 
 void test_context_switch() {
@@ -129,22 +119,4 @@ void test_context_switch() {
 
 kthread_t *get_cur_kthread() {
     return cur;
-}
-
-void go_to_ring3(kthread_t *user_binary) {
-    set_tss_rsp(&(user_binary->k_stack[K_STACK_SIZE - 1]));
-    set_new_cr3(user_binary->cr3);
-
-    __asm__ __volatile__ (
-        "movq %0, %%rax;"
-        "pushq $0x23;"
-        "pushq %%rax;"
-        "pushfq;"
-        "popq %%rax;"
-        "pushq %%rax;"
-        "pushq $0x2B;"
-        "pushq %1;"
-        "iretq;"
-        ::"r"(user_binary->rsp_user),"r"(user_binary->rip)
-    );
 }

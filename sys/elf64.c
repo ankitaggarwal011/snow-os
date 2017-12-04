@@ -58,7 +58,7 @@ void load_file(kthread_t *new_process, char *filename) {
         phdr++;
         i++;
     }
-    /*
+    
     struct vma_struct *vma_heap = (struct vma_struct*) kmalloc(sizeof(struct vma_struct));
     vma_heap->start = HEAP_START;
     vma_heap->end = HEAP_START + PAGE_SIZE;
@@ -75,10 +75,10 @@ void load_file(kthread_t *new_process, char *filename) {
     update_page_tables(HEAP_START, get_free_page(), PAGING_USER_R_W_FLAGS);
 
     struct vma_struct *vma_stack = (struct vma_struct*) kmalloc(sizeof(struct vma_struct));
-    */
+    
     update_page_tables(STACK_START, get_free_page(), PAGING_USER_R_W_FLAGS);
     uint64_t *stack = (uint64_t*) STACK_START;
-    /*
+    
     vma_stack->start = (uint64_t) stack + PAGE_SIZE;
     vma_stack->end = (uint64_t) stack;
     vma_stack->type = STACK;
@@ -88,7 +88,7 @@ void load_file(kthread_t *new_process, char *filename) {
         vma_map_iter->next = vma_stack;
     }
     vma_map_iter = vma_stack;
-    */
+    
     new_process->process_mm->vma_map = vma_map;
     /*
     struct vma_struct *test = new_process->process_mm->vma_map;
