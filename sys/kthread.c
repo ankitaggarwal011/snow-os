@@ -107,21 +107,3 @@ void test_context_switch() {
 kthread_t *get_cur_kthread() {
     return cur;
 }
-
-void go_to_ring3(kthread_t *user_binary) {
-    set_tss_rsp(&(user_binary->k_stack[K_STACK_SIZE - 1]));
-    set_new_cr3(user_binary->cr3);
-
-    __asm__ __volatile__ (
-        "movq %0, %%rax;"
-        "pushq $0x23;"
-        "pushq %%rax;"
-        "pushfq;"
-        "popq %%rax;"
-        "pushq %%rax;"
-        "pushq $0x2B;"
-        "pushq %1;"
-        "iretq;"
-        ::"r"(user_binary->rsp_user),"r"(user_binary->rip)
-    );
-}
