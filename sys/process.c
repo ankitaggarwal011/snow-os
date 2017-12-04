@@ -11,6 +11,10 @@
 
 kthread_t *current_process;
 
+kthread_t *get_current_process() {
+    return current_process;
+}
+
 int getPID() {
     for (int i = 1; i < MAX_P; i++) {
         if (processes[i] == 0) {
@@ -36,7 +40,7 @@ void init_processes() {
 }
 
 void init_scheduler() {
-    while(1) {
+    while (1) {
         kprintf(" in sched thred ");
         scheduler();
     }
@@ -47,15 +51,15 @@ void scheduler() {
 }
 
 void switch_process() {
-    if(current_process != current_process->next) {
+    if (current_process != current_process->next) {
         switch_to(&current_process, current_process->next);
     }
 }
 
-kthread_t* init_idle_process() {
+kthread_t *init_idle_process() {
     kthread_t *idle = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(idle->k_stack, 0, K_STACK_SIZE);
-    idle->k_stack[K_STACK_SIZE - 1] = (uint64_t) &init_scheduler;
+    idle->k_stack[K_STACK_SIZE - 1] = (uint64_t) & init_scheduler;
     idle->rsp_val = &(idle->k_stack[K_STACK_SIZE - 1]);
     idle->rsp_user = (uint64_t) & (idle->k_stack[K_STACK_SIZE - 1]);
     idle->pid = getPID();
@@ -66,13 +70,20 @@ kthread_t* init_idle_process() {
     idle->next = idle;
     idle->num_child = 0;
     current_process = idle;
+    file_object_t *stdin_fo = get_stdin_fo();
+    stdin_fo->ref_count++;
+    idle->fds[0] = stdin_fo;
+
+    file_object_t *stdout_fo = get_stdout_fo();
+    stdout_fo->ref_count++;
+    idle->fds[1] = stdout_fo;
     return idle;
 }
 
-kthread_t* create_process(char *filename) {
+kthread_t *create_process(char *filename) {
     kthread_t *new_process = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(new_process->k_stack, 0, K_STACK_SIZE);
-    new_process->k_stack[K_STACK_SIZE - 1] = (uint64_t) &go_to_ring3;
+    new_process->k_stack[K_STACK_SIZE - 1] = (uint64_t) & go_to_ring3;
     new_process->rsp_val = &(new_process->k_stack[K_STACK_SIZE - 17]);
     new_process->pid = getPID();
     new_process->next = NULL;
@@ -83,7 +94,13 @@ kthread_t* create_process(char *filename) {
     set_new_cr3(new_process->cr3);
     struct mm_struct *process_mm = (struct mm_struct *) kmalloc(sizeof(struct mm_struct));
     new_process->process_mm = process_mm;
+    file_object_t *stdin_fo = get_stdin_fo();
+    stdin_fo->ref_count++;
+    new_process->fds[0] = stdin_fo;
 
+    file_object_t *stdout_fo = get_stdout_fo();
+    stdout_fo->ref_count++;
+    new_process->fds[1] = stdout_fo;
     load_file(new_process, filename);
 
     set_new_cr3(current_cr3);
@@ -99,14 +116,14 @@ void go_to_ring3() {
     set_new_cr3(current_process->cr3);
 
     __asm__ __volatile__ (
-        "movq %0, %%rax;"
-        "pushq $0x23;"
-        "pushq %%rax;"
-        "pushfq;"
-        "pushq $0x2B;"
-        "pushq %1;"
-        "iretq;"
-        ::"r"(current_process->rip),"r"(current_process->rsp_user)
+    "movq %0, %%rax;"
+            "pushq $0x23;"
+            "pushq %%rax;"
+            "pushfq;"
+            "pushq $0x2B;"
+            "pushq %1;"
+            "iretq;"
+    ::"r"(current_process->rip), "r"(current_process->rsp_user)
     );
 }
 
@@ -119,6 +136,13 @@ uint64_t copy_process(kthread_t *parent_task) {
     child->process_mm = NULL;
     child->next = NULL;
     child->num_child = 0;
+    file_object_t *stdin_fo = get_stdin_fo();
+    stdin_fo->ref_count++;
+    child->fds[0] = stdin_fo;
+
+    file_object_t *stdout_fo = get_stdout_fo();
+    stdout_fo->ref_count++;
+    child->fds[1] = stdout_fo;
     parent_task->num_child++;
 
     child->cr3 = setup_user_page_tables();
@@ -133,10 +157,11 @@ uint64_t copy_process(kthread_t *parent_task) {
         struct vma_struct *c_vma = (struct vma_struct *) kmalloc(sizeof(struct vma_struct));
         memcpy(c_vma, p_vma, sizeof(struct vma_struct));
 
-        uint64_t pages = (((c_vma->end / PAGE_SIZE + 1) * PAGE_SIZE) - ((c_vma->start / PAGE_SIZE) * PAGE_SIZE)) / PAGE_SIZE;
+        uint64_t pages =
+                (((c_vma->end / PAGE_SIZE + 1) * PAGE_SIZE) - ((c_vma->start / PAGE_SIZE) * PAGE_SIZE)) / PAGE_SIZE;
         uint64_t v_addr = (c_vma->start / PAGE_SIZE) * PAGE_SIZE;
         pages++;
-        while(pages--) {
+        while (pages--) {
             uint64_t page = get_free_page();
             update_page_tables(v_addr, page, PAGING_USER_R_W_FLAGS);
             v_addr += PAGE_SIZE;
@@ -171,20 +196,21 @@ int fork() {
     set_new_cr3(parent_task->cr3);
 
     __asm__ __volatile__(
-        "movq $1f, %0;"
-        "1:\t"
-        :"=g"(child_task->rip)
+    "movq $1f, %0;"
+            "1:\t"
+    :"=g"(child_task->rip)
     );
 
     child_task->k_stack[K_STACK_SIZE - 1] = child_task->rip;
 
     __asm__ __volatile__(
-        "movq %%rsp, %0;"
-        :"=r"(p_stack)
+    "movq %%rsp, %0;"
+    :"=r"(p_stack)
     );
 
-    if(current_process == parent_task) {
-        child_task->rsp_val = (uint64_t *)(((uint64_t) &(child_task->k_stack[K_STACK_SIZE - 1])) - (((uint64_t) &(parent_task->k_stack[K_STACK_SIZE - 1])) - p_stack));
+    if (current_process == parent_task) {
+        child_task->rsp_val = (uint64_t * )(((uint64_t) & (child_task->k_stack[K_STACK_SIZE - 1])) -
+                                            (((uint64_t) & (parent_task->k_stack[K_STACK_SIZE - 1])) - p_stack));
         return 0;
     }
     return child_task->pid;

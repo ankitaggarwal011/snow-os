@@ -23,17 +23,29 @@
 int processes[MAX_P];
 
 void init_processes();
-kthread_t* create_process(char *filename);
+
+kthread_t *create_process(char *filename);
+
 int getPID();
+
 uint64_t copy_process(kthread_t *parent_task);
+
 int fork();
-kthread_t* init_idle_process();
+
+kthread_t *init_idle_process();
+
 void init_scheduler();
+
 void scheduler();
+
 void switch_process();
+
 void go_to_ring3();
 
+kthread_t *get_current_process();
+
 int get_process_pid();
+
 int get_process_ppid();
 
 #endif

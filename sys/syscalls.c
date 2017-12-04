@@ -1,6 +1,7 @@
 #include <sys/defs.h>
 #include <sys/kprintf.h>
 #include <sys/kthread.h>
+#include <sys/process.h>
 #include <sys/syscall_codes.h>
 #include <sys/process.h>
 #include <sys/vfs.h>
@@ -9,7 +10,7 @@
 uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6) {
     switch (code) {
         case SYSCALL_WRITE: {
-            kthread_t *cur_kt = get_cur_kthread();
+            kthread_t *cur_kt = get_current_process();
             file_object_t *fo = cur_kt->fds[arg2];
             file_sys_impl_t *fs_impl = fo->file_sys_impl;
             if (fs_impl == NULL) {
@@ -24,7 +25,7 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
 
         case SYSCALL_READ: {
             //hack
-            char *file = (char *) get_file("lib/libc.a");
+            char *file = (char *) get_file("lib/crt1.o");
             return tarfs_read((void *) arg3, arg4, file, 0);
             /*kthread_t *cur_kt = get_cur_kthread();
             file_object_t *fo = cur_kt->fds[arg2];
@@ -41,7 +42,7 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
             if (file == NULL) {
                 return -1;
             }
-            kthread_t *cur_kt = get_cur_kthread();
+            kthread_t *cur_kt = get_current_process();
             int fd_idx = 3; // start searching from 3
             for (; fd_idx < NUM_FDS; fd_idx++) {
                 if (cur_kt->fds[fd_idx] == NULL) {
