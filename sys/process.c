@@ -61,7 +61,7 @@ void switch_process(kthread_t *last_process, kthread_t *current_process) {
         :"=g"(last_process->rip)
         :"r"(current_process->rip)
     );
-    
+
     switch_to(&last_process, current_process);
 }
 
@@ -98,8 +98,9 @@ kthread_t* create_process(char *filename) {
 
     set_new_cr3(current_cr3);
 
+    current_process = new_process;
     current_process->next = new_process;
-    new_process->next = current_process;
+    //new_process->next = current_process;
 
     return new_process;
 }
