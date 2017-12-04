@@ -32,7 +32,7 @@ struct mm_struct {
 
 void test_context_switch();
 
-void go_to_ring3(kthread_t *user_binary);
+void go_to_ring3();
 
 kthread_t *get_cur_kthread();
 

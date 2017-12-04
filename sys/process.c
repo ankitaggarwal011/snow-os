@@ -174,7 +174,7 @@ int fork() {
         :"=g"(child_task->rip)
     );
 
-    new_process->k_stack[K_STACK_SIZE - 1] = child_task->rip;
+    child_task->k_stack[K_STACK_SIZE - 1] = child_task->rip;
 
     __asm__ __volatile__(
         "movq %%rsp, %0;"
