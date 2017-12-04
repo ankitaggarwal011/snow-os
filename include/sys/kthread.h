@@ -36,6 +36,8 @@ void go_to_ring3(kthread_t *user_binary);
 
 kthread_t *get_cur_kthread();
 
+extern void set_rsp(uint64_t val);
+
 extern void switch_to(kthread_t **me, kthread_t *next);
 
 #endif
