@@ -12,7 +12,7 @@
 kthread_t *current_process;
 
 int getPID() {
-    for(int i = 0; i < MAX_P; i++) {
+    for(int i = 1; i < MAX_P; i++) {
         if(processes[i] == 0) {
             processes[i] = 1;
             return i;
@@ -110,7 +110,7 @@ void go_to_ring3() {
 uint64_t copy_process(kthread_t *parent_task) {
     kthread_t *child = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(parent_task->k_stack, 0, K_STACK_SIZE);
-    child->rsp_val = &(child->k_stack[K_STACK_SIZE - 1]);
+    child->rsp_val = &(child->k_stack[K_STACK_SIZE - 17]);
     child->pid = getPID();
     child->ppid = parent_task->pid;
     child->process_mm = NULL;
@@ -162,7 +162,6 @@ int fork() {
     current_process->next = child_task;
     child_task->next = last;
 
-    // memcpy((void *) &(child_task->k_stack[0]), (void *) &(parent_task->k_stack[0]), 4096);
     for (int i = 0; i < 4096; i++) {
         *(child_task->k_stack + i) = *(parent_task->k_stack + i);
     }
@@ -170,10 +169,12 @@ int fork() {
     set_new_cr3(parent_task->cr3);
     
     __asm__ __volatile__(
-        "movq $2f, %0;"
-        "2:\t"
+        "movq $1f, %0;"
+        "1:\t"
         :"=g"(child_task->rip)
     );
+
+    new_process->k_stack[K_STACK_SIZE - 1] = child_task->rip;
 
     __asm__ __volatile__(
         "movq %%rsp, %0;"
