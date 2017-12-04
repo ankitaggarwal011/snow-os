@@ -40,17 +40,13 @@ void init_scheduler() {
 }
 
 void scheduler() {
-    kthread_t *last_process = current_process;
-    current_process = current_process->next;
-    if(last_process != current_process) {
-        switch_process(last_process, current_process);
+    if(current_process != current_process->next) {
+        switch_process(current_process, current_process->next);
     }
 }
 
 void switch_process(kthread_t *last_process, kthread_t *current_process) {
     set_tss_rsp(&(current_process->k_stack[K_STACK_SIZE - 1]));
-
-    switch_to(&last_process, current_process);
 
     __asm__ __volatile__ (
         "movq %0, %%cr3;"
@@ -65,6 +61,8 @@ void switch_process(kthread_t *last_process, kthread_t *current_process) {
         :"=g"(last_process->rip)
         :"r"(current_process->rip)
     );
+    
+    switch_to(&last_process, current_process);
 }
 
 void init_idle_process() {
@@ -102,7 +100,6 @@ kthread_t* create_process(char *filename) {
 
     current_process->next = new_process;
     new_process->next = current_process;
-    current_process = new_process; 
 
     return new_process;
 }
@@ -162,7 +159,6 @@ int fork() {
     current_process->next = child_task;
     child_task->next = last;
 
-    parent_task = current_process;
     // memcpy((void *) &(child_task->k_stack[0]), (void *) &(parent_task->k_stack[0]), 4096);
     for (int i = 0; i < 4096; i++) {
         *(child_task->k_stack + i) = *(parent_task->k_stack + i);

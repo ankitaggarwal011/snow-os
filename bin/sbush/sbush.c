@@ -11,7 +11,7 @@ int main(int argc, char *argv[], char *envp[]) {
   c[0] = '0' + pp;
   write(1, (char*) b, 1);
   write(1, (char*) c, 1);
-  /*
+  
   if (fork() == 0) {
     write(1, "Parent\n", 7);
     yield();
@@ -20,7 +20,7 @@ int main(int argc, char *argv[], char *envp[]) {
   else {
     write(1, "Child\n", 6);
   }
-  */
+  
   while(1);
   return 0;
 }
