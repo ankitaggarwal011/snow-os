@@ -48,4 +48,8 @@ int get_process_pid();
 
 int get_process_ppid();
 
+uint64_t user_malloc(uint64_t bytes);
+
+void user_free(uint64_t addr);
+
 #endif
