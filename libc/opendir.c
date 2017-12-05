@@ -5,5 +5,5 @@
 DIR *opendir(const char *name) {
     DIR dir_open;
     dir_open.stream = syscall2(SYSCALL_OPENDIR, (uint64_t) name);
-    return (DIR *)((uint64_t) dir_open);
+    return (DIR *)((uint64_t) &dir_open);
 }
