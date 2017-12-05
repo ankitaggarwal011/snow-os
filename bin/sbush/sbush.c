@@ -42,7 +42,8 @@ int main(int argc, char *argv[], char *envp[]) {
     DIR *test = opendir("bin");
     struct dirent *test_dir;
     while(test_dir != NULL) {
-        test_dir = readdir(test);   
+        test_dir = (struct dirent *) readdir(test);
+        write(1, (char *) test_dir->d_name, 256);   
     }
     closedir(test);
 
