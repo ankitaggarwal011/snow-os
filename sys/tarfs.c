@@ -151,7 +151,7 @@ int read_dir(uint64_t stream, char* filename) {
         return -1;
     }
     for (int i = 0; i < 255; i++) {
-        *(filename + i) = d->files[current_point][i];
+        *(filename + i) = d->files[d->current_point][i];
     }
     d->current_point++;
     return 0;
