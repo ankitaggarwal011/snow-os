@@ -177,7 +177,7 @@ void remove_page_table_mapping(uint64_t virt_addr) {
     }
     pde_t = (uint64_t * )(kernel_virtual_base + pde);
 
-    if ((pde_t[offset_pde] & 1UL) != 1UL) {
+    if ((pde_t[offset_pde] & 1UL) == 1UL) {
         pte = pde_t[offset_pde] & MASK;
     } else {
         return;

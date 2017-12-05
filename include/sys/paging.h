@@ -3,7 +3,7 @@
 
 #include <sys/defs.h>
 
-#define PAGING_KERNEL_R_W_FLAGS 0x7 // change to 0x3. 0x7 value is a hack for now
+#define PAGING_KERNEL_R_W_FLAGS 0x3 // change to 0x3. 0x7 value is a hack for now
 #define PAGING_USER_R_W_FLAGS 0x7
 
 void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree);
@@ -21,5 +21,7 @@ uint64_t get_cr3();
 uint64_t setup_user_page_tables();
 
 uint64_t get_physical_from_virtual(uint64_t virtual_addr);
+
+void remove_page_table_mapping(uint64_t virt_addr);
 
 #endif
