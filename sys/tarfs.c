@@ -3,6 +3,7 @@
 #include <sys/physical_memory.h>
 #include <sys/string.h>
 #include <sys/tarfs.h>
+#include <sys/paging.h>
 
 struct posix_header_ustar *tarfs_start = (struct posix_header_ustar *) &_binary_tarfs_start;
 struct posix_header_ustar *tarfs_end = (struct posix_header_ustar *) &_binary_tarfs_end;
@@ -108,7 +109,14 @@ struct dir_header *get_folder(char *name) {
         int file_size = o_to_d(atoi(s->size));
 
         if (substr(name, s->name)) {
-            dir_pointer->files[dir_pointer->file_count] = s->name;
+            char *tmp = s->name;
+            int j = 0;
+            while(tmp) {
+                dir_pointer->files[dir_pointer->file_count][j] = tmp;
+                tmp++;
+                j++;
+            }
+            tmp[j] = 0;
             dir_pointer->file_count++;
         }
 
@@ -138,6 +146,7 @@ uint64_t open_dir(char *name) {
 }
 
 int read_dir(uint64_t stream, char* filename) {
+    struct dir_header *d = (struct dir_header *) stream;
     if (d->current_point >= dir_pointer->file_count) {
         return -1;
     }
