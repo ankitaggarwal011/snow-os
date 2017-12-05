@@ -1,6 +1,8 @@
 #ifndef _DIRENT_H
 #define _DIRENT_H
 
+#include <unistd.h>
+
 #define NAME_MAX 255
 
 struct dirent {
@@ -9,7 +11,7 @@ struct dirent {
 
 struct DIR {
     uint64_t stream;
-}
+};
 
 typedef struct DIR DIR;
 
