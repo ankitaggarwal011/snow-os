@@ -112,7 +112,7 @@ kthread_t *create_process(char *filename) {
 }
 
 void go_to_ring3() {
-    set_tss_rsp(&(current_process->k_stack[K_STACK_SIZE - 1]));
+    set_tss_rsp(current_process->rsp_val);
     set_new_cr3(current_process->cr3);
 
     __asm__ __volatile__ (
