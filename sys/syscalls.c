@@ -74,9 +74,9 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
             user_free(arg2);
             break;
         case SYSCALL_OPENDIR:
-            return open_dir(arg2);
+            return open_dir((char *) arg2);
         case SYSCALL_READDIR:
-            return read_dir(arg2, arg3);
+            return read_dir(arg2, (char *) arg3);
         case SYSCALL_CLOSEDIR:
             return close_dir(arg2);
         default:
