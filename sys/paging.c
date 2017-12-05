@@ -99,6 +99,13 @@ void set_new_cr3(uint64_t cr3_addr) {
     __asm__ __volatile__ ("movq %0, %%cr3;"::"r"(cr3_addr));
 }
 
+void flush_tlb() {
+    __asm__ __volatile__ (
+        "movq %%cr3 %%rax;"
+        "movq %%rax %%cr3;"
+    );
+}
+
 void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree) {
     uint64_t cr3_addr = get_free_page(), v_i = kernmem, p_i = physbase;
     kernel_virtual_base = kernmem - physbase;
@@ -225,5 +232,5 @@ void kfree(void *ptr) {
     remove_page_table_mapping((uint64_t) ptr); // remove page table mapping
     add_back_free_pages(phy_addr, 1);
     update_max_pages(1);
-    set_new_cr3(get_cr3()); // update cr3 to clear tlb cache
+    flush_tlb(); // update cr3 to clear tlb cache
 }

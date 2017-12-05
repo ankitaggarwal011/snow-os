@@ -18,6 +18,8 @@ void kfree(void *ptr);
 
 uint64_t get_cr3();
 
+void flush_tlb();
+
 uint64_t setup_user_page_tables();
 
 uint64_t walk_page_table(uint64_t virt_addr);
