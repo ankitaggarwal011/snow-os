@@ -148,3 +148,49 @@ void *kmalloc(uint32_t bytes_required) {
     }
     return (void *) (kernel_virtual_base + allocated_addr);
 }
+
+uint64_t get_physical_from_virtual(uint64_t virtual_addr) {
+    return (virtual_addr - kernel_virtual_base);
+}
+
+void remove_page_table_mapping(uint64_t virt_addr) {
+    uint64_t *pml4_t = (uint64_t *)(get_cr3() + kernel_virtual_base);
+    uint64_t *pdpe_t = NULL, *pde_t = NULL, *pte_t = NULL;
+    uint32_t
+    offset_pte = 0x1FF & (virt_addr >> 12),
+    offset_pde = 0x1FF & (virt_addr >> 21),
+    offset_pdpe = 0x1FF & (virt_addr >> 30),
+    offset_pml4 = 0x1FF & (virt_addr >> 39);
+
+    if ((pml4_t[offset_pml4] & 1UL) == 1UL) {
+        pdpe = pml4_t[offset_pml4] & MASK;
+    } else {
+        return;
+    }
+    pdpe_t = (uint64_t * )(kernel_virtual_base + pdpe);
+
+    if ((pdpe_t[offset_pdpe] & 1UL) == 1UL) {
+        pde = pdpe_t[offset_pdpe] & MASK;
+    } else {
+        return;
+    }
+    pde_t = (uint64_t * )(kernel_virtual_base + pde);
+
+    if ((pde_t[offset_pde] & 1UL) != 1UL) {
+        pte = pde_t[offset_pde] & MASK;
+    } else {
+        return;
+    }
+    pte_t = (uint64_t * )(kernel_virtual_base + pte);
+    pte_t[offset_pte] = 0;
+}
+
+// takes virtual address in kernel space as an input
+void kfree(void *ptr) {
+    memset(ptr, 0, PAGE_SIZE);
+    uint64_t phy_addr = get_physical_from_virtual((uint64_t) ptr);
+    remove_page_table_mapping((uint64_t) ptr); // remove page table mapping
+    add_back_free_pages(phy_addr, 1);
+    update_max_pages(1);
+    set_new_cr3(get_cr3()); // update cr3 to clear tlb cache
+}
