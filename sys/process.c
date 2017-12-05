@@ -141,7 +141,7 @@ void user_free(uint64_t addr) {
         if (iter->start == addr) {
             uint64_t tmp = addr;
             while (tmp < iter->end) {
-                kfree(tmp);
+                kfree((void *) tmp);
                 tmp += PAGE_SIZE;
             }
             break;
