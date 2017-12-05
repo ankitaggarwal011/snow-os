@@ -101,8 +101,8 @@ void set_new_cr3(uint64_t cr3_addr) {
 
 void flush_tlb() {
     __asm__ __volatile__ (
-        "movq %%cr3 %%rax;"
-        "movq %%rax %%cr3;"
+        "movq %cr3 %rax\n\t"
+        "movq %rax %%cr3"
     );
 }
 
