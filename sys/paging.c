@@ -156,6 +156,7 @@ uint64_t get_physical_from_virtual(uint64_t virtual_addr) {
 void remove_page_table_mapping(uint64_t virt_addr) {
     uint64_t *pml4_t = (uint64_t *)(get_cr3() + kernel_virtual_base);
     uint64_t *pdpe_t = NULL, *pde_t = NULL, *pte_t = NULL;
+    uint64_t pdpe, pde, pte;
     uint32_t
     offset_pte = 0x1FF & (virt_addr >> 12),
     offset_pde = 0x1FF & (virt_addr >> 21),
