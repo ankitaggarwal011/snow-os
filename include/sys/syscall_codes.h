@@ -16,6 +16,9 @@ typedef enum syscall_code {
     SYSCALL_PID = 0xC,
     SYSCALL_PPID = 0xD,
     SYSCALL_MALLOC = 0xE,
-    SYSCALL_FREE = 0xF
+    SYSCALL_FREE = 0xF,
+    SYSCALL_OPENDIR = 0x10,
+    SYSCALL_READDIR = 0x11,
+    SYSCALL_CLOSEDIR = 0x12
 } syscall_code_t;
 #endif

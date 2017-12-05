@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include <unistd.h>
 
 int main(int argc, char *argv[], char *envp[]) {
     char *welcome = "Welcome to SBUnix!\n";
+    write(1, welcome, 19);
     /*
     char *a = "hiwhattefun";
     read(0, a, 5);
@@ -13,13 +15,10 @@ int main(int argc, char *argv[], char *envp[]) {
     write(1, a, 5);
     yield();
     */
-    write(1, welcome, 19);
-
+    /*
     char *test_malloc = (char *) malloc(10);
-    test_malloc[0] = 'a';
-    test_malloc[1] = 'b';
     free(test_malloc);
-    test_malloc[0] = 'c'; // will produce page fault at allocated address
+    */
 
     /*
     if (fork() == 0) {
@@ -39,6 +38,14 @@ int main(int argc, char *argv[], char *envp[]) {
 //        yield();
 //        write(1, welcome, 19);
 //    }
+
+    DIR *test = opendir("bin");
+    struct dirent *test_dir;
+    while(test_dir != NULL) {
+        test_dir = readdir(test);   
+    }
+    closedir(test);
+
     while (1);
     return 0;
 }
