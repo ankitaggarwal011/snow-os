@@ -219,7 +219,7 @@ void remove_page_table_mapping(uint64_t virt_addr) {
         return;
     }
     pte_t = (uint64_t * )(kernel_virtual_base + pte);
-    pte_t[offset_pte] = 0;
+    pte_t[offset_pte] = 0x0;
 }
 
 // takes virtual address as an input
@@ -229,8 +229,8 @@ void kfree(void *ptr) {
     if (phy_addr == 0) {
         return; // no mapping found
     }
-    remove_page_table_mapping((uint64_t) ptr); // remove page table mapping
     add_back_free_pages(phy_addr, 1);
     update_max_pages(1);
+    remove_page_table_mapping((uint64_t) ptr); // remove page table mapping
     flush_tlb(); // update cr3 to clear tlb cache
 }
