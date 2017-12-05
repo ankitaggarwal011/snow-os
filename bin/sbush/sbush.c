@@ -18,9 +18,8 @@ int main(int argc, char *argv[], char *envp[]) {
     char *test_malloc = (char *) malloc(10);
     test_malloc[0] = 'a';
     test_malloc[1] = 'b';
-    write(1, test_malloc, 2);
     free(test_malloc);
-    test_malloc[0] = 'c';
+    test_malloc[0] = 'c'; // will produce page fault at allocated address
 
     /*
     if (fork() == 0) {
