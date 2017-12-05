@@ -111,12 +111,12 @@ struct dir_header *get_folder(char *name) {
         if (substr(name, s->name)) {
             char *tmp = s->name;
             int j = 0;
-            while(tmp) {
-                dir_pointer->files[dir_pointer->file_count][j] = tmp;
+            while(*tmp) {
+                dir_pointer->files[dir_pointer->file_count][j] = *tmp;
                 tmp++;
                 j++;
             }
-            tmp[j] = 0;
+            dir_pointer->files[dir_pointer->file_count][j] = 0;
             dir_pointer->file_count++;
         }
 
@@ -147,10 +147,9 @@ uint64_t open_dir(char *name) {
 
 int read_dir(uint64_t stream, char* filename) {
     struct dir_header *d = (struct dir_header *) stream;
-    if (d->current_point >= dir_pointer->file_count) {
+    if (d->current_point >= d->file_count) {
         return -1;
     }
-    struct dir_header *d = (struct dir_header *) stream;
     for (int i = 0; i < 255; i++) {
         *(filename + i) = d->files[current_point][i];
     }
