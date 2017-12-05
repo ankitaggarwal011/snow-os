@@ -69,8 +69,9 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
         case SYSCALL_PPID:
             return get_process_ppid();
         case SYSCALL_MALLOC:
-            return 0; // dummy
+            return user_malloc(arg2);
         case SYSCALL_FREE:
+            user_free(arg2);
             break;
         default:
             kprintf("Arg1: %x, Arg2: %x, Arg3: %x \n", code, arg2, arg3);

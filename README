@@ -3,6 +3,9 @@ References used:-
 2.) Stackoverflow - https://stackoverflow.com/
 3.) AskUbuntu - https://askubuntu.com/
 
+Note:
+vma_map_iter, vma_stack, vma_heap needs to set during copy process as well for fork
+
 
 Known Bugs
 1.) array allocations not working in sbush : possibly due to missing BSS section mapping while ELF parsing
