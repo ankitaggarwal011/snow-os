@@ -14,8 +14,16 @@ void set_new_cr3(uint64_t cr3_addr);
 
 void *kmalloc(uint32_t bytes_required);
 
+void kfree(void *ptr);
+
 uint64_t get_cr3();
 
+void flush_tlb();
+
 uint64_t setup_user_page_tables();
+
+uint64_t walk_page_table(uint64_t virt_addr);
+
+void remove_page_table_mapping(uint64_t virt_addr);
 
 #endif

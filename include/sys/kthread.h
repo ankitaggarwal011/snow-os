@@ -33,6 +33,8 @@ struct vma_struct {
 struct mm_struct {
     struct vma_struct *vma_map;
     struct vma_struct *vma_map_iter;
+    struct vma_struct *vma_stack;
+    struct vma_struct *vma_heap;
 }__attribute__((__packed__));
 
 void test_context_switch();

@@ -61,8 +61,8 @@ void add_back_free_pages(uint64_t page_addr, uint64_t num_of_pages) {
     uint64_t page_number = page_addr / PAGE_SIZE;
     struct physical_page *prev_free_list = free_list;
     free_list = &page_descriptor[page_number];
-    page_descriptor[page_number + num_of_pages].next = prev_free_list;
-    pages_used -= num_of_pages; 
+    page_descriptor[page_number + num_of_pages - 1].next = prev_free_list;
+    pages_used -= num_of_pages;
     // kprintf("After adding the page back, free list starts from: %p\n", free_list->page_number * PAGE_SIZE);
 }
 

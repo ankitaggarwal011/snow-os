@@ -111,6 +111,45 @@ kthread_t *create_process(char *filename) {
     return new_process;
 }
 
+uint64_t user_malloc(uint64_t bytes) {
+    uint64_t start_alloc = current_process->process_mm->vma_map_iter->end;
+    uint64_t end_alloc = start_alloc;
+    if (bytes % PAGE_SIZE == 0) {
+        end_alloc += bytes;
+    }
+    else {
+        end_alloc += ((bytes / PAGE_SIZE) + 1) * PAGE_SIZE;
+    }
+    struct vma_struct *vma_malloc = kmalloc(sizeof(struct vma_struct));
+    vma_malloc->start = start_alloc;
+    vma_malloc->end = end_alloc;
+    vma_malloc->next = NULL;
+    current_process->process_mm->vma_map_iter->next = vma_malloc;
+    current_process->process_mm->vma_map_iter = vma_malloc;
+
+    while (start_alloc < end_alloc) {
+        update_page_tables(start_alloc, get_free_page(), PAGING_USER_R_W_FLAGS);
+        start_alloc += PAGE_SIZE;
+    }
+
+    return vma_malloc->start;
+}
+
+void user_free(uint64_t addr) {
+    struct vma_struct *iter = current_process->process_mm->vma_heap;
+    while (iter != NULL) {
+        if (iter->start == addr) {
+            uint64_t tmp = addr;
+            while (tmp < iter->end) {
+                kfree((void *) tmp);
+                tmp += PAGE_SIZE;
+            }
+            break;
+        }
+        iter = iter->next;
+    }
+}
+
 void go_to_ring3() {
     set_tss_rsp(current_process->rsp_val);
     set_new_cr3(current_process->cr3);

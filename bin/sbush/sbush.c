@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 int main(int argc, char *argv[], char *envp[]) {
     char *welcome = "Welcome to SBUnix!\n";
+    /*
     char *a = "hiwhattefun";
     read(0, a, 5);
     yield();
@@ -10,7 +12,14 @@ int main(int argc, char *argv[], char *envp[]) {
     yield();
     write(1, a, 5);
     yield();
+    */
     write(1, welcome, 19);
+
+    char *test_malloc = (char *) malloc(10);
+    test_malloc[0] = 'a';
+    test_malloc[1] = 'b';
+    free(test_malloc);
+    test_malloc[0] = 'c'; // will produce page fault at allocated address
 
     /*
     if (fork() == 0) {
