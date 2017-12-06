@@ -9,7 +9,7 @@
 
 uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6) {
     switch (code) {
-        case SYSCALL_WRITE:
+        case SYSCALL_WRITE: {
             kthread_t *cur_kt = get_current_process();
             file_object_t *fo = cur_kt->fds[arg2];
             file_sys_impl_t *fs_impl = fo->file_sys_impl;
@@ -19,10 +19,12 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
             }
             fs_impl->write_impl((void *) arg3, arg4);
             return arg4;
+        }
+        
         case SYSCALL_FORK:
             return fork();
 
-        case SYSCALL_READ:
+        case SYSCALL_READ: {
             //hack
             char *file = (char *) get_file("lib/crt1.o");
             return tarfs_read((void *) arg3, arg4, file, 0);
@@ -34,8 +36,9 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
                 return 0;
             }
             fs_impl->read_impl((void *) arg3, arg4); */
+        }
 
-        case SYSCALL_OPEN:
+        case SYSCALL_OPEN: {
             char *file = (char *) get_file((char *) arg2);
             if (file == NULL) {
                 return -1;
@@ -58,6 +61,7 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
             file_object_t->fs_impl =*/
             // do later
             break;
+        }
         case SYSCALL_YIELD:
             scheduler();
             return 0;
