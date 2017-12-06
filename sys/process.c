@@ -95,7 +95,7 @@ kthread_t *create_process(char *filename) {
     for (int i = 0; (filename + i) < tmp; i++) {
          new_process->cwd[i] = *(filename + i);
     }
-
+    new_process->cwd[i] = 0;
     new_process->cr3 = setup_user_page_tables();
     uint64_t current_cr3 = get_cr3();
     set_new_cr3(new_process->cr3);
@@ -166,8 +166,9 @@ int get_cwd(char *buf, size_t size) {
 
 int ch_dir(char *path) {
     for (int i = 0; *(path + i) != 0; i++) {
-         *(current_process->cwd + i) = *(path + i);
+         current_process->cwd[i] = *(path + i);
     }
+    current_process->cwd[i] = 0;
     return 0;
 }
 
