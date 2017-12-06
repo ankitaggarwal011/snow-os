@@ -109,3 +109,79 @@ file_sys_impl_t *get_tarfs_impl() {
     }
     return tarfs_impl;
 }
+
+struct dir_header *get_folder(char *name) {
+    struct dir_header *dir_pointer = (struct dir_header *) kmalloc(sizeof(struct dir_header));
+    dir_pointer->file_count = 0;
+    struct posix_header_ustar *s = tarfs_start;
+    do {
+        if (!s || s->name[0] == '\0') {
+            break;
+        }
+        int file_size = o_to_d(atoi(s->size));
+
+        // check to exclude the directory itself
+        char tmp_copy[256];
+        char *tmp_1 = (char *) name, *tmp_2 = (char *) tmp_copy;
+        while (*tmp_1) {
+            *tmp_2 = *tmp_1;
+            tmp_1++;
+            tmp_2++;
+        }
+        *tmp_2 = '/';
+        tmp_2++;
+        *tmp_2 = '\0';
+
+        if (substr(name, s->name) && kstrcmp((char *) tmp_copy, s->name) != 0) {
+            char *tmp = s->name;
+            int j = 0;
+            while(*tmp) {
+                dir_pointer->files[dir_pointer->file_count][j] = *tmp;
+                tmp++;
+                j++;
+            }
+            dir_pointer->files[dir_pointer->file_count][j] = 0;
+            dir_pointer->file_count++;
+        }
+
+        if (file_size > 0) {
+            s += (file_size / sizeof(struct posix_header_ustar)) + 2;
+        } else {
+            s++;
+        }
+    } while (s < tarfs_end);
+    return dir_pointer;
+}
+
+int substr(char *s1, char *s2) {
+    char *s1_ = s1, *s2_ = s2;
+    while (*s1_ && *s2_) {
+        if (*s1_ != *s2_) {
+            return 0;
+        }
+        s1_++;
+        s2_++;
+    }
+    return 1;
+}
+
+uint64_t open_dir(char *name) {
+    return (uint64_t) get_folder(name);
+}
+
+int read_dir(uint64_t stream, char* filename) {
+    struct dir_header *d = (struct dir_header *) stream;
+    if (d->current_point >= d->file_count) {
+        return -1;
+    }
+    for (int i = 0; i < 255; i++) {
+        *(filename + i) = d->files[d->current_point][i];
+    }
+    d->current_point++;
+    return 0;
+}
+
+int close_dir(uint64_t stream) {
+    kfree((void *) stream);
+    return 0;
+}

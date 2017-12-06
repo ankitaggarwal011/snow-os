@@ -19,11 +19,21 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
                 return 0;
             }
             fs_impl->write_impl((void *) arg3, arg4, fo->content_start, fo->offset);
-        }
             return arg4;
-        case SYSCALL_FORK:
-            return fork();
+        }
 
+        case SYSCALL_FORK: {
+            fork();
+            uint64_t fork_ret_val = -1;
+            __asm__ __volatile__(
+            "movq %%rax, %0;"
+            :"=g"(fork_ret_val)
+            );
+            if (fork_ret_val == 0) {
+                kprintf("Executing for child!!");
+            }
+            return fork_ret_val;
+        }
         case SYSCALL_READ: {
             //hack
             kthread_t *cur_kt = get_current_process();
@@ -55,7 +65,6 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
             }
             return len_read;
         }
-
         case SYSCALL_OPEN: {
             char *file = (char *) get_file((char *) arg2);
             if (file == NULL) {
@@ -83,7 +92,6 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
             return fd_idx;
             // do later
         }
-
         case SYSCALL_CLOSE: {
             if (arg2 < 0 || arg2 >= NUM_FDS) {
                 // fd limit reached
@@ -108,12 +116,11 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
                 kfree(fo);
             }
             return 0;
-            // do later
         }
 
         case SYSCALL_YIELD:
             scheduler();
-            break;
+            return 0;
         case SYSCALL_PID:
             return get_process_pid();
         case SYSCALL_PPID:
@@ -122,7 +129,17 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
             return user_malloc(arg2);
         case SYSCALL_FREE:
             user_free(arg2);
-            break;
+            return 0;
+        case SYSCALL_OPENDIR:
+            return open_dir((char *) arg2);
+        case SYSCALL_READDIR:
+            return read_dir(arg2, (char *) arg3);
+        case SYSCALL_CLOSEDIR:
+            return close_dir(arg2);
+        case SYSCALL_GETCWD:
+            return get_cwd((char *) arg2, arg3);
+        case SYSCALL_CHDIR:
+            return ch_dir((char *) arg2);
         default:
             kprintf("Arg1: %x, Arg2: %x, Arg3: %x \n", code, arg2, arg3);
             kprintf("Arg4: %x, Arg5: %x, Arg6: %x \n", arg4, arg5, arg6);

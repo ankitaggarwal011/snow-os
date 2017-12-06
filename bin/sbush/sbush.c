@@ -1,20 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include <unistd.h>
 
 int main(int argc, char *argv[], char *envp[]) {
-//    char *welcome = "Welcome to SBUnix!\n";
-//    write(1, welcome, 19);
-    int fd = open("lib/crt1.o", 0);
-    //read(fd, welcome, 10);
-    //yield();
-    //write(1, welcome, 19);
-    close(fd);
-    char *buf= "ooooo";
-    read(0, buf, 5);
-    write(0, " got:", 5);
-    write(0, buf, 5);
-//    write(fd, welcome, 19);
+    // char *welcome = "Welcome to SBUnix!\n";
+    // write(1, welcome, 19);
     /*
     char *a = "hiwhattefun";
     read(0, a, 5);
@@ -28,9 +19,13 @@ int main(int argc, char *argv[], char *envp[]) {
     char *test_malloc = (char *) malloc(10);
     free(test_malloc);
     */
-
+    char *a = "hello";
+    read(0, a, 5);
+    write(0, "got: ", 5);
+    write(0, a, 5);
+    write(0, "\n", 1);
     /*
-    if (fork() == 0) {
+    if (fork() != 0) {
       write(1, "Parent\n", 7);
       yield();
       write(1, "Parent is back\n", 15);
@@ -47,6 +42,22 @@ int main(int argc, char *argv[], char *envp[]) {
 //        yield();
 //        write(1, welcome, 19);
 //    }
+    /*
+    DIR *test = opendir("bin");
+    struct dirent *test_dir;
+    while(1) {
+        test_dir = readdir(test);
+        //write(1, (char *) test_dir->d_name, 256);
+        if (test_dir == NULL) break;
+    }
+    closedir(test);
+    */
+    /*
+    char buff[256];
+    getcwd((char *) buff, 256);
+    chdir("bin/test");
+    getcwd((char *) buff, 256);
+    */
     while (1);
     return 0;
 }
