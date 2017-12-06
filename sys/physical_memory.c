@@ -15,6 +15,21 @@ struct physical_page *free_list;
 struct physical_page page_descriptor[MAX_PAGES];
 uint64_t max_pages_available = 0, max_free_pages_available = 0, pages_used = 0, base_addr = 0x0, physical_mem_size = 0, free_page;
 
+void update_max_pages(uint32_t add_pages) {
+    max_free_pages_available += add_pages;
+    max_pages_available += add_pages;
+}
+
+uint32_t get_page_ref_count(uint64_t page_addr) {
+    uint64_t page_number = page_addr / PAGE_SIZE;
+    return page_descriptor[page_number].ref_count;
+}
+
+void set_page_ref_count(uint64_t page_addr, uint32_t new_ref_count) {
+    uint64_t page_number = page_addr / PAGE_SIZE;
+    page_descriptor[page_number].ref_count = new_ref_count;
+}
+
 void init_physical_memory(uint64_t physfree, uint64_t base, uint64_t length) {
     physical_mem_size = base + length;
     max_free_pages_available = (physical_mem_size - physfree) / PAGE_SIZE; // 4k for each page
@@ -43,7 +58,7 @@ uint64_t get_free_page() {
         return 0x0;
     }
     free_page = free_list->page_number * PAGE_SIZE;
-    free_list->ref_count = 1;
+    set_page_ref_count(free_page, 1);
     free_list = free_list->next;
     pages_used++;
     // kprintf("After allocating new page, free list starts from: %p\n", free_list->page_number * PAGE_SIZE);
@@ -70,19 +85,4 @@ void add_back_free_pages(uint64_t page_addr, uint64_t num_of_pages) {
     page_descriptor[page_number + num_of_pages - 1].next = prev_free_list;
     pages_used -= num_of_pages;
     // kprintf("After adding the page back, free list starts from: %p\n", free_list->page_number * PAGE_SIZE);
-}
-
-void update_max_pages(uint32_t add_pages) {
-    max_free_pages_available += add_pages;
-    max_pages_available += add_pages;
-}
-
-uint32_t get_page_ref_count(uint64_t page_addr) {
-    uint64_t page_number = page_addr / PAGE_SIZE;
-    return page_descriptor[page_number].ref_count;
-}
-
-void set_page_ref_count(uint64_t page_addr, uint32_t new_ref_count) {
-    uint64_t page_number = page_addr / PAGE_SIZE;
-    page_descriptor[page_number].ref_count = new_ref_count;
 }
