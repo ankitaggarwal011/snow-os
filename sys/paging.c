@@ -7,6 +7,7 @@
 #define PHYS_VIDEO_MEM 0xB8000
 #define ENTRIES 512
 #define MASK 0xFFFFFFFFFFFFF000
+#define GET_FLAGS 0x0000000000000FFF
 
 uint64_t *pml4_t, kernel_virtual_base;
 
@@ -233,4 +234,48 @@ void kfree(void *ptr) {
     update_max_pages(1);
     remove_page_table_mapping((uint64_t) ptr); // remove page table mapping
     flush_tlb(); // update cr3 to clear tlb cache
+}
+
+uint64_t cow_page_tables() {
+    uint64_t child_cr3 = get_free_page();
+    uint64_t *child_pml4 = (uint64_t *) (child_cr3 + kernel_virtual_base);
+    uint64_t *parent_pml4 = (uint64_t *)(get_cr3() + kernel_virtual_base);
+    for(int i = 0; i < 512; i++) {
+        if ((parent_pml4[i] & 1UL) == 1UL) {
+            uint64_t pdpe = get_free_page();
+            child_pml4[i] = pdpe | (parent_pml4[i] & GET_FLAGS);
+            uint64_t *child_pdpe = (uint64_t *)(kernel_virtual_base + pdpe);
+            uint64_t *parent_pdpe = (uint64_t * )(kernel_virtual_base + (parent_pml4[i] & MASK));
+            for(int j = 0; j < 512; j++) {
+                if ((parent_pdpe[j] & 1UL) == 1UL) {
+                    uint64_t pde = get_free_page();
+                    child_pdpe[j] = pde | (parent_pdpe[j] & GET_FLAGS);
+                    uint64_t *child_pde = (uint64_t *)(kernel_virtual_base + pde);
+                    uint64_t *parent_pde = (uint64_t * )(kernel_virtual_base + (parent_pdpe[j] & MASK));
+                    for(int k = 0; k < 512; k++) {
+                        if ((parent_pde[k] & 1UL) == 1UL) {
+                            uint64_t pte = get_free_page();
+                            child_pde[k] = pte | (parent_pde[k] & GET_FLAGS);
+                            uint64_t *child_pte = (uint64_t *)(kernel_virtual_base + pte);
+                            uint64_t *parent_pte = (uint64_t * )(kernel_virtual_base + (parent_pde[k] & MASK));
+                            for (int l = 0; l < 512; l++) {
+                                if ((parent_pte[l] & 1UL) == 1UL) {
+                                    parent_pte[l] = parent_pte[l] ^ 2;
+                                    child_pte[l] = parent_pte[l];
+                                    uint64_t physical_addr = parent_pte[l] & MASK;
+                                    if (get_page_ref_count(physical_addr) == 1) {
+                                        set_page_ref_count(physical_addr, 2);
+                                    }
+                                    else {
+                                        kprintf("Page reference in not 1.\n");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return child_cr3;   
 }

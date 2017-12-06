@@ -26,4 +26,6 @@ uint64_t walk_page_table(uint64_t virt_addr);
 
 void remove_page_table_mapping(uint64_t virt_addr);
 
+uint64_t cow_page_tables();
+
 #endif
