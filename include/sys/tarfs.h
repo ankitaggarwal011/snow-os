@@ -1,6 +1,7 @@
 #ifndef _TARFS_H
 #define _TARFS_H
 
+#include <sys/vfs.h>
 extern char _binary_tarfs_start;
 extern char _binary_tarfs_end;
 
@@ -33,6 +34,7 @@ void *get_file(char *filename);
 void *get_file_binary(char *filename);
 
 //hack
-ssize_t tarfs_read(void *buffer, int len, void *file, int offset);
+ssize_t tarfs_read(void *buffer, int len, char *file, int offset);
 
+file_sys_impl_t *get_tarfs_impl();
 #endif

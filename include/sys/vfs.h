@@ -7,9 +7,9 @@
 
 #include <sys/defs.h>
 
-typedef ssize_t (*write_fp)(void *buf, int len);
+typedef ssize_t (*write_fp)(void *buffer, int len, char *file, int offset);
 
-typedef ssize_t (*read_fp)(void *buf, int len);
+typedef ssize_t (*read_fp)(void *buffer, int len, char *file, int offset);
 
 typedef struct file_sys_impl {
     // read contract: read() // not clear
@@ -21,9 +21,12 @@ typedef struct file_obj {
     char *file_path;
     file_sys_impl_t *file_sys_impl;
     uint16_t ref_count;
+    char *content_start;
     uint32_t offset;
 } file_object_t;
 
 file_object_t *get_stdin_fo();
+
 file_object_t *get_stdout_fo();
+
 #endif //SNOW_OS_VFS_H

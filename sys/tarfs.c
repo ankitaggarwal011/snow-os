@@ -3,6 +3,8 @@
 #include <sys/physical_memory.h>
 #include <sys/string.h>
 #include <sys/tarfs.h>
+#include <sys/vfs.h>
+#include <sys/paging.h>
 
 struct posix_header_ustar *tarfs_start = (struct posix_header_ustar *) &_binary_tarfs_start;
 struct posix_header_ustar *tarfs_end = (struct posix_header_ustar *) &_binary_tarfs_end;
@@ -83,7 +85,7 @@ void init_tarfs() {
     print_all_files();
 }
 
-ssize_t tarfs_read(void *buffer, int len, void *file, int offset) {
+ssize_t tarfs_read(void *buffer, int len, char *file, int offset) {
     char *c = (char *) file;
     int i = 0;
     char *buf = (char *) buffer;
@@ -95,4 +97,15 @@ ssize_t tarfs_read(void *buffer, int len, void *file, int offset) {
         i++;
     }
     return len;
+}
+
+file_sys_impl_t *tarfs_impl;
+
+file_sys_impl_t *get_tarfs_impl() {
+    if (tarfs_impl == NULL) {
+        tarfs_impl = (file_sys_impl_t *) kmalloc(sizeof(file_sys_impl_t));
+        tarfs_impl->read_impl = tarfs_read;
+        tarfs_impl->write_impl = NULL;
+    }
+    return tarfs_impl;
 }

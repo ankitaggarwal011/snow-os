@@ -39,8 +39,6 @@ struct mm_struct {
 
 void test_context_switch();
 
-kthread_t *get_cur_kthread();
-
 extern void set_rsp(uint64_t val);
 
 extern void switch_to(kthread_t **me, kthread_t *next);

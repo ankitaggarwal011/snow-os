@@ -3,11 +3,12 @@
 #include <sys/kthread.h>
 #include <sys/process.h>
 #include <sys/syscall_codes.h>
-#include <sys/process.h>
+#include <sys/paging.h>
 #include <sys/vfs.h>
 #include <sys/tarfs.h>
 
-uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6) {
+uint64_t
+handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6) {
     switch (code) {
         case SYSCALL_WRITE: {
             kthread_t *cur_kt = get_current_process();
@@ -17,7 +18,7 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
                 kprintf("#%d: this file descriptor isn't handled for write\n", arg2);
                 return 0;
             }
-            fs_impl->write_impl((void *) arg3, arg4);
+            fs_impl->write_impl((void *) arg3, arg4, fo->content_start, fo->offset);
         }
             return arg4;
         case SYSCALL_FORK:
@@ -25,16 +26,34 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
 
         case SYSCALL_READ: {
             //hack
-            char *file = (char *) get_file("lib/crt1.o");
-            return tarfs_read((void *) arg3, arg4, file, 0);
-            /*kthread_t *cur_kt = get_cur_kthread();
+            kthread_t *cur_kt = get_current_process();
+            if (arg2 < 0 || arg2 >= NUM_FDS) {
+                kprintf("Invalid FD #, must be between %d and %d\n", 0, NUM_FDS);
+                return -1;
+            }
+            if (arg2 == 1 || arg2 == 2) {
+                kprintf("Read op not supported on FD #%d", arg2);
+                return -1;
+            }
             file_object_t *fo = cur_kt->fds[arg2];
+            if (fo == NULL) {
+                kprintf("FD $d is not setup yet!\n", arg2);
+                return -1;
+            }
             file_sys_impl_t *fs_impl = fo->file_sys_impl;
             if (fs_impl == NULL) {
                 kprintf("#%d: this file descriptor isn't handled for read\n", arg2);
-                return 0;
+                return -1;
             }
-            fs_impl->read_impl((void *) arg3, arg4); */
+            if (fs_impl->read_impl == NULL) {
+                kprintf("FD # %d does not support reading.\n", arg2);
+                return -1;
+            }
+            ssize_t len_read = fs_impl->read_impl((void *) arg3, arg4, fo->content_start, fo->offset);
+            if (len_read > 0) {
+                fo->offset += len_read;
+            }
+            return len_read;
         }
 
         case SYSCALL_OPEN: {
@@ -54,13 +73,44 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
                 return -2;
             }
             // now, make new file object
-            /*file_object_t *file_object_t = (file_object_t *) kmalloc(sizeof(file_object_t));
-            file_object_t->name = (char *) arg2;
-            file_object_t->offset = 0;
-            file_object_t->fs_impl =*/
+            file_object_t *fo = (file_object_t *) kmalloc(sizeof(file_object_t));
+            fo->file_path = (char *) arg2;
+            fo->offset = 0;
+            fo->ref_count = 1;
+            fo->file_sys_impl = get_tarfs_impl();
+            fo->content_start = file;
+            cur_kt->fds[fd_idx] = fo;
+            return fd_idx;
             // do later
         }
-            break;
+
+        case SYSCALL_CLOSE: {
+            if (arg2 < 0 || arg2 >= NUM_FDS) {
+                // fd limit reached
+                kprintf("FD # is incorrect!\n");
+                return -1;
+            }
+            if (arg2 == 0 || arg2 == 1 || arg2 == 2) {
+                kprintf("Can't close FD #%d\n", arg2);
+                return -1;
+            }
+
+            // now, make new file object
+            kthread_t *cur_kt = get_current_process();
+            file_object_t *fo = cur_kt->fds[arg2];
+            if (fo == NULL) {
+                kprintf("FD #%d is not open\n", arg2);
+                return -1;
+            }
+            fo->ref_count -= 1;
+            if (fo->ref_count == 0) {
+                cur_kt->fds[arg2] = NULL;
+                kfree(fo);
+            }
+            return 0;
+            // do later
+        }
+
         case SYSCALL_YIELD:
             scheduler();
             break;

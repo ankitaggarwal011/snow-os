@@ -3,8 +3,14 @@
 #include <unistd.h>
 
 int main(int argc, char *argv[], char *envp[]) {
-    char *welcome = "Welcome to SBUnix!\n";
-    write(1, welcome, 19);
+//    char *welcome = "Welcome to SBUnix!\n";
+//    write(1, welcome, 19);
+    int fd = open("lib/crt1.o", 0);
+    //read(fd, welcome, 10);
+    //yield();
+    //write(1, welcome, 19);
+    close(fd);
+//    write(fd, welcome, 19);
     /*
     char *a = "hiwhattefun";
     read(0, a, 5);

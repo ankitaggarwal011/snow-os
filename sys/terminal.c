@@ -3,9 +3,9 @@
 #include <sys/defs.h>
 #include <sys/kprintf.h>
 
-ssize_t terminal_read(void *buffer, int len);
+ssize_t terminal_read(void *buffer, int len, char *content, int offset);
 
-ssize_t terminal_write(void *buffer, int len);
+ssize_t terminal_write(void *buffer, int len, char *content, int offset);
 
 file_sys_impl_t terminal_fs_impl = {
         terminal_read,
@@ -26,7 +26,7 @@ void reset_term_inp_buffer() {
 }
 
 
-ssize_t terminal_read(void *buffer, int len) {
+ssize_t terminal_read(void *buffer, int len, char *file, int offset) {
     if (len == 0) {
         return 0;
     }
@@ -34,14 +34,15 @@ ssize_t terminal_read(void *buffer, int len) {
     while (index < len - 1);
     // index must be >=len-1
     kprintf("Buffer complete: ");
+    char *buf = (char *) buffer;
     for (int i = 0; i < index; i++) {
-        kprintf("%c", term_buf[i]);
+        kprintf("%c", term_buf[i]); // local echo
+        buf[i] = term_buf[i];
     }
-    kprintf("\n");
     return index;
 }
 
-ssize_t terminal_write(void *buffer, int len) {
+ssize_t terminal_write(void *buffer, int len, char *content, int offset) {
     if (len <= 0) {
         return 0;
     }
