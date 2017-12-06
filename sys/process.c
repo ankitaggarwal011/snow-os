@@ -69,7 +69,6 @@ kthread_t *init_idle_process() {
     idle->rip = (uint64_t) & init_scheduler;
     idle->next = idle;
     idle->num_child = 0;
-    idle->cwd = "";
     current_process = idle;
     file_object_t *stdin_fo = get_stdin_fo();
     stdin_fo->ref_count++;
