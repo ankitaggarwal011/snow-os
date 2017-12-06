@@ -223,3 +223,17 @@ void printInputChar(const char *c) {
         i++;
     }
 }
+
+void handle_video_mem_backspace() {
+    if (currentColumn == 0) {
+        if (currentRow == 0) {
+            return;
+        }
+        currentColumn = VIDEO_MEM_COLUMNS - 1;
+        currentRow--;
+    } else {
+        currentColumn--;
+    }
+    char *address = getAddress(currentRow, currentColumn);
+    *address = ' ';
+}

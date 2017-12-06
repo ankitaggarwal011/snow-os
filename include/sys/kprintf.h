@@ -25,4 +25,5 @@ void resetVideoMemory(char initValue, char color);
 void printTime(uint64_t x);
 void kprintf(const char *fmt, ...);
 void printInputChar(const char *c);
+void handle_video_mem_backspace();
 #endif

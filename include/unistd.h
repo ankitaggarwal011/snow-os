@@ -21,7 +21,7 @@ extern uint64_t syscall6(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint
 //int open(const char *pathname, int flags);
 #define FILE_OPEN_FLAG_O_DIRECTORY //enforce that file is not a dir
 int open(const char *pathname, int flags);
-//int close(int fd);
+int close(int fd);
 ssize_t read(int fd, void *buf, size_t count);
 ssize_t write(int fd, const void *buf, size_t count);
 
@@ -43,7 +43,6 @@ pid_t getppid(void);
 //off_t lseek(int fd, off_t offset, int whence);
 //int mkdir(const char *pathname, mode_t mode);
 //int unlink(const char *pathname);
-
 // OPTIONAL: implement for ``signals and pipes (+10 pts)''
 //int pipe(int pipefd[2]);
 
