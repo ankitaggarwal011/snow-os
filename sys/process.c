@@ -251,7 +251,7 @@ uint64_t copy_process(kthread_t *parent_task) {
     return (uint64_t) child;
 }
 
-int fork() {
+void fork() {
     uint64_t return_val = (uint64_t) __builtin_return_address(0);
     kthread_t *parent_task = current_process, *last;
     // volatile uint64_t p_stack;
