@@ -79,7 +79,7 @@ void load_file(kthread_t *new_process, char *filename) {
     update_page_tables(STACK_START, get_free_page(), PAGING_USER_R_W_FLAGS);
     uint64_t *stack = (uint64_t*) STACK_START;
     
-    vma_stack->start = (uint64_t) stack + PAGE_SIZE;
+    vma_stack->start = (uint64_t) stack + PAGE_SIZE - 16;
     vma_stack->end = (uint64_t) stack;
     vma_stack->type = STACK;
     vma_stack->flags = (PR | PW);

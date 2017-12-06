@@ -190,6 +190,39 @@ uint64_t walk_page_table(uint64_t virt_addr) {
     return (pte_t[offset_pte] & MASK);
 }
 
+uint64_t get_flags(uint64_t virt_addr) {
+    uint64_t *pml4_t = (uint64_t *)(get_cr3() + kernel_virtual_base);
+    uint64_t *pdpe_t = NULL, *pde_t = NULL, *pte_t = NULL;
+    uint64_t pdpe, pde, pte;
+    uint32_t
+    offset_pte = 0x1FF & (virt_addr >> 12),
+    offset_pde = 0x1FF & (virt_addr >> 21),
+    offset_pdpe = 0x1FF & (virt_addr >> 30),
+    offset_pml4 = 0x1FF & (virt_addr >> 39);
+
+    if ((pml4_t[offset_pml4] & 1UL) == 1UL) {
+        pdpe = pml4_t[offset_pml4] & MASK;
+    } else {
+        return 0;
+    }
+    pdpe_t = (uint64_t * )(kernel_virtual_base + pdpe);
+
+    if ((pdpe_t[offset_pdpe] & 1UL) == 1UL) {
+        pde = pdpe_t[offset_pdpe] & MASK;
+    } else {
+        return 0;
+    }
+    pde_t = (uint64_t * )(kernel_virtual_base + pde);
+
+    if ((pde_t[offset_pde] & 1UL) == 1UL) {
+        pte = pde_t[offset_pde] & MASK;
+    } else {
+        return 0;
+    }
+    pte_t = (uint64_t * )(kernel_virtual_base + pte);
+    return (pte_t[offset_pte] & GET_FLAGS);
+}
+
 void remove_page_table_mapping(uint64_t virt_addr) {
     uint64_t *pml4_t = (uint64_t *)(get_cr3() + kernel_virtual_base);
     uint64_t *pdpe_t = NULL, *pde_t = NULL, *pte_t = NULL;

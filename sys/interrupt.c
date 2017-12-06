@@ -2,6 +2,10 @@
 #include <sys/io.h>
 #include <sys/kprintf.h>
 #include <sys/interrupt.h>
+#include <sys/process.h>
+#include <sys/physical_memory.h>
+
+#define LIMIT_STACK 8192
 
 extern void timer_isr();
 extern void keyboard_isr();
@@ -16,6 +20,32 @@ void page_fault_handler() {
     volatile uint64_t addr;
     __asm__ volatile("mov %%cr2, %0" : "=r" (addr));
     kprintf("Page fault at %x\n", addr);
+
+    struct vma *current_vma_map = current_process->process_mm->vma_map;
+    struct vma *current_vma_heap = current_process->process_mm->vma_heap;
+    struct vma *current_vma_stack = current_process->process_mm->vma_stack;
+
+    uint64_t physical_addr_flags = get_flags(addr);
+    if (physical_addr_flags & 2 == 2) { // COW
+        uint64_t physical_addr = walk_page_table(addr);
+        if (get_page_ref_count(physical_addr) == 2) {
+            uint64_t v_page = (uint64_t) kmalloc(PAGE_SIZE);
+            uint64_t p_page = walk_page_table(v_page);
+            memcpy((void *) v_page, (void *) addr, PAGE_SIZE);
+            update_page_tables(addr, p_page, PAGING_USER_R_W_FLAGS);
+        }
+        else {
+            update_page_tables(addr, physical_addr, PAGING_USER_R_W_FLAGS);
+        }
+        return;
+    }
+
+    // Auto-growing stack
+    if (addr <= current_vma_stack->start && (current_vma_stack->start - current_vma_stack->end - PAGE_SIZE + 16) >= LIMIT_STACK) {
+        update_page_tables(current_vma_stack->end, get_free_page(), PAGING_USER_R_W_FLAGS);
+        current_vma_stack->end += PAGE_SIZE;
+    }
+
     while(1);
 }
 
