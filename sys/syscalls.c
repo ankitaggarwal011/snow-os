@@ -22,7 +22,16 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
         }
         
         case SYSCALL_FORK:
-            return fork();
+            fork();
+            uint64_t fork_ret_val = -1;
+            __asm__ __volatile__(
+                "movq %%rax, %0;"
+                :"=g"(fork_ret_val)
+            );
+            if (fork_ret_val == 0) {
+                kprintf("Executing for child!!");
+            }
+            return fork_ret_val;
 
         case SYSCALL_READ: {
             //hack

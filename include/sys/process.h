@@ -30,7 +30,7 @@ int getPID();
 
 uint64_t copy_process(kthread_t *parent_task);
 
-int fork();
+void fork();
 
 kthread_t *init_idle_process();
 

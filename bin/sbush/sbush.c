@@ -21,7 +21,7 @@ int main(int argc, char *argv[], char *envp[]) {
     */
 
     /*
-    if (fork() == 0) {
+    if (fork() != 0) {
       write(1, "Parent\n", 7);
       yield();
       write(1, "Parent is back\n", 15);

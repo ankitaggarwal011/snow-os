@@ -15,6 +15,12 @@ kthread_t *get_current_process() {
     return current_process;
 }
 
+extern void setup_forked_kthread_stack(uint64_t *addr);
+
+extern uint64_t get_rsp_val();
+
+extern void put_in_rax();
+
 int getPID() {
     for (int i = 1; i < MAX_P; i++) {
         if (processes[i] == 0) {
@@ -194,7 +200,7 @@ void go_to_ring3() {
 uint64_t copy_process(kthread_t *parent_task) {
     kthread_t *child = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(parent_task->k_stack, 0, K_STACK_SIZE);
-    child->rsp_val = &(child->k_stack[K_STACK_SIZE - 17]);
+    child->rsp_val = &(child->k_stack[K_STACK_SIZE - 1]);
     child->pid = getPID();
     child->ppid = parent_task->pid;
     child->process_mm = NULL;
@@ -246,36 +252,40 @@ uint64_t copy_process(kthread_t *parent_task) {
 }
 
 int fork() {
+    uint64_t return_val = (uint64_t) __builtin_return_address(0);
     kthread_t *parent_task = current_process, *last;
-    volatile uint64_t p_stack;
+    // volatile uint64_t p_stack;
     kthread_t *child_task = (kthread_t *) copy_process(parent_task);
-    last = current_process->next;
-    current_process->next = child_task;
-    child_task->next = last;
 
     for (int i = 0; i < 4096; i++) {
         *(child_task->k_stack + i) = *(parent_task->k_stack + i);
     }
 
-    set_new_cr3(parent_task->cr3);
+    last = current_process->next;
+    current_process->next = child_task;
+    child_task->next = last;
 
+    set_new_cr3(parent_task->cr3);
+    
+    /*
     __asm__ __volatile__(
     "movq $1f, %0;"
             "1:\t"
     :"=g"(child_task->rip)
     );
-
-    child_task->k_stack[K_STACK_SIZE - 1] = child_task->rip;
-
-    __asm__ __volatile__(
-    "movq %%rsp, %0;"
-    :"=r"(p_stack)
-    );
-
-    if (current_process == parent_task) {
-        child_task->rsp_val = (uint64_t * )(((uint64_t) & (child_task->k_stack[K_STACK_SIZE - 1])) -
-                                            (((uint64_t) & (parent_task->k_stack[K_STACK_SIZE - 1])) - p_stack));
-        return 0;
+    */
+    
+    volatile uint64_t *var = (uint64_t * )(get_rsp_val() + 8);
+    parent_task->rsp_val = (uint64_t * )(get_rsp_val() + 8);
+    volatile uint64_t diff = parent_task->k_stack + K_STACK_SIZE - 1 - (var);
+    // child_task->rsp_val = child_task->k_stack + K_STACK_SIZE - 1;
+    child_task->rsp_val = (uint64_t * )(((uint64_t) child_task->rsp_val) - 8 * ((uint64_t) diff));
+    while (*(child_task)->rsp_val != return_val) {
+        child_task->rsp_val++;
     }
-    return child_task->pid;
+    put_in_rax((uint64_t) 0);
+    child_task->rsp_val--;
+    setup_forked_kthread_stack(child_task->rsp_val);
+    child_task->rsp_val -= 15;
+    put_in_rax((uint64_t) child_task->pid);
 }
