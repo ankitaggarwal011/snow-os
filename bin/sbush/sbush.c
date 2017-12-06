@@ -48,10 +48,12 @@ int main(int argc, char *argv[], char *envp[]) {
     }
     closedir(test);
     */
+    /*
     char buff[256];
     getcwd((char *) buff, 256);
     chdir("bin/test");
     getcwd((char *) buff, 256);
+    */
     while (1);
     return 0;
 }

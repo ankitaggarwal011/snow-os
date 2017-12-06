@@ -47,6 +47,7 @@ void init_scheduler() {
 }
 
 void scheduler() {
+    set_new_cr3(current_process->cr3);
     switch_process();
 }
 
