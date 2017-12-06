@@ -6,7 +6,6 @@ DIR dir_open;
 
 DIR *opendir(const char *name) {
     dir_open.stream = 0;
-    char *param = name;
-    dir_open.stream = syscall2(SYSCALL_OPENDIR, (uint64_t) param);
+    dir_open.stream = syscall2(SYSCALL_OPENDIR, (uint64_t) name);
     return (DIR *)((uint64_t) &dir_open);
 }
