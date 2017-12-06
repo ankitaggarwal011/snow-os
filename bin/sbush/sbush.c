@@ -19,12 +19,14 @@ int main(int argc, char *argv[], char *envp[]) {
     char *test_malloc = (char *) malloc(10);
     free(test_malloc);
     */
+    /*
     char *a = "hello";
     read(0, a, 5);
     write(0, "got: ", 5);
     write(0, a, 5);
     write(0, "\n", 1);
-    /*
+    */
+    
     if (fork() != 0) {
       write(1, "Parent\n", 7);
       yield();
@@ -33,7 +35,7 @@ int main(int argc, char *argv[], char *envp[]) {
     else {
       write(1, "Child\n", 6);
     }
-    */
+    
 //    yield();
 //    char buf[10];
 //    ssize_t len = read(0, buf, 5);
