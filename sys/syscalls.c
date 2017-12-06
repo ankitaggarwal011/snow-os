@@ -18,8 +18,9 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
                 return 0;
             }
             fs_impl->write_impl((void *) arg3, arg4);
-        }
             return arg4;
+        }
+        
         case SYSCALL_FORK:
             return fork();
 
@@ -59,11 +60,11 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
             file_object_t->offset = 0;
             file_object_t->fs_impl =*/
             // do later
-        }
             break;
+        }
         case SYSCALL_YIELD:
             scheduler();
-            break;
+            return 0;
         case SYSCALL_PID:
             return get_process_pid();
         case SYSCALL_PPID:
@@ -72,7 +73,17 @@ uint64_t handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint6
             return user_malloc(arg2);
         case SYSCALL_FREE:
             user_free(arg2);
-            break;
+            return 0;
+        case SYSCALL_OPENDIR:
+            return open_dir((char *) arg2);
+        case SYSCALL_READDIR:
+            return read_dir(arg2, (char *) arg3);
+        case SYSCALL_CLOSEDIR:
+            return close_dir(arg2);
+        case SYSCALL_GETCWD:
+            return get_cwd((char *) arg2, arg3);
+        case SYSCALL_CHDIR:
+            return ch_dir((char *) arg2);
         default:
             kprintf("Arg1: %x, Arg2: %x, Arg3: %x \n", code, arg2, arg3);
             kprintf("Arg4: %x, Arg5: %x, Arg6: %x \n", arg4, arg5, arg6);

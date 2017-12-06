@@ -47,6 +47,7 @@ void init_scheduler() {
 }
 
 void scheduler() {
+    set_new_cr3(current_process->cr3);
     switch_process();
 }
 
@@ -89,6 +90,14 @@ kthread_t *create_process(char *filename) {
     new_process->next = NULL;
     new_process->num_child = 0;
 
+    int i = 0;
+    char *tmp = filename;
+    while(*tmp != 0) tmp++;
+    while(*tmp != '/') tmp--;
+    for (i = 0; (filename + i) < tmp; i++) {
+         new_process->cwd[i] = *(filename + i);
+    }
+    new_process->cwd[i] = 0;
     new_process->cr3 = setup_user_page_tables();
     uint64_t current_cr3 = get_cr3();
     set_new_cr3(new_process->cr3);
@@ -150,17 +159,33 @@ void user_free(uint64_t addr) {
     }
 }
 
+int get_cwd(char *buf, size_t size) {
+    for (int i = 0; i < size; i++) {
+        *(buf + i) = *(current_process->cwd + i);
+    }
+    return 0;
+}
+
+int ch_dir(char *path) {
+    int i = 0;
+    for (i = 0; *(path + i) != 0; i++) {
+         current_process->cwd[i] = *(path + i);
+    }
+    current_process->cwd[i] = 0;
+    return 0;
+}
+
 void go_to_ring3() {
-    set_tss_rsp(current_process->rsp_val);
+    set_tss_rsp(&current_process->k_stack[K_STACK_SIZE - 1]);
     set_new_cr3(current_process->cr3);
 
     __asm__ __volatile__ (
-    "movq %0, %%rax;"
+            "movq %1, %%rax;"
             "pushq $0x23;"
             "pushq %%rax;"
             "pushfq;"
             "pushq $0x2B;"
-            "pushq %1;"
+            "pushq %0;"
             "iretq;"
     ::"r"(current_process->rip), "r"(current_process->rsp_user)
     );
