@@ -27,7 +27,7 @@ struct posix_header_ustar {
 struct dir_header {
     int current_point;
     int file_count;
-    char files[1000][256]; // can have 1000 files for now
+    char files[100][256]; // can have 1000 files for now
 };
 
 void init_tarfs();

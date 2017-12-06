@@ -4,8 +4,8 @@
 #include <unistd.h>
 
 int main(int argc, char *argv[], char *envp[]) {
-    char *welcome = "Welcome to SBUnix!\n";
-    write(1, welcome, 19);
+    // char *welcome = "Welcome to SBUnix!\n";
+    // write(1, welcome, 19);
     /*
     char *a = "hiwhattefun";
     read(0, a, 5);
