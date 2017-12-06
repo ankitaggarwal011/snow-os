@@ -151,7 +151,7 @@ void user_free(uint64_t addr) {
 }
 
 void go_to_ring3() {
-    set_tss_rsp((uint64_t) &current_process->k_stack[K_STACK_SIZE - 1]);
+    set_tss_rsp(&current_process->k_stack[K_STACK_SIZE - 1]);
     set_new_cr3(current_process->cr3);
 
     __asm__ __volatile__ (
