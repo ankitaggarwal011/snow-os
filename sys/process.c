@@ -89,10 +89,11 @@ kthread_t *create_process(char *filename) {
     new_process->next = NULL;
     new_process->num_child = 0;
 
+    int i = 0;
     char *tmp = filename;
     while(*tmp != 0) tmp++;
     while(*tmp != '/') tmp--;
-    for (int i = 0; (filename + i) < tmp; i++) {
+    for (i = 0; (filename + i) < tmp; i++) {
          new_process->cwd[i] = *(filename + i);
     }
     new_process->cwd[i] = 0;
@@ -165,7 +166,8 @@ int get_cwd(char *buf, size_t size) {
 }
 
 int ch_dir(char *path) {
-    for (int i = 0; *(path + i) != 0; i++) {
+    int i = 0;
+    for (i = 0; *(path + i) != 0; i++) {
          current_process->cwd[i] = *(path + i);
     }
     current_process->cwd[i] = 0;
