@@ -245,30 +245,30 @@ uint64_t cow_page_tables() {
             uint64_t pdpe = get_free_page();
             child_pml4[i] = pdpe | (parent_pml4[i] & GET_FLAGS);
             uint64_t *child_pdpe = (uint64_t *)(kernel_virtual_base + pdpe);
-            uint64_t *parent_pdpe = (uint64_t * )(kernel_virtual_base + (parent_pml4[i] & MASK));
+            uint64_t *parent_pdpe = (uint64_t *)(kernel_virtual_base + (parent_pml4[i] & MASK));
             for(int j = 0; j < 512; j++) {
                 if ((parent_pdpe[j] & 1UL) == 1UL) {
                     uint64_t pde = get_free_page();
                     child_pdpe[j] = pde | (parent_pdpe[j] & GET_FLAGS);
                     uint64_t *child_pde = (uint64_t *)(kernel_virtual_base + pde);
-                    uint64_t *parent_pde = (uint64_t * )(kernel_virtual_base + (parent_pdpe[j] & MASK));
+                    uint64_t *parent_pde = (uint64_t *)(kernel_virtual_base + (parent_pdpe[j] & MASK));
                     for(int k = 0; k < 512; k++) {
                         if ((parent_pde[k] & 1UL) == 1UL) {
                             uint64_t pte = get_free_page();
                             child_pde[k] = pte | (parent_pde[k] & GET_FLAGS);
                             uint64_t *child_pte = (uint64_t *)(kernel_virtual_base + pte);
-                            uint64_t *parent_pte = (uint64_t * )(kernel_virtual_base + (parent_pde[k] & MASK));
+                            uint64_t *parent_pte = (uint64_t *)(kernel_virtual_base + (parent_pde[k] & MASK));
                             for (int l = 0; l < 512; l++) {
                                 if ((parent_pte[l] & 1UL) == 1UL) {
                                     parent_pte[l] = parent_pte[l] ^ 2;
                                     child_pte[l] = parent_pte[l];
                                     uint64_t physical_addr = parent_pte[l] & MASK;
-                                    if (get_page_ref_count(physical_addr) == 1) {
+                                    // if (get_page_ref_count(physical_addr) == 1) {
                                         set_page_ref_count(physical_addr, 2);
-                                    }
-                                    else {
-                                        kprintf("Page reference in not 1.\n");
-                                    }
+                                    // }
+                                    // else {
+                                    //     kprintf("Page reference in not 1.\n");
+                                    // }
                                 }
                             }
                         }
