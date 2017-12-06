@@ -2,10 +2,13 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+struct dirent read_dirent;
+
 struct dirent *readdir(DIR *dirp) {
-    struct dirent *read_dirent = (struct dirent *) malloc(sizeof(struct dirent));
-    if (syscall3(SYSCALL_READDIR, dirp->stream, (uint64_t) &read_dirent->d_name) == -1) {
+    for (int i = 0; i < 256; i++) read_dirent.d_name[i] = 0;
+    uint64_t stream_addr = dirp->stream;
+    if (syscall3(SYSCALL_READDIR, stream_addr, (uint64_t) &read_dirent.d_name) == -1) {
         return NULL;
     }
-    return read_dirent;
+    return (struct dirent *)((uint64_t) &read_dirent);
 }
