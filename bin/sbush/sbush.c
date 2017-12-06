@@ -45,6 +45,7 @@ int main(int argc, char *argv[], char *envp[]) {
         test_dir = readdir(test);
         //write(1, (char *) test_dir->d_name, 256);
         if (test_dir == NULL) break;
+        free(test_dir);
     }
     closedir(test);
 
