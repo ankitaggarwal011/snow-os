@@ -155,12 +155,12 @@ void go_to_ring3() {
     set_new_cr3(current_process->cr3);
 
     __asm__ __volatile__ (
-            "movq %0, %%rax;"
+            "movq %1, %%rax;"
             "pushq $0x23;"
             "pushq %%rax;"
             "pushfq;"
             "pushq $0x2B;"
-            "pushq %1;"
+            "pushq %0;"
             "iretq;"
     ::"r"(current_process->rip), "r"(current_process->rsp_user)
     );
