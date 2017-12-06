@@ -1,6 +1,7 @@
 .text
 .global syscall_isr
 syscall_isr:
+    sti
     push %rcx
     push %rdx
     push %rbx
@@ -41,6 +42,7 @@ syscall_isr:
     pop %rbx
     pop %rdx
     pop %rcx
+    cli
     iretq
 
 .global test_syscall

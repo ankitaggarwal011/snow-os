@@ -412,11 +412,8 @@ void printAscii(uint8_t sc) {
             }
             return;
     }
-    if (sc > 0x80) {
-        handleNormalScanCodes(sc - 0x80);
-    } else {
         handleNormalScanCodes(sc);
-    }
+
 }
 
 

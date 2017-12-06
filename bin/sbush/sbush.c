@@ -10,6 +10,10 @@ int main(int argc, char *argv[], char *envp[]) {
     //yield();
     //write(1, welcome, 19);
     close(fd);
+    char *buf= "ooooo";
+    read(0, buf, 5);
+    write(0, " got:", 5);
+    write(0, buf, 5);
 //    write(fd, welcome, 19);
     /*
     char *a = "hiwhattefun";
