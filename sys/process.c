@@ -264,7 +264,6 @@ uint64_t copy_process(kthread_t *parent_task) {
 
     memcpy(c_vma_stack, p_vma_stack, sizeof(struct vma_struct));
     child->process_mm->vma_stack = c_vma_stack;
-    uint64_t *stack = (uint64_t*) STACK_START;
 
     return (uint64_t) child;
 }
