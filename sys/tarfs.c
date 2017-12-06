@@ -107,6 +107,8 @@ struct dir_header *get_folder(char *name) {
             break;
         }
         int file_size = o_to_d(atoi(s->size));
+        
+        // check to exclude the directory itself
         char tmp_copy[256];
         char *tmp_1 = (char *) name, *tmp_2 = (char *) tmp_copy;
         while (*tmp_1) {
@@ -114,10 +116,10 @@ struct dir_header *get_folder(char *name) {
             tmp_1++;
             tmp_2++;
         }
-
         *tmp_2 = '/';
         tmp_2++;
         *tmp_2 = '\0';
+        
         if (substr(name, s->name) && kstrcmp((char *) tmp_copy, s->name) != 0) {
             char *tmp = s->name;
             int j = 0;
