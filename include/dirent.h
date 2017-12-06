@@ -7,11 +7,11 @@
 
 struct dirent {
  char d_name[NAME_MAX+1];
-};
+}__attribute__((__packed__));
 
 struct DIR {
     uint64_t stream;
-};
+}__attribute__((__packed__));
 
 typedef struct DIR DIR;
 

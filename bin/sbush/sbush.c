@@ -39,10 +39,10 @@ int main(int argc, char *argv[], char *envp[]) {
 //        write(1, welcome, 19);
 //    }
 
-    DIR test = opendir("bin");
+    DIR *test = opendir("bin");
     DIR abc, *de;
     abc.stream = test->stream;
-    de = (DIR *)((uint64_t) &abc);
+    de = (DIR *) &abc;
     struct dirent *test_dir;
     while(1) {
         test_dir = readdir(de);
