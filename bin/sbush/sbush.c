@@ -38,19 +38,20 @@ int main(int argc, char *argv[], char *envp[]) {
 //        yield();
 //        write(1, welcome, 19);
 //    }
-
+    /*
     DIR *test = opendir("bin");
-    DIR abc, *de;
-    abc.stream = test->stream;
-    de = (DIR *) &abc;
     struct dirent *test_dir;
     while(1) {
-        test_dir = readdir(de);
+        test_dir = readdir(test);
         //write(1, (char *) test_dir->d_name, 256);
         if (test_dir == NULL) break;  
     }
-    closedir(de);
-
+    closedir(test);
+    */
+    char buff[256];
+    getcwd((char *) buff, 256);
+    chdir("bin/test");
+    getcwd((char *) buff, 256);
     while (1);
     return 0;
 }

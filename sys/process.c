@@ -69,6 +69,7 @@ kthread_t *init_idle_process() {
     idle->rip = (uint64_t) & init_scheduler;
     idle->next = idle;
     idle->num_child = 0;
+    idle->cwd = "";
     current_process = idle;
     file_object_t *stdin_fo = get_stdin_fo();
     stdin_fo->ref_count++;
@@ -88,6 +89,13 @@ kthread_t *create_process(char *filename) {
     new_process->pid = getPID();
     new_process->next = NULL;
     new_process->num_child = 0;
+
+    char *tmp = filename;
+    while(*tmp != 0) tmp++;
+    while(*tmp != '/') tmp--;
+    for (int i = 0; (filename + i) < tmp; i++) {
+         *(current_process->cwd + i) = *(filename + i);
+    }
 
     new_process->cr3 = setup_user_page_tables();
     uint64_t current_cr3 = get_cr3();
@@ -148,6 +156,20 @@ void user_free(uint64_t addr) {
         }
         iter = iter->next;
     }
+}
+
+int get_cwd(char *buf, size_t size) {
+    for (int i = 0; i < size; i++) {
+        *(buf + i) = *(current_process->cwd + i);
+    }
+    return 0;
+}
+
+int ch_dir(char *path) {
+    for (int i = 0; *(path + i) != 0; i++) {
+         *(current_process->cwd + i) = *(path + i);
+    }
+    return 0;
 }
 
 void go_to_ring3() {

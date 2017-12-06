@@ -52,4 +52,8 @@ uint64_t user_malloc(uint64_t bytes);
 
 void user_free(uint64_t addr);
 
+int get_cwd(char *buf, size_t size);
+
+int ch_dir(char *path);
+
 #endif
