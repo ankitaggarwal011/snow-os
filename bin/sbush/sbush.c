@@ -42,9 +42,9 @@ int main(int argc, char *argv[], char *envp[]) {
     DIR *test = opendir("bin");
     struct dirent *test_dir;
     while(1) {
-        test_dir = readdir(abc);
+        test_dir = readdir(test);
         //write(1, (char *) test_dir->d_name, 256);
-        if (test_dir == NULL) break;  
+        if (test_dir == NULL) break;
     }
     closedir(test);
 
