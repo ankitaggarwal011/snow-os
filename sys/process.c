@@ -201,6 +201,7 @@ uint64_t copy_process(kthread_t *parent_task) {
     kthread_t *child = (kthread_t *) kmalloc(sizeof(kthread_t));
     memset(parent_task->k_stack, 0, K_STACK_SIZE);
     child->rsp_val = &(child->k_stack[K_STACK_SIZE - 1]);
+    child->rsp_user = parent_task->rsp_user;
     child->pid = getPID();
     child->ppid = parent_task->pid;
     child->process_mm = NULL;
@@ -215,7 +216,7 @@ uint64_t copy_process(kthread_t *parent_task) {
     child->fds[1] = stdout_fo;
     parent_task->num_child++;
 
-    child->cr3 = setup_user_page_tables();
+    child->cr3 = cow_page_tables();
     set_new_cr3(child->cr3);
 
     child->process_mm = (struct mm_struct *) kmalloc(sizeof(struct mm_struct));
@@ -223,19 +224,10 @@ uint64_t copy_process(kthread_t *parent_task) {
 
     struct vma_struct *p_vma = parent_task->process_mm->vma_map, *c_vma_map = NULL, *c_vma_iter = NULL;
 
-    while (p_vma != NULL) {
+    while (p_vma != NULL && p_vma != parent_task->process_mm->vma_heap) {
         struct vma_struct *c_vma = (struct vma_struct *) kmalloc(sizeof(struct vma_struct));
+        c_vma->next = NULL;
         memcpy(c_vma, p_vma, sizeof(struct vma_struct));
-
-        uint64_t pages =
-                (((c_vma->end / PAGE_SIZE + 1) * PAGE_SIZE) - ((c_vma->start / PAGE_SIZE) * PAGE_SIZE)) / PAGE_SIZE;
-        uint64_t v_addr = (c_vma->start / PAGE_SIZE) * PAGE_SIZE;
-        pages++;
-        while (pages--) {
-            uint64_t page = get_free_page();
-            update_page_tables(v_addr, page, PAGING_USER_R_W_FLAGS);
-            v_addr += PAGE_SIZE;
-        }
 
         if (c_vma_iter != NULL) {
             c_vma_iter->next = c_vma;
@@ -247,6 +239,32 @@ uint64_t copy_process(kthread_t *parent_task) {
     }
 
     child->process_mm->vma_map = c_vma_map;
+    child->process_mm->vma_map_iter = c_vma_iter;
+
+    struct vma_struct *p_vma_heap = parent_task->process_mm->vma_heap, *c_vma_heap = NULL, *c_vma_heap_iter = NULL;
+
+    while (p_vma_heap != NULL) {
+        struct vma_struct *c_vma = (struct vma_struct *) kmalloc(sizeof(struct vma_struct));
+        c_vma->next = NULL;
+        memcpy(c_vma, p_vma_heap, sizeof(struct vma_struct));
+
+        if (c_vma_heap_iter != NULL) {
+            c_vma_heap_iter->next = c_vma;
+        } else {
+            c_vma_heap = c_vma;
+        }
+        c_vma_heap_iter = c_vma;
+        p_vma_heap = p_vma_heap->next;
+    }
+
+    child->process_mm->vma_heap = c_vma_heap;
+
+    struct vma_struct *p_vma_stack = parent_task->process_mm->vma_stack;
+    struct vma_struct *c_vma_stack = (struct vma_struct *) kmalloc(sizeof(struct vma_struct));
+
+    memcpy(c_vma_stack, p_vma_stack, sizeof(struct vma_struct));
+    child->process_mm->vma_stack = c_vma_stack;
+    uint64_t *stack = (uint64_t*) STACK_START;
 
     return (uint64_t) child;
 }
