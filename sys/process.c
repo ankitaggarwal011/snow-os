@@ -93,7 +93,7 @@ kthread_t *create_process(char *filename) {
     while(*tmp != 0) tmp++;
     while(*tmp != '/') tmp--;
     for (int i = 0; (filename + i) < tmp; i++) {
-         *(current_process->cwd + i) = *(filename + i);
+         new_process->cwd[i] = *(filename + i);
     }
 
     new_process->cr3 = setup_user_page_tables();
