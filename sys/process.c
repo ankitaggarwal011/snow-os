@@ -210,7 +210,7 @@ uint64_t copy_process(kthread_t *parent_task) {
     file_object_t *stdin_fo = get_stdin_fo();
     stdin_fo->ref_count++;
     child->fds[0] = stdin_fo;
-    for(int i = 0; i < 1024; i++) child_task->cwd[i] = parent_task->cwd[i];
+    for(int i = 0; i < 1024; i++) child->cwd[i] = parent_task->cwd[i];
 
     file_object_t *stdout_fo = get_stdout_fo();
     stdout_fo->ref_count++;
