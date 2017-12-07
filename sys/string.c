@@ -22,8 +22,7 @@ int kstrcmp(char *s1, char *s2) {
     }
     if (*s1 == 0 && *s2 == 0) {
         return 0;
-    }
-    else if (*s1 > *s2) {
+    } else if (*s1 > *s2) {
         return 1;
     }
     return -1;
@@ -37,15 +36,45 @@ int atoi(char *str) {
     str++;
     int ans = 0;
     while (*str) {
-        if ((int)(*str) >= 48 && (int)(*str) <= 57) {
+        if ((int) (*str) >= 48 && (int) (*str) <= 57) {
             ans = ans * 10 + (*str) - 48;
             str++;
-        }
-        else {
+        } else {
             return 0;
         }
     }
     return ans * sign;
+}
+
+void itoa(char *buf, int64_t val) {
+    if (val == 0) {
+        buf[0] = '0';
+        buf[1] = '\0';
+        return;
+    }
+    uint64_t bkup = val >= 0 ? val : -val;
+    int n_digits = 0;
+    while (bkup) {
+        bkup /= 10;
+        n_digits++;
+    }
+
+    int i = n_digits;
+    if (val < 0) {
+        i++;
+    }
+    buf[i--] = '\0';
+    uint64_t numCopy = val >= 0 ? val : -val;
+    do {
+        buf[i--] = 48 + numCopy % 10;
+        numCopy /= 10;
+    } while (numCopy);
+    if (val < 0) {
+        buf[i] = '-';
+    } else {
+        i++;
+    }
+    return;
 }
 
 uint64_t pow(int a, int b) {

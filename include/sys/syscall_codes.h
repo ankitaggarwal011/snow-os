@@ -20,6 +20,7 @@ typedef enum syscall_code {
     SYSCALL_OPENDIR = 0x10,
     SYSCALL_READDIR = 0x11,
     SYSCALL_CLOSEDIR = 0x12,
-    SYSCALL_SLEEP = 0x13
+    SYSCALL_SLEEP = 0x13,
+    SYSCALL_PS = 0x14
 } syscall_code_t;
 #endif
