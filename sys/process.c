@@ -226,9 +226,8 @@ uint64_t copy_process(kthread_t *parent_task) {
 
     while (p_vma != NULL && p_vma != parent_task->process_mm->vma_heap) {
         struct vma_struct *c_vma = (struct vma_struct *) kmalloc(sizeof(struct vma_struct));
-        c_vma->next = NULL;
         memcpy(c_vma, p_vma, sizeof(struct vma_struct));
-
+        c_vma->next = NULL;
         if (c_vma_iter != NULL) {
             c_vma_iter->next = c_vma;
         } else {
