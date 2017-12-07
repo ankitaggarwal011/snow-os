@@ -81,7 +81,7 @@ kthread_t *init_idle_process() {
     file_object_t *stdin_fo = get_stdin_fo();
     stdin_fo->ref_count++;
     idle->fds[0] = stdin_fo;
-
+    idle->process_name = "Idle";
     file_object_t *stdout_fo = get_stdout_fo();
     stdout_fo->ref_count++;
     idle->fds[1] = stdout_fo;
@@ -102,6 +102,7 @@ kthread_t *create_process(char *filename) {
     char *tmp = filename;
     while (*tmp != 0) tmp++;
     while (*tmp != '/') tmp--;
+    new_process->process_name = filename;
     for (i = 0; (filename + i) < tmp; i++) {
         new_process->cwd[i] = *(filename + i);
     }
@@ -212,7 +213,8 @@ uint64_t copy_process(kthread_t *parent_task) {
     file_object_t *stdin_fo = get_stdin_fo();
     stdin_fo->ref_count++;
     child->fds[0] = stdin_fo;
-    for(int i = 0; i < 1024; i++) child->cwd[i] = parent_task->cwd[i];
+    child->process_name = parent_task->process_name;
+    for (int i = 0; i < 1024; i++) child->cwd[i] = parent_task->cwd[i];
 
     file_object_t *stdout_fo = get_stdout_fo();
     stdout_fo->ref_count++;
@@ -307,4 +309,33 @@ void fork() {
     setup_forked_kthread_stack(child_task->rsp_val);
     child_task->rsp_val -= 15;
     put_in_rax((uint64_t) child_task->pid);
+}
+
+void get_process_state(char *buf) {
+    kthread_t *start = get_current_process();
+    kthread_t *it = start;
+    int i = 0;
+    char *s = buf;
+    do {
+//        int len = 0;
+        strcat(s, "Pid: ");
+//        len += 5;
+        char num[10];
+        itoa(num, it->pid);
+        strcat(s, num);
+//        len += strlen(num);
+        strcat(s, ", ppid: ");
+//        len += 8;
+        memset(num, '\0', 10);
+        itoa(num, it->ppid);
+        strcat(s, num);
+//        len += strlen(num);
+        strcat(s, ", name: ");
+//        len += 8;
+        strcat(s, it->process_name);
+        strcat(s, "\n");
+//        len += strlen(it->process_name);
+        it = it->next;
+        i++;
+    } while (it != start);
 }

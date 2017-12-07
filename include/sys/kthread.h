@@ -18,6 +18,7 @@ typedef struct kern_thread {
     uint64_t rip;
     int ppid;
     int num_child;
+    char *process_name;
     struct kern_thread *next;
     file_object_t *fds[NUM_FDS];
     char cwd[1024];
@@ -43,4 +44,5 @@ void test_context_switch();
 extern void set_rsp(uint64_t val);
 
 extern void switch_to(kthread_t **me, kthread_t *next);
+
 #endif //PROJECT_KTHREAD_H
