@@ -47,7 +47,7 @@ void init_processes() {
 
 void init_scheduler() {
     while (1) {
-        kprintf(" in sched thred ");
+        kprintf(" _idle_t_ ");
         scheduler();
     }
 }

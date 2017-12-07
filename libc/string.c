@@ -27,6 +27,37 @@ int strcmp(char *s1, char *s2) {
     return -1;
 }
 
+void itoa_cl(char *buf, int64_t val) {
+    if (val == 0) {
+        buf[0] = '0';
+        buf[1] = '\0';
+        return;
+    }
+    uint64_t bkup = val >= 0 ? val : -val;
+    int n_digits = 0;
+    while (bkup) {
+        bkup /= 10;
+        n_digits++;
+    }
+
+    int i = n_digits;
+    if (val < 0) {
+        i++;
+    }
+    buf[i--] = '\0';
+    uint64_t numCopy = val >= 0 ? val : -val;
+    do {
+        buf[i--] = 48 + numCopy % 10;
+        numCopy /= 10;
+    } while (numCopy);
+    if (val < 0) {
+        buf[i] = '-';
+    } else {
+        i++;
+    }
+    return;
+}
+
 int atoi(char *str) {
     int sign = 1;
     if (*(str) == '-') {

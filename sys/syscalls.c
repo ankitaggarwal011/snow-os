@@ -43,7 +43,8 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
             uint64_t fork_ret_val = -1;
             __asm__ __volatile__(
             "movq %%rax, %0;"
-            :"=g"(fork_ret_val)
+            :"=m"(fork_ret_val)
+            ::"%rax"
             );
             if (fork_ret_val == 0) {
                 kprintf("Executing for child!!");
