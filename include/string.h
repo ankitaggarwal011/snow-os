@@ -15,6 +15,6 @@ uint64_t pow(int a, int b);
 
 size_t strlen(char *s);
 
-void itoa(char *buf, int64_t val);
+void itoa_cl(char *buf, int64_t val);
 
 #endif
