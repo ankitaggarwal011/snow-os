@@ -84,6 +84,7 @@ kthread_t *init_idle_process() {
     file_object_t *stdout_fo = get_stdout_fo();
     stdout_fo->ref_count++;
     idle->fds[1] = stdout_fo;
+    idle->fds[2] = stdout_fo;
     return idle;
 }
 
@@ -98,10 +99,10 @@ kthread_t *create_process(char *filename) {
 
     int i = 0;
     char *tmp = filename;
-    while(*tmp != 0) tmp++;
-    while(*tmp != '/') tmp--;
+    while (*tmp != 0) tmp++;
+    while (*tmp != '/') tmp--;
     for (i = 0; (filename + i) < tmp; i++) {
-         new_process->cwd[i] = *(filename + i);
+        new_process->cwd[i] = *(filename + i);
     }
     new_process->cwd[i] = 0;
     new_process->cr3 = setup_user_page_tables();
@@ -116,6 +117,7 @@ kthread_t *create_process(char *filename) {
     file_object_t *stdout_fo = get_stdout_fo();
     stdout_fo->ref_count++;
     new_process->fds[1] = stdout_fo;
+    new_process->fds[2] = stdout_fo;
     load_file(new_process, filename);
 
     set_new_cr3(current_cr3);
@@ -131,8 +133,7 @@ uint64_t user_malloc(uint64_t bytes) {
     uint64_t end_alloc = start_alloc;
     if (bytes % PAGE_SIZE == 0) {
         end_alloc += bytes;
-    }
-    else {
+    } else {
         end_alloc += ((bytes / PAGE_SIZE) + 1) * PAGE_SIZE;
     }
     struct vma_struct *vma_malloc = kmalloc(sizeof(struct vma_struct));
@@ -175,7 +176,7 @@ int get_cwd(char *buf, size_t size) {
 int ch_dir(char *path) {
     int i = 0;
     for (i = 0; *(path + i) != 0; i++) {
-         current_process->cwd[i] = *(path + i);
+        current_process->cwd[i] = *(path + i);
     }
     current_process->cwd[i] = 0;
     return 0;
@@ -186,7 +187,7 @@ void go_to_ring3() {
     set_new_cr3(current_process->cr3);
 
     __asm__ __volatile__ (
-            "movq %1, %%rax;"
+    "movq %1, %%rax;"
             "pushq $0x23;"
             "pushq %%rax;"
             "pushfq;"
@@ -266,7 +267,7 @@ void fork() {
     child_task->next = last;
 
     set_new_cr3(parent_task->cr3);
-    
+
     /*
     __asm__ __volatile__(
     "movq $1f, %0;"
@@ -274,7 +275,7 @@ void fork() {
     :"=g"(child_task->rip)
     );
     */
-    
+
     volatile uint64_t *var = (uint64_t * )(get_rsp_val() + 8);
     parent_task->rsp_val = (uint64_t * )(get_rsp_val() + 8);
     volatile uint64_t diff = parent_task->k_stack + K_STACK_SIZE - 1 - (var);
