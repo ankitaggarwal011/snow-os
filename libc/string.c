@@ -1,4 +1,5 @@
 #include <sys/defs.h>
+
 char *strcat(char *s1, const char *s2) {
     char *s = s1;
     while (*s != '\0') {
@@ -30,15 +31,18 @@ int atoi(char *str) {
     int sign = 1;
     if (*(str) == '-') {
         sign = -1;
+        str++;
+    } else if (*(str) == '+') {
+        sign = 1;
+        str++;
     }
-    str++;
     int ans = 0;
     while (*str) {
         if ((int) (*str) >= 48 && (int) (*str) <= 57) {
             ans = ans * 10 + (*str) - 48;
             str++;
         } else {
-            return 0;
+            return -1;
         }
     }
     return ans * sign;

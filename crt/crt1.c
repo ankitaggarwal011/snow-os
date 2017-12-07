@@ -2,6 +2,6 @@
 
 void _start(void) {
     // call main() and exit() here
-    char *args[] = {"binname", "etc/test.txt"};
-    main(2, args, NULL);
+    char *args[] = {"bin/name"};
+    main(1, args, NULL);
 }
