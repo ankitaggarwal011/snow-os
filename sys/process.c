@@ -107,7 +107,7 @@ kthread_t *create_process(char *filename) {
     p_name[0] = 0;
     strcat((char *) p_name, filename);
     
-    new_process->process_name = &p_name;
+    new_process->process_name = (char *) &p_name;
     for (i = 0; (filename + i) < tmp; i++) {
         new_process->cwd[i] = *(filename + i);
     }
@@ -223,7 +223,7 @@ uint64_t copy_process(kthread_t *parent_task) {
     p_name[0] = 0;
     strcat((char *) p_name, parent_task->process_name);
     
-    child->process_name = &p_name;
+    child->process_name = (char *) &p_name;
     for (int i = 0; i < 1024; i++) child->cwd[i] = parent_task->cwd[i];
 
     file_object_t *stdout_fo = get_stdout_fo();
@@ -371,7 +371,7 @@ int exec_vpe(char *filename, char **argv, char **envp) {
     p_name[0] = 0;
     strcat((char *) p_name, filename);
     
-    new_process->process_name = &p_name;
+    new_process->process_name = (char *) &p_name;
 
     new_process->fds[0] = current_process->fds[0];
     new_process->fds[1] = current_process->fds[1];
