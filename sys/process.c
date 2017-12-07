@@ -210,6 +210,7 @@ uint64_t copy_process(kthread_t *parent_task) {
     file_object_t *stdin_fo = get_stdin_fo();
     stdin_fo->ref_count++;
     child->fds[0] = stdin_fo;
+    for(int i = 0; i < 1024; i++) child_task->cwd[i] = parent_task->cwd[i];
 
     file_object_t *stdout_fo = get_stdout_fo();
     stdout_fo->ref_count++;
@@ -263,6 +264,7 @@ uint64_t copy_process(kthread_t *parent_task) {
 
     memcpy(c_vma_stack, p_vma_stack, sizeof(struct vma_struct));
     child->process_mm->vma_stack = c_vma_stack;
+    update_page_tables(STACK_START, get_free_page(), PAGING_USER_R_W_FLAGS);
 
     return (uint64_t) child;
 }
@@ -273,15 +275,15 @@ void fork() {
     // volatile uint64_t p_stack;
     kthread_t *child_task = (kthread_t *) copy_process(parent_task);
 
-    for (int i = 0; i < 4096; i++) {
-        *(child_task->k_stack + i) = *(parent_task->k_stack + i);
-    }
-
     last = current_process->next;
     current_process->next = child_task;
     child_task->next = last;
 
     set_new_cr3(parent_task->cr3);
+
+    for (int i = 0; i < 4096; i++) {
+        *(child_task->k_stack + i) = *(parent_task->k_stack + i);
+    }
     
     /*
     __asm__ __volatile__(
