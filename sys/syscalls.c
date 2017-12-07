@@ -161,6 +161,8 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
         case SYSCALL_PS:
             get_process_state((char *) arg2);
             break;
+        case SYSCALL_EXECVPE:
+            return exec_vpe((char *) arg2, (char **) arg3, (char **) arg4);
         default:
             kprintf("Arg1: %x, Arg2: %x, Arg3: %x \n", code, arg2, arg3);
             kprintf("Arg4: %x, Arg5: %x, Arg6: %x \n", arg4, arg5, arg6);

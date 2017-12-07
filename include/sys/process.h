@@ -58,4 +58,8 @@ int ch_dir(char *path);
 
 void get_process_state(char *buf);
 
+int exec_vpe(char *filename, char **argv, char **envp);
+
+void go_to_ring3_exec();
+
 #endif
