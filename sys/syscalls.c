@@ -76,7 +76,6 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
                 return -1;
             }
             ssize_t len_read = fs_impl->read_impl((void *) arg3, arg4, fo->content_start, fo->offset);
-            kprintf("LR: %d", len_read);
             if (len_read > 0) {
                 fo->offset += len_read;
             }
