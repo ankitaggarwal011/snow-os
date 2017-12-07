@@ -90,7 +90,7 @@ ssize_t tarfs_read(void *buffer, int len, char *file, int offset) {
     int i = 0;
     char *buf = (char *) buffer;
     while (i < len) {
-        if (*(c + offset + i) == '\0') {
+        if (*(c + offset + i) == '\0' || *(c + offset + i) == EOF) {
             return i;
         }
         buf[i] = *(c + offset + i);
@@ -135,7 +135,7 @@ struct dir_header *get_folder(char *name) {
         if (substr(name, s->name) && kstrcmp((char *) tmp_copy, s->name) != 0) {
             char *tmp = s->name;
             int j = 0;
-            while(*tmp) {
+            while (*tmp) {
                 dir_pointer->files[dir_pointer->file_count][j] = *tmp;
                 tmp++;
                 j++;
@@ -169,7 +169,7 @@ uint64_t open_dir(char *name) {
     return (uint64_t) get_folder(name);
 }
 
-int read_dir(uint64_t stream, char* filename) {
+int read_dir(uint64_t stream, char *filename) {
     struct dir_header *d = (struct dir_header *) stream;
     if (d->current_point >= d->file_count) {
         return -1;

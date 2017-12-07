@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <sys/defs.h>
 
 int puts(const char *s)
 {

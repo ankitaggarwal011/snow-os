@@ -1,7 +1,7 @@
 #ifndef _STDIO_H
 #define _STDIO_H
 
-static const int EOF = -1;
+//static const int EOF = -1;
 
 int putchar(int c);
 int puts(const char *s);
