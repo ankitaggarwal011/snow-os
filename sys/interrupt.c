@@ -24,6 +24,8 @@ extern void page_fault_handler() {
     __asm__ volatile("mov %%cr2, %0" : "=r" (addr));
     kprintf("Page fault at %x\n", addr);
 
+    addr = (addr / PAGE_SIZE) * PAGE_SIZE;
+
     uint64_t physical_addr_flags = get_flags(addr);
     if (((physical_addr_flags >> 9) & 1UL) == 1) { // COW
         uint64_t physical_addr = walk_page_table(addr);
