@@ -51,6 +51,9 @@ extern void page_fault_handler() {
         update_page_tables(current_vma_stack->end, get_free_page(), PAGING_USER_R_W_FLAGS);
         current_vma_stack->end += PAGE_SIZE;
     }
+    else {
+        while(1); // Segmentation fault
+    }
 }
 
 void init_idt() {
