@@ -54,6 +54,7 @@ void init_scheduler() {
 
 void scheduler() {
     set_new_cr3(current_process->cr3);
+    set_tss_rsp(&current_process->k_stack[K_STACK_SIZE - 1]);
     switch_process();
 }
 
