@@ -8,6 +8,7 @@
 #define ENTRIES 512
 #define MASK 0xFFFFFFFFFFFFF000
 #define GET_FLAGS 0x0000000000000FFF
+#define COW_FLAG 0x0000000000000200
 
 uint64_t *pml4_t, kernel_virtual_base;
 
@@ -294,11 +295,12 @@ uint64_t cow_page_tables() {
                             for (int l = 0; l < 512; l++) {
                                 if ((parent_pte[l] & 1UL) == 1UL) {
                                     parent_pte[l] = parent_pte[l] ^ 2;
+                                    parent_pte[l] = parent_pte[l] | COW_FLAG;
                                     child_pte[l] = parent_pte[l];
                                     uint64_t physical_addr = parent_pte[l] & MASK;
-                                    // if (get_page_ref_count(physical_addr) == 1) {
+                                    if (get_page_ref_count(physical_addr) == 1) {
                                         set_page_ref_count(physical_addr, 2);
-                                    // }
+                                    }
                                     // else {
                                     //     kprintf("Page reference in not 1.\n");
                                     // }
