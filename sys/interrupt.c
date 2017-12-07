@@ -22,10 +22,10 @@ void page_fault_handler() {
     __asm__ volatile("mov %%cr2, %0" : "=r" (addr));
     kprintf("Page fault at %x\n", addr);
 
-    kthread *current_process = get_current_process();
-    // struct vma *current_vma_map = current_process->process_mm->vma_map;
-    // struct vma *current_vma_heap = current_process->process_mm->vma_heap;
-    struct vma *current_vma_stack = current_process->process_mm->vma_stack;
+    kthread_t *current_process = get_current_process();
+    // struct vma_struct *current_vma_map = current_process->process_mm->vma_map;
+    // struct vma_struct *current_vma_heap = current_process->process_mm->vma_heap;
+    struct vma_struct *current_vma_stack = current_process->process_mm->vma_stack;
 
     uint64_t physical_addr_flags = get_flags(addr);
     if ((physical_addr_flags & 2) == 2) { // COW
