@@ -1,7 +1,6 @@
 #include <stdlib.h>
 
-void _start(void) {
+void _start(int argc, char* argv[]) {
     // call main() and exit() here
-    char *args[] = {"bin/name"};
-    main(1, args, NULL);
+    main(argc, argv, NULL);
 }

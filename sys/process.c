@@ -102,7 +102,12 @@ kthread_t *create_process(char *filename) {
     char *tmp = filename;
     while (*tmp != 0) tmp++;
     while (*tmp != '/') tmp--;
-    new_process->process_name = filename;
+    
+    char p_name[256];
+    p_name[0] = 0;
+    strcat((char *) p_name, filename);
+    
+    new_process->process_name = (char *) &p_name;
     for (i = 0; (filename + i) < tmp; i++) {
         new_process->cwd[i] = *(filename + i);
     }
@@ -213,7 +218,12 @@ uint64_t copy_process(kthread_t *parent_task) {
     file_object_t *stdin_fo = get_stdin_fo();
     stdin_fo->ref_count++;
     child->fds[0] = stdin_fo;
-    child->process_name = parent_task->process_name;
+
+    char p_name[256];
+    p_name[0] = 0;
+    strcat((char *) p_name, parent_task->process_name);
+    
+    child->process_name = (char *) &p_name;
     for (int i = 0; i < 1024; i++) child->cwd[i] = parent_task->cwd[i];
 
     file_object_t *stdout_fo = get_stdout_fo();
@@ -317,25 +327,109 @@ void get_process_state(char *buf) {
     int i = 0;
     char *s = buf;
     do {
-//        int len = 0;
         strcat(s, "Pid: ");
-//        len += 5;
         char num[10];
         itoa(num, it->pid);
         strcat(s, num);
-//        len += strlen(num);
         strcat(s, ", ppid: ");
-//        len += 8;
         memset(num, '\0', 10);
         itoa(num, it->ppid);
         strcat(s, num);
-//        len += strlen(num);
         strcat(s, ", name: ");
-//        len += 8;
         strcat(s, it->process_name);
         strcat(s, "\n");
-//        len += strlen(it->process_name);
         it = it->next;
         i++;
     } while (it != start);
+}
+
+int exec_vpe(char *filename, char **argv, char **envp) {
+    char filename_copy[256];
+    memset((void *) filename_copy, 0, 256);
+    for (int k = 0; filename[k] != 0; k++) {
+        filename_copy[k] = filename[k];
+    }
+    uint64_t argc = 0;
+    char user_stack[16][128];
+    memset((void *) user_stack, 0, 16 * 128);
+    if (argv != NULL) {
+        for (int i = 0; argv[i] != NULL; i++, argc++) {
+            for (int j = 0; argv[i][j] != 0; j++) {
+                user_stack[argc][j] = argv[i][j];
+            }
+        }
+    }
+
+    kthread_t *new_process = (kthread_t *) kmalloc(sizeof(kthread_t));
+    
+    new_process->pid = current_process->pid;
+    new_process->ppid = current_process->ppid;
+    new_process->next = NULL;
+    new_process->num_child = 0;
+
+    char p_name[256];
+    p_name[0] = 0;
+    strcat((char *) p_name, filename);
+    
+    new_process->process_name = (char *) &p_name;
+
+    new_process->fds[0] = current_process->fds[0];
+    new_process->fds[1] = current_process->fds[1];
+    new_process->fds[2] = current_process->fds[2];
+
+    for (int i = 0; i < 1024; i++) {
+        new_process->cwd[i] = current_process->cwd[i];
+    }
+
+    new_process->cr3 = setup_user_page_tables();
+    set_new_cr3(new_process->cr3);
+
+    memset(new_process->k_stack, 0, K_STACK_SIZE);
+    new_process->rsp_val = &(new_process->k_stack[K_STACK_SIZE - 17]);
+
+    struct mm_struct *process_mm = (struct mm_struct *) kmalloc(sizeof(struct mm_struct));
+    new_process->process_mm = process_mm;
+
+    load_file(new_process, filename_copy);
+
+    void *user_stack_ptr = (void *)(STACK_START + 4096 - 16 - sizeof(user_stack));
+    memcpy(user_stack_ptr, (void *) user_stack, sizeof(user_stack));
+
+    for(int i = argc; i > 0; i--) {
+        *((uint64_t *) (user_stack_ptr - 8 * i)) = (uint64_t) user_stack_ptr + 128 * (argc - i);
+    }
+    user_stack_ptr = user_stack_ptr - 8 * argc;
+    new_process->rsp_user = (uint64_t) user_stack_ptr;
+    
+    kthread_t *last = current_process->next;
+    while(last->next != current_process) {
+        last = last->next;
+    }
+    last->next = new_process;
+    new_process->next = current_process->next;
+    current_process = new_process;
+
+    go_to_ring3_exec(argc, user_stack_ptr);
+
+    return -1;
+}
+
+void go_to_ring3_exec(uint64_t argc, void *user_stack_ptr) {
+    set_tss_rsp(&current_process->k_stack[K_STACK_SIZE - 1]);
+    set_new_cr3(current_process->cr3);
+
+    __asm__ __volatile__ (
+            "sti;"
+            "movq %0, %%rsp;"
+            "movq %2, %%rax;"
+            "pushq $0x23;"
+            "pushq %%rax;"
+            "pushfq;"
+            "pushq $0x2B;"
+            "pushq %1;"
+            "movq %3, %%rsi;"
+            "movq %4, %%rdi;"
+            "iretq;"
+    ::"r"(current_process->rsp_val), "r"(current_process->rip), "r"(current_process->rsp_user), "r"(user_stack_ptr), "r"(argc)
+    );
 }
