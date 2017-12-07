@@ -25,7 +25,7 @@ extern void page_fault_handler() {
     kprintf("Page fault at %x\n", addr);
 
     uint64_t physical_addr_flags = get_flags(addr);
-    if ((physical_addr_flags & 2) == 2) { // COW
+    if (((physical_addr_flags >> 1) & 1UL) == 0) { // COW
         uint64_t physical_addr = walk_page_table(addr);
         if (get_page_ref_count(physical_addr) == 2) {
             uint64_t v_page = (uint64_t) kmalloc(PAGE_SIZE);
