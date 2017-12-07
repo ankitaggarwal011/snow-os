@@ -217,6 +217,7 @@ uint64_t copy_process(kthread_t *parent_task) {
     file_object_t *stdout_fo = get_stdout_fo();
     stdout_fo->ref_count++;
     child->fds[1] = stdout_fo;
+    child->fds[2] = stdout_fo;
     parent_task->num_child++;
 
     child->cr3 = cow_page_tables();
