@@ -4,6 +4,7 @@
 #include <sys/interrupt.h>
 #include <sys/process.h>
 #include <sys/physical_memory.h>
+#include <sys/paging.h>
 
 #define LIMIT_STACK 8192
 
@@ -21,12 +22,13 @@ void page_fault_handler() {
     __asm__ volatile("mov %%cr2, %0" : "=r" (addr));
     kprintf("Page fault at %x\n", addr);
 
-    struct vma *current_vma_map = current_process->process_mm->vma_map;
-    struct vma *current_vma_heap = current_process->process_mm->vma_heap;
+    kthread *current_process = get_current_process();
+    // struct vma *current_vma_map = current_process->process_mm->vma_map;
+    // struct vma *current_vma_heap = current_process->process_mm->vma_heap;
     struct vma *current_vma_stack = current_process->process_mm->vma_stack;
 
     uint64_t physical_addr_flags = get_flags(addr);
-    if (physical_addr_flags & 2 == 2) { // COW
+    if ((physical_addr_flags & 2) == 2) { // COW
         uint64_t physical_addr = walk_page_table(addr);
         if (get_page_ref_count(physical_addr) == 2) {
             uint64_t v_page = (uint64_t) kmalloc(PAGE_SIZE);
