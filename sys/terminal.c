@@ -57,15 +57,14 @@ ssize_t terminal_read(void *buffer, int len, char *file, int offset) {
         }
         last_index = index;
         if (term_buf[index - 1] == '\n') {
-            int cpy_val = index -1;
+            int cpy_val = index - 1;
             reset_term_inp_buffer();
             return cpy_val;
         }
         buf[index - 1] = term_buf[index - 1];
-        if (index >= len) {
-            int cpy_val = index -1;
+        if (index == len ) {
             reset_term_inp_buffer();
-            return cpy_val;
+            return len;
         }
 
     }
