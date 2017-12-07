@@ -24,6 +24,10 @@ uint64_t setup_user_page_tables();
 
 uint64_t walk_page_table(uint64_t virt_addr);
 
+uint64_t get_flags(uint64_t virt_addr);
+
 void remove_page_table_mapping(uint64_t virt_addr);
+
+uint64_t cow_page_tables();
 
 #endif
