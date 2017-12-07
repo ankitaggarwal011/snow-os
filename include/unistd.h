@@ -4,19 +4,18 @@
 #include <sys/defs.h>
 #include <sys/syscall_codes.h>
 
-extern uint64_t syscall0();
 
-extern uint64_t syscall1(syscall_code_t code);
+uint64_t syscall1(syscall_code_t code);
 
-extern uint64_t syscall2(syscall_code_t code, uint64_t arg2);
+uint64_t syscall2(syscall_code_t code, uint64_t arg2);
 
-extern uint64_t syscall3(syscall_code_t code, uint64_t arg2, uint64_t arg3);
+uint64_t syscall3(syscall_code_t code, uint64_t arg2, uint64_t arg3);
 
-extern uint64_t syscall4(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4);
+uint64_t syscall4(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4);
 
-extern uint64_t syscall5(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5);
+uint64_t syscall5(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5);
 
-extern uint64_t syscall6(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg6);
+uint64_t syscall6(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg6);
 
 //int open(const char *pathname, int flags);
 #define FILE_OPEN_FLAG_O_DIRECTORY //enforce that file is not a dir
