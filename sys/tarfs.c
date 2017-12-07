@@ -113,6 +113,7 @@ file_sys_impl_t *get_tarfs_impl() {
 struct dir_header *get_folder(char *name) {
     struct dir_header *dir_pointer = (struct dir_header *) kmalloc(sizeof(struct dir_header));
     dir_pointer->file_count = 0;
+    dir_pointer->dir_exists = 0;
     struct posix_header_ustar *s = tarfs_start;
     do {
         if (!s || s->name[0] == '\0') {
@@ -142,6 +143,10 @@ struct dir_header *get_folder(char *name) {
             }
             dir_pointer->files[dir_pointer->file_count][j] = 0;
             dir_pointer->file_count++;
+            dir_pointer->dir_exists = 1;
+        }
+        else if (kstrcmp((char *) tmp_copy, s->name) == 0){
+            dir_pointer->dir_exists = 1;
         }
 
         if (file_size > 0) {
@@ -166,7 +171,11 @@ int substr(char *s1, char *s2) {
 }
 
 uint64_t open_dir(char *name) {
-    return (uint64_t) get_folder(name);
+    struct dir_header *dir = get_folder(name);
+    if (dir->dir_exists == 1) {
+        return (uint64_t) dir;
+    }
+    return 0;
 }
 
 int read_dir(uint64_t stream, char *filename) {

@@ -29,6 +29,7 @@ struct dir_header {
     int current_point;
     int file_count;
     char files[100][256]; // can have 1000 files for now
+    int dir_exists;
 }__attribute__((__packed__));
 
 void init_tarfs();
