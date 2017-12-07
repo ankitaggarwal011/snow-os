@@ -6,6 +6,7 @@
 #include <sys/paging.h>
 #include <sys/vfs.h>
 #include <sys/tarfs.h>
+#include <sys/sleep.h>
 
 uint64_t
 handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6) {
@@ -140,6 +141,8 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
             return get_cwd((char *) arg2, arg3);
         case SYSCALL_CHDIR:
             return ch_dir((char *) arg2);
+        case SYSCALL_SLEEP:
+            return (uint64_t) sleep((unsigned int) arg2);
         default:
             kprintf("Arg1: %x, Arg2: %x, Arg3: %x \n", code, arg2, arg3);
             kprintf("Arg4: %x, Arg5: %x, Arg6: %x \n", arg4, arg5, arg6);

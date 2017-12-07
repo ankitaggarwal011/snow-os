@@ -34,7 +34,7 @@ int yield();
 //pid_t wait(int *status);
 //int waitpid(int pid, int *status);
 
-//unsigned int sleep(unsigned int seconds);
+unsigned int sleep(unsigned int seconds);
 
 pid_t getpid(void);
 pid_t getppid(void);

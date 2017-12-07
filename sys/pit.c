@@ -3,12 +3,16 @@
 #include <sys/interrupt.h>
 #include <sys/kprintf.h>
 #include <sys/pit.h>
+#include <sys/sleep.h>
 
 uint64_t time_since_boot = 0;
 
 extern void pit_intr_handler() {
     time_since_boot++;
     printTime(time_since_boot);
+    if (time_since_boot % 100 == 0) {
+        on_second_tick();
+    }
     output_b(PIC_M_CR, PIC_EOI);
 }
 
