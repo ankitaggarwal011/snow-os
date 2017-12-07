@@ -17,7 +17,7 @@ file_sys_impl_t *get_terminal_fs_impl() {
 }
 
 char term_buf[TERM_BUF_SIZE];
-uint16_t index;
+volatile uint16_t index;
 
 void reset_term_inp_buffer() {
     memset(term_buf, 0, TERM_BUF_SIZE);
@@ -57,13 +57,15 @@ ssize_t terminal_read(void *buffer, int len, char *file, int offset) {
         }
         last_index = index;
         if (term_buf[index - 1] == '\n') {
+            int cpy_val = index -1;
             reset_term_inp_buffer();
-            return index;
+            return cpy_val;
         }
         buf[index - 1] = term_buf[index - 1];
         if (index >= len) {
+            int cpy_val = index -1;
             reset_term_inp_buffer();
-            return index;
+            return cpy_val;
         }
 
     }

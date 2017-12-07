@@ -13,14 +13,29 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
     switch (code) {
         case SYSCALL_WRITE: {
             kthread_t *cur_kt = get_current_process();
+            if (arg2 < 0 || arg2 >= NUM_FDS) {
+                kprintf("Invalid FD #, must be between %d and %d\n", 0, NUM_FDS);
+                return -1;
+            }
+            if (arg2 == 0) {
+                kprintf("Write op not supported on FD #%d", arg2);
+                return -1;
+            }
             file_object_t *fo = cur_kt->fds[arg2];
+            if (fo == NULL) {
+                kprintf("FD %d is not setup yet!\n", arg2);
+                return -1;
+            }
             file_sys_impl_t *fs_impl = fo->file_sys_impl;
             if (fs_impl == NULL) {
                 kprintf("#%d: this file descriptor isn't handled for write\n", arg2);
-                return 0;
+                return -1;
             }
-            fs_impl->write_impl((void *) arg3, arg4, fo->content_start, fo->offset);
-            return arg4;
+            if (fs_impl->write_impl == NULL) {
+                kprintf("FD # %d does not support writing.\n", arg2);
+                return -1;
+            }
+            return fs_impl->write_impl((void *) arg3, arg4, fo->content_start, fo->offset);
         }
 
         case SYSCALL_FORK: {
@@ -61,6 +76,7 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
                 return -1;
             }
             ssize_t len_read = fs_impl->read_impl((void *) arg3, arg4, fo->content_start, fo->offset);
+            kprintf("LR: %d", len_read);
             if (len_read > 0) {
                 fo->offset += len_read;
             }
