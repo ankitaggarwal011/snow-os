@@ -280,6 +280,7 @@ void fork() {
     child_task->next = last;
 
     set_new_cr3(parent_task->cr3);
+    update_page_tables(STACK_START, walk_page_table(STACK_START), PAGING_USER_R_W_FLAGS);
 
     for (int i = 0; i < 4096; i++) {
         *(child_task->k_stack + i) = *(parent_task->k_stack + i);
