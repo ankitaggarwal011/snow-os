@@ -81,7 +81,7 @@ kthread_t *init_idle_process() {
     file_object_t *stdin_fo = get_stdin_fo();
     stdin_fo->ref_count++;
     idle->fds[0] = stdin_fo;
-//    idle->process_name = "Idle";
+    idle->process_name = "Idle";
     file_object_t *stdout_fo = get_stdout_fo();
     stdout_fo->ref_count++;
     idle->fds[1] = stdout_fo;
@@ -102,7 +102,7 @@ kthread_t *create_process(char *filename) {
     char *tmp = filename;
     while (*tmp != 0) tmp++;
     while (*tmp != '/') tmp--;
-//    new_process->process_name = filename;
+    new_process->process_name = filename;
     for (i = 0; (filename + i) < tmp; i++) {
         new_process->cwd[i] = *(filename + i);
     }
@@ -213,7 +213,7 @@ uint64_t copy_process(kthread_t *parent_task) {
     file_object_t *stdin_fo = get_stdin_fo();
     stdin_fo->ref_count++;
     child->fds[0] = stdin_fo;
-//    child->process_name = parent_task->process_name;
+    child->process_name = parent_task->process_name;
     for (int i = 0; i < 1024; i++) child->cwd[i] = parent_task->cwd[i];
 
     file_object_t *stdout_fo = get_stdout_fo();
@@ -311,29 +311,31 @@ void fork() {
     put_in_rax((uint64_t) child_task->pid);
 }
 
-void get_process_state(char **buf) {
-    /*kthread_t *start = get_current_process();
+void get_process_state(char *buf) {
+    kthread_t *start = get_current_process();
     kthread_t *it = start;
     int i = 0;
+    char *s = buf;
     do {
-        char *s = buf[0];
-        int len = 0;
+//        int len = 0;
         strcat(s, "Pid: ");
-        len += 5;
+//        len += 5;
         char num[10];
         itoa(num, it->pid);
-        strcat(s + len, num);
-        len += strlen(num);
-        strcat(s + len, ", ppid: ");
-        len += 8;
+        strcat(s, num);
+//        len += strlen(num);
+        strcat(s, ", ppid: ");
+//        len += 8;
+        memset(num, '\0', 10);
         itoa(num, it->ppid);
-        strcat(s + len, num);
-        len += strlen(num);
-        strcat(s + len, ", name: ");
-        len += 8;
-        strcat(s + len, it->process_name);
-        len += strlen(it->process_name);
+        strcat(s, num);
+//        len += strlen(num);
+        strcat(s, ", name: ");
+//        len += 8;
+        strcat(s, it->process_name);
+        strcat(s, "\n");
+//        len += strlen(it->process_name);
         it = it->next;
         i++;
-    } while (it != start);*/
+    } while (it != start);
 }

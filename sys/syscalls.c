@@ -159,7 +159,7 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
         case SYSCALL_SLEEP:
             return (uint64_t) sleep((unsigned int) arg2);
         case SYSCALL_PS:
-            get_process_state((char **) arg2);
+            get_process_state((char *) arg2);
             break;
         default:
             kprintf("Arg1: %x, Arg2: %x, Arg3: %x \n", code, arg2, arg3);

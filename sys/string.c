@@ -47,9 +47,15 @@ int atoi(char *str) {
 }
 
 void itoa(char *buf, int64_t val) {
-    uint64_t bkup = val;
+    if (val == 0) {
+        buf[0] = '0';
+        buf[1] = '\0';
+        return;
+    }
+    uint64_t bkup = val >= 0 ? val : -val;
     int n_digits = 0;
-    while (bkup /= 10) {
+    while (bkup) {
+        bkup /= 10;
         n_digits++;
     }
 

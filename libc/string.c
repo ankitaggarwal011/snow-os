@@ -48,32 +48,6 @@ int atoi(char *str) {
     return ans * sign;
 }
 
-
-void itoa(char *buf, int64_t val) {
-    uint64_t bkup = val;
-    int n_digits = 0;
-    while (bkup /= 10) {
-        n_digits++;
-    }
-
-    int i = n_digits;
-    if (val < 0) {
-        i++;
-    }
-    buf[i--] = '\0';
-    uint64_t numCopy = val >= 0 ? val : -val;
-    do {
-        buf[i--] = 48 + numCopy % 10;
-        numCopy /= 10;
-    } while (numCopy);
-    if (val < 0) {
-        buf[i] = '-';
-    } else {
-        i++;
-    }
-    return;
-}
-
 uint64_t pow(int a, int b) {
     uint64_t ans = 1;
     while (b--) {

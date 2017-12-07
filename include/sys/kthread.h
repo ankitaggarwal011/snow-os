@@ -18,7 +18,7 @@ typedef struct kern_thread {
     uint64_t rip;
     int ppid;
     int num_child;
-//    char *process_name;
+    char *process_name;
     struct kern_thread *next;
     file_object_t *fds[NUM_FDS];
     char cwd[1024];
