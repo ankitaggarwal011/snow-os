@@ -56,4 +56,6 @@ int get_cwd(char *buf, size_t size);
 
 int ch_dir(char *path);
 
+void get_process_state(char **buf);
+
 #endif
