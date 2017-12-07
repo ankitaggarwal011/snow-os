@@ -36,6 +36,7 @@ extern void page_fault_handler() {
         else {
             update_page_tables(addr, physical_addr, PAGING_USER_R_W_FLAGS);
         }
+        flush_tlb();
         return;
     }
 
