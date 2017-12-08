@@ -20,7 +20,7 @@ void *memcpy(void *dest, void *src, int bytes) {
     const unsigned char *ts = src;
     unsigned char *td = dest;
     for (int i = 0; i < bytes; i++) {
-        td[i] = ts[i]
+        td[i] = ts[i];
     }
     return dest;
 }
