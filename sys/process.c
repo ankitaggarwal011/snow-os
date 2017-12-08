@@ -469,12 +469,33 @@ void go_to_ring3_exec(uint64_t argc, void *user_stack_ptr) {
     );
 }
 
-void deep_clean(kthread_t *it) {
+void deep_cleanup(kthread_t *process) {
 
 }
 
-void shallow_cleanup(kthread_t *it) {
-
+// clean pages, clean vma, clean mm_struct
+void shallow_cleanup(kthread_t *process) {
+    struct vma_struct *v_map = process->process_mm->vma_map;
+    struct vma_struct *v_stack = process->process_mm->vma_stack;
+    struct vma_struct *v_map_next = v_map;
+    struct vma_struct *prev = NULL;
+    while (v_map_next != NULL) {
+        uint64_t s_addr = v_map_next->start;
+        while (s_addr < v_map_next->end) {
+            kfree((void *) s_addr);
+            s_addr += PAGE_SIZE;
+        }
+        prev = v_map_next;
+        v_map_next = v_map_next->next;
+        kfree(prev);
+    }
+    uint64_t stack_end = v_stack->end;
+    while (stack_end < v_stack->start) {
+        kfree((void *) stack_end);
+        stack_end += PAGE_SIZE;
+    }
+    kfree(v_stack);
+    kfree(process->process_mm);
 }
 
 void reap_process(kthread_t *process) {
@@ -490,7 +511,7 @@ void reap_process(kthread_t *process) {
         it = it->next;
     }
     prev->next = process->next;
-    deep_clean(process);
+    deep_cleanup(process);
     processes[process->pid] = 0;
     kfree(process);
     // remove from list
@@ -514,10 +535,9 @@ void kill_process(kthread_t *process) {
         }
         it = it->next;
     }
-    // now I have to shallow clean myself up.
-    shallow_cleanup(cur);
-    // now I will remove myself from scheduling list
     current_process->state = ZOMBIE;
+    shallow_cleanup(current_process);
+    // cleanup happens in page tables
 }
 
 int kill_kern(int pid) {
@@ -562,28 +582,4 @@ int kill_kern(int pid) {
 void exit_current_process(int status) {
     kill_process(current_process);
     scheduler();
-}
-
-
-// clean pages, clean page tables, clean vma, clean mm_struct
-void cleanup_process(kthread_t *process) {
-    struct vma_struct *v_map = process->process_mm->vma_map;
-    struct vma_struct *v_stack = process->process_mm->vma_stack;
-    struct vma_struct *v_map_next = v_map;
-    while (v_map_next != NULL) {
-        uint64_t s_addr = v_map->start;
-        while (s_addr < v_map->end) {
-            kfree((void *) s_addr);
-            s_addr += PAGE_SIZE;
-        }
-        v_map_next = v_map->next;
-        kfree(v_map);
-    }
-    uint64_t stack_start = v_stack->start;
-    while (stack_start < v_stack->end) {
-        kfree((void *) stack_start);
-        stack_start += PAGE_SIZE;
-    }
-    kfree(v_stack);
-    kfree(process->process_mm);
 }
