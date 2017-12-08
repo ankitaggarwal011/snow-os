@@ -15,6 +15,5 @@ int main(int argc, char *argv[], char *envp[]) {
     char *end_msg = "\n ------------------ End Process State  ------------------ \n";
     write(1, end_msg, strlen(end_msg));
     get_process_state(buf);
-    while(1);
     return 0;
 }

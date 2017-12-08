@@ -14,7 +14,8 @@ char *strcat(char *s1, const char *s2) {
     return s1;
 }
 
-int strcmp(char *s1, char *s2) {
+int strcmp(char *str1, char *str2) {
+    char *s1 = str1, *s2 = str2;
     while (*s1 && *s2 && *s1 == *s2) {
         s1++;
         s2++;
@@ -109,4 +110,28 @@ size_t strlen(char *s) {
         len++;
     }
     return len;
+}
+
+char *strcpy(char *dest, const char *src) {
+    char *str = dest;
+    while(*src) {
+        *str = *src;
+        src++;
+        str++;
+    }
+    *str = 0;
+    return dest;
+}
+
+void *memcpy(void *dest, void *src, int bytes) {
+    char *ts = src, *td = dest;
+    while (bytes--)
+        *td++ = *ts++;
+    return dest;
+}
+
+void *memset(void *a, int v, size_t b) {
+    unsigned char *p = a;
+    while(b-- > 0) *p++ = (unsigned char) v;
+    return a;
 }

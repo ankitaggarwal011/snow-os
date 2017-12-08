@@ -6,7 +6,7 @@
 #include <sys/physical_memory.h>
 #include <sys/paging.h>
 
-#define LIMIT_STACK 8192
+#define LIMIT_STACK 4096000
 #define PAGE_FAULT 14
 
 extern void timer_isr();
@@ -49,11 +49,12 @@ extern void page_fault_handler() {
     struct vma_struct *current_vma_stack = current_process->process_mm->vma_stack;
 
     // Auto-growing stack
-    if (addr <= current_vma_stack->start && (current_vma_stack->start - current_vma_stack->end - PAGE_SIZE + 16) >= LIMIT_STACK) {
+    if (addr <= current_vma_stack->start && (current_vma_stack->start - current_vma_stack->end - PAGE_SIZE + 16) <= LIMIT_STACK) {
         update_page_tables(current_vma_stack->end, get_free_page(), PAGING_USER_R_W_FLAGS);
-        current_vma_stack->end += PAGE_SIZE;
+        current_vma_stack->end -= PAGE_SIZE;
     }
     else {
+        kprintf("STACK LIMIT EXCEEDED!\n");
         while(1); // Segmentation fault
     }
 }

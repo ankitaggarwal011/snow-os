@@ -3,17 +3,26 @@
 #include <string.h>
 #include <unistd.h>
 
+#define PATH_LEN 1024
+
 int main(int argc, char *argv[], char *envp[]) {
-    if (argc < 2 || argc > 2) {
-        char *err_msg = "ls must have exactly 2 argument\n";
+    if (argc > 2) {
+        char *err_msg = "Incorrect number of arguments\n";
         write(1, err_msg, strlen(err_msg));
         return -1;
     }
-    DIR *dir = opendir(argv[1]);
+    char dir_to_open[PATH_LEN];
+    if (argc == 1) {
+        getcwd(dir_to_open, PATH_LEN);
+    }
+    else {
+        strcpy(dir_to_open, argv[1]);
+    }
+    DIR *dir = opendir(dir_to_open);
     if (dir == NULL) {
         char *err_msg = "No directory found with name: ";
         write(1, err_msg, strlen(err_msg));
-        write(1, argv[1], strlen(argv[1]));
+        write(1, dir_to_open, strlen(dir_to_open));
         return -1;
     }
     struct dirent *dirent;

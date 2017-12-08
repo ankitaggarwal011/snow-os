@@ -15,7 +15,8 @@ char *strcat(char *s1, const char *s2) {
     return s1;
 }
 
-int kstrcmp(char *s1, char *s2) {
+int kstrcmp(char *str1, char *str2) {
+    char *s1 = str1, *s2 = str2;
     while (*s1 && *s2 && *s1 == *s2) {
         s1++;
         s2++;

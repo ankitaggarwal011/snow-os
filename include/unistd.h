@@ -4,7 +4,6 @@
 #include <sys/defs.h>
 #include <sys/syscall_codes.h>
 
-
 uint64_t syscall1(syscall_code_t code);
 
 uint64_t syscall2(syscall_code_t code, uint64_t arg2);
@@ -17,7 +16,6 @@ uint64_t syscall5(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t ar
 
 uint64_t syscall6(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg6);
 
-//int open(const char *pathname, int flags);
 #define FILE_OPEN_FLAG_O_DIRECTORY //enforce that file is not a dir
 
 int open(const char *pathname, int flags);
@@ -36,8 +34,8 @@ pid_t fork();
 
 int yield();
 int execvpe(const char *file, char *const argv[], char *const envp[]);
-//pid_t wait(int *status);
-//int waitpid(int pid, int *status);
+pid_t wait(int *status);
+int waitpid(int pid, int *status);
 
 unsigned int sleep(unsigned int seconds);
 
