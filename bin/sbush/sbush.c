@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <dirent.h>
 #include <unistd.h>
 #include <string.h>
 
@@ -8,8 +7,8 @@
 #define STDOUT 1
 #define STDERR 2
 
-#define BUF_SIZE 256
-#define MAX_ARGS 16
+#define BUF_SIZE 128
+#define MAX_ARGS 8
 
 struct job {
     char jobname[BUF_SIZE];

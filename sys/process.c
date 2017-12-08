@@ -9,6 +9,9 @@
 #include <sys/paging.h>
 #include <sys/gdt.h>
 
+#define BUF_SIZE 128
+#define MAX_ARGS 8
+
 kthread_t *current_process;
 
 kthread_t *get_current_process() {
@@ -47,7 +50,7 @@ void init_processes() {
 
 void init_scheduler() {
     while (1) {
-        kprintf(" _idle_t_ ");
+        // kprintf(" _idle_t_ ");
         scheduler();
     }
 }
@@ -124,7 +127,7 @@ kthread_t *create_process(char *filename) {
     while (*tmp != 0) tmp++;
     while (*tmp != '/') tmp--;
 
-    char p_name[256];
+    char p_name[BUF_SIZE];
     int len = strlen(filename);
     for (int i = 0; i < len; i++) {
         p_name[i] = filename[i];
@@ -245,12 +248,12 @@ uint64_t copy_process(kthread_t *parent_task) {
     stdin_fo->ref_count++;
     child->fds[0] = stdin_fo;
 
-    char p_name[256];
+    char p_name[BUF_SIZE];
     p_name[0] = 0;
     strcat((char *) p_name, parent_task->process_name);
 
     child->process_name = (char *) &p_name;
-    for (int i = 0; i < 1024; i++) child->cwd[i] = parent_task->cwd[i];
+    for (int i = 0; i < BUF_SIZE; i++) child->cwd[i] = parent_task->cwd[i];
 
     file_object_t *stdout_fo = get_stdout_fo();
     stdout_fo->ref_count++;
@@ -384,14 +387,14 @@ void get_process_state(char *buf) {
 }
 
 int exec_vpe(char *filename, char **argv, char **envp) {
-    char filename_copy[256];
-    memset((void *) filename_copy, 0, 256);
+    char filename_copy[BUF_SIZE];
+    memset((void *) filename_copy, 0, BUF_SIZE);
     for (int k = 0; filename[k] != 0; k++) {
         filename_copy[k] = filename[k];
     }
     uint64_t argc = 0;
-    char user_stack[16][128];
-    memset((void *) user_stack, 0, 16 * 128);
+    char user_stack[MAX_ARGS][BUF_SIZE];
+    memset((void *) user_stack, 0, MAX_ARGS * BUF_SIZE);
     if (argv != NULL) {
         for (int i = 0; argv[i] != NULL; i++, argc++) {
             for (int j = 0; argv[i][j] != 0; j++) {
@@ -407,7 +410,7 @@ int exec_vpe(char *filename, char **argv, char **envp) {
     new_process->next = NULL;
     new_process->num_child = 0;
 
-    char p_name[256];
+    char p_name[BUF_SIZE];
     p_name[0] = 0;
     strcat((char *) p_name, filename);
 
@@ -417,7 +420,7 @@ int exec_vpe(char *filename, char **argv, char **envp) {
     new_process->fds[1] = current_process->fds[1];
     new_process->fds[2] = current_process->fds[2];
 
-    for (int i = 0; i < 1024; i++) {
+    for (int i = 0; i < BUF_SIZE; i++) {
         new_process->cwd[i] = current_process->cwd[i];
     }
 
@@ -436,7 +439,7 @@ int exec_vpe(char *filename, char **argv, char **envp) {
     memcpy(user_stack_ptr, (void *) user_stack, sizeof(user_stack));
 
     for (int i = argc; i > 0; i--) {
-        *((uint64_t * )(user_stack_ptr - 8 * i)) = (uint64_t) user_stack_ptr + 128 * (argc - i);
+        *((uint64_t * )(user_stack_ptr - 8 * i)) = (uint64_t) user_stack_ptr + BUF_SIZE * (argc - i);
     }
     user_stack_ptr = user_stack_ptr - 8 * argc;
     new_process->rsp_user = (uint64_t) user_stack_ptr;

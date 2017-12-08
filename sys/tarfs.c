@@ -38,7 +38,7 @@ void *get_file(char *filename) {
         char *file = (char *) (s + 1);
 
         if (kstrcmp(filename, s->name) == 0) {
-            kprintf("File found: Name: %s, Size: %d bytes, Type: %s\n", s->name, file_size, s->typeflag);
+            // kprintf("File found: Name: %s, Size: %d bytes, Type: %s\n", s->name, file_size, s->typeflag);
             return (void *) file;
         }
 
@@ -56,7 +56,6 @@ void *get_file(char *filename) {
 
 void *get_file_binary(char *filename) {
     struct posix_header_ustar *s = tarfs_start;
-    kprintf("Printing all available files in the tarfs:\n");
     do {
         if (!s || s->name[0] == '\0') {
             break;
@@ -65,7 +64,7 @@ void *get_file_binary(char *filename) {
         char *file = (char *) (s + 1);
 
         if (kstrcmp(filename, s->name) == 0 && atoi(s->typeflag) == 0) {
-            kprintf("File found: Name: %s, Size: %d bytes, Type: %s\n", s->name, file_size, s->typeflag);
+            // kprintf("File found: Name: %s, Size: %d bytes, Type: %s\n", s->name, file_size, s->typeflag);
             return (void *) file;
         }
 

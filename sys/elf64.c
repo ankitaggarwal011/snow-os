@@ -9,8 +9,8 @@
 
 void load_file(kthread_t *new_process, char *filename) {
     void *location = get_file_binary(filename);
-    kprintf("Location of %s: %p\n", filename, location);
-    kprintf("Reading ELF64 header:\n");
+    // kprintf("Location of %s: %p\n", filename, location);
+    // kprintf("Reading ELF64 header:\n");
 
     Elf64_Ehdr *ehdr = (Elf64_Ehdr *) location;
     Elf64_Phdr *phdr = (Elf64_Phdr *)((uint64_t)ehdr + ehdr->e_phoff);

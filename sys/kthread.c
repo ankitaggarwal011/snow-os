@@ -19,11 +19,8 @@ void test_func_2();
 
 void schedule();
 
-void user_test_func();
-
 kthread_t *t1, *t2;
 kthread_t *cur = NULL;
-//kthread_t *last = NULL;
 
 void test_func_1() {
     unsigned int i = 0;
@@ -103,14 +100,7 @@ void init_kthreads() {
     t2->fds[1] = stdout_fo;
 }
 
-void user_test_func() {
-    // char *str = "hellio";
-    // kprintf("In user space\n");
-    // write(1, (void *) str, strlen(str));
-}
-
 void test_context_switch() {
-//    last = &t1;
     kprintf("Getting here\n");
     init_kthreads();
     set_rsp((uint64_t) t1->rsp_val);

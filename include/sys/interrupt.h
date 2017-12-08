@@ -1,5 +1,11 @@
 #include <sys/defs.h>
 
+#define LIMIT_STACK 4096000
+#define PAGE_FAULT 14
+#define IRQ0 32
+#define IRQ1 33
+#define SOFT_INTR 128
+
 struct idtr_struct {
     uint16_t limit;
     uint64_t offset;

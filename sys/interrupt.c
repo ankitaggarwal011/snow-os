@@ -6,9 +6,6 @@
 #include <sys/physical_memory.h>
 #include <sys/paging.h>
 
-#define LIMIT_STACK 4096000
-#define PAGE_FAULT 14
-
 extern void timer_isr();
 
 extern void keyboard_isr();
@@ -60,7 +57,7 @@ extern void page_fault_handler() {
         }
     } else {
         kprintf("Segmentation fault in process %d!. Exiting.\n", current_process->pid);
-//        exit_current_process(0); // TODO CHANGE THIS
+        // exit_current_process(0); // TODO CHANGE THIS
         while (1);
     }
 }
