@@ -203,14 +203,14 @@ int shell_init(char* envp[]) {
         memset(input, 0, BUF_SIZE);
         memset(current_dir, 0, BUF_SIZE);
         is_background = 0;
-        getcwd(current_dir, BUF_SIZE);
-        strcat(current_dir, ": sbush> ");
+        char *dir = getcwd(current_dir, BUF_SIZE);
+        strcat(dir, ": sbush> ");
 
         if (PS1_set) {
             write(STDOUT, PS1, strlen(PS1));
         }
         else {
-            write(STDOUT, current_dir, strlen(current_dir));
+            write(STDOUT, dir, strlen(dir));
         }
 
         read(STDIN, input, BUF_SIZE);
