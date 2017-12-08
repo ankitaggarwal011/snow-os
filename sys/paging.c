@@ -332,8 +332,8 @@ void clean_page_tables(uint64_t cr3) {
                     kfree(pde);
                 }
             }
+            kfree(pdpe);
         }
-        kfree(pdpe);
     }
     kfree(pml4);
 }
