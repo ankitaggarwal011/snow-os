@@ -12,7 +12,7 @@
 
 struct job {
     char jobname[BUF_SIZE];
-    char arguments[MAX_ARGS][BUF_SIZE];
+    char *arguments[MAX_ARGS];
     int num_args;
 };
 
@@ -63,11 +63,11 @@ int put_env(char *new_path, char *envp[]) {
 int exec_binary(char *arguments[], int num_args, char *envp[]) {
     char bin[BUF_SIZE];
     int i = 0;
-    for (i = 0; (path[i] != '/' || path[i] != '\0'); i++) {
+    for (i = 0; (path[i] != '/' && path[i] != '\0'); i++) {
         bin[i] = path[i];
     }
-    bin[i] = 0;
-    strcat(bin, "/");
+    bin[i++] = '/';
+    bin[i] = '\0'
     strcat(bin, arguments[0]);
     pid_t c_pid = fork();
     if (c_pid == 0) {
@@ -86,8 +86,8 @@ int exec_binary(char *arguments[], int num_args, char *envp[]) {
 
 int set_env_variables(char *arguments[], int num_args, char *envp[]) {
     if (arguments[1][0] == 'P' && arguments[1][1] == 'S' && arguments[1][2] == '1') {
-        char tokens[MAX_ARGS][BUF_SIZE];
-        parse_split((char **) tokens, arguments[1], '=');
+        char *tokens[MAX_ARGS];
+        parse_split(tokens, arguments[1], '=');
         int k = 0;
         while(tokens[1][k]) {
             PS1[k] = tokens[1][k];
@@ -136,20 +136,6 @@ int cd(char *arguments[], int num_args, char *envp[]) {
     return 0;
 }
 
-int execute_job(struct job job_to_execute, char* envp[]) {
-    char* jobname = job_to_execute.arguments[0];
-    if (strcmp(jobname, "cd") == 0) {
-        cd((char **) job_to_execute.arguments, job_to_execute.num_args, envp);
-    }
-    else if (strcmp(jobname, "export") == 0) {
-        set_env_variables((char **) job_to_execute.arguments, job_to_execute.num_args, envp);
-    }
-    else {
-        exec_binary((char **) job_to_execute.arguments, job_to_execute.num_args, envp);
-    }
-    return 0;
-}
-
 int shell_parse(char *input, int len_input, char *envp[]) {    
     if (strcmp(input, "$PATH") == 0) {
         write(STDOUT, path, strlen(path));
@@ -162,18 +148,27 @@ int shell_parse(char *input, int len_input, char *envp[]) {
         return 0;
     }
 
-    if (*input) {
-        if (input[len_input - 1] == '&') {
-            is_background = 1;
-            input[len_input - 1] = 0;
-            len_input--;
-        }
+    if (input[len_input - 1] == '&') {
+        is_background = 1;
+        input[len_input - 1] = 0;
+        len_input--;
     }
 
     input = remove_white_spaces(input);
     struct job shell_job;
-    shell_job.num_args = parse_split((char **) shell_job.arguments, input, ' ');
-    execute_job(shell_job, envp);
+    shell_job.num_args = parse_split(shell_job.arguments, input, ' ');
+
+    char* jobname = shell_job.arguments[0];
+    if (strcmp(jobname, "cd") == 0) {
+        cd(shell_job.arguments, shell_job.num_args, envp);
+    }
+    else if (strcmp(jobname, "export") == 0) {
+        set_env_variables(shell_job.arguments, shell_job.num_args, envp);
+    }
+    else {
+        exec_binary(shell_job.arguments, shell_job.num_args, envp);
+    }
+
     return 0;
 }
 
@@ -193,8 +188,10 @@ int shell_execfile(char *filename, char *envp[]) {
 }
 
 int shell_init(char* envp[]) {
+    char input[BUF_SIZE], current_dir[BUF_SIZE];
     while (1) {
-        char input[BUF_SIZE], current_dir[BUF_SIZE];
+        memset(input, 0, BUF_SIZE);
+        memset(current_dir, 0, BUF_SIZE);
         is_background = 0;
         getcwd(current_dir, BUF_SIZE);
         char *sbush = ": sbush> ";
@@ -209,7 +206,7 @@ int shell_init(char* envp[]) {
 
         read(STDIN, input, BUF_SIZE);
 
-        if (*input) {
+        if (*input != '\0') {
             int len_input = strlen(input);
             if (input[len_input - 1] == '\n') {
                 input[len_input - 1] = 0;
