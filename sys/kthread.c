@@ -11,11 +11,14 @@ extern void set_rsp_arg1(uint64_t rsp_val, uint64_t arg1);
 
 extern void _jump_usermode(void *starting_func_addr);
 
+/*
 extern uint64_t test_syscall();
 
 void test_func_1();
 
 void test_func_2();
+
+void user_test_func();
 
 void schedule();
 
@@ -105,7 +108,7 @@ void test_context_switch() {
     init_kthreads();
     set_rsp((uint64_t) t1->rsp_val);
 }
-
+*/
 
 kthread_t *get_cur_kthread() {
     return cur;
