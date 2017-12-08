@@ -12,21 +12,16 @@ char *strcat(char *s1, const char *s2) {
         s++;
         t++;
     }
+    *s = '\0';
     return s1;
 }
 
-int kstrcmp(char *str1, char *str2) {
-    char *s1 = str1, *s2 = str2;
+int kstrcmp(const char *s1, const char *s2) {
     while (*s1 && *s2 && *s1 == *s2) {
         s1++;
         s2++;
     }
-    if (*s1 == 0 && *s2 == 0) {
-        return 0;
-    } else if (*s1 > *s2) {
-        return 1;
-    }
-    return -1;
+    return *s1 - *s2;
 }
 
 int atoi(char *str) {
@@ -98,7 +93,7 @@ int o_to_d(int n) {
 }
 
 
-size_t strlen(char *s) {
+size_t strlen(const char *s) {
     if (s == NULL || '\0' == *s) {
         return 0;
     }
@@ -108,4 +103,15 @@ size_t strlen(char *s) {
         len++;
     }
     return len;
+}
+
+const char *strcpy(char *dest, const char *src) {
+    const char *str = dest;
+    while(*src) {
+        *dest = *src;
+        src++;
+        dest++;
+    }
+    *dest = '\0';
+    return str;
 }
