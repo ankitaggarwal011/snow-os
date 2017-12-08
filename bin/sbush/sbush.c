@@ -156,14 +156,14 @@ int shell_parse(char *input, int len_input, char *envp[]) {
         char print_path[BUF_SIZE];
         strcpy(print_path, path);
         strcat(print_path, "\n");
-        write(STDOUT, path, strlen(print_path));
+        write(STDOUT, print_path, strlen(print_path));
         return 0;
     }
     else if (strcmp(input, "$PS1") == 0) {
         char print_PS1[BUF_SIZE];
         strcpy(print_PS1, PS1);
         strcat(print_PS1, "\n");
-        write(STDOUT, PS1, strlen(print_PS1));
+        write(STDOUT, print_PS1, strlen(print_PS1));
         return 0;
     }
 
