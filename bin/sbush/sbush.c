@@ -153,17 +153,13 @@ int execute_job(struct job job_to_execute, char* envp[]) {
 
 int shell_parse(char *input, int len_input, char *envp[]) {    
     if (strcmp(input, "$PATH") == 0) {
-        char print_path[BUF_SIZE];
-        strcpy(print_path, path);
-        strcat(print_path, "\n");
-        write(STDOUT, print_path, strlen(print_path));
+        write(STDOUT, path, strlen(path));
+        write(STDOUT, "\n", 1);
         return 0;
     }
     else if (strcmp(input, "$PS1") == 0) {
-        char print_PS1[BUF_SIZE];
-        strcpy(print_PS1, PS1);
-        strcat(print_PS1, "\n");
-        write(STDOUT, print_PS1, strlen(print_PS1));
+        write(STDOUT, PS1, strlen(PS1));
+        write(STDOUT, "\n", 1);
         return 0;
     }
 
@@ -203,8 +199,9 @@ int shell_init(char* envp[]) {
         memset(input, 0, BUF_SIZE);
         memset(current_dir, 0, BUF_SIZE);
         is_background = 0;
-        char *dir = getcwd(current_dir, BUF_SIZE);
-        strcat(dir, ": sbush> ");
+        char *dir = (char *) current_dir;
+        dir = getcwd(dir, BUF_SIZE);
+        dir = strcat(dir, ": sbush> ");
 
         if (PS1_set) {
             write(STDOUT, PS1, strlen(PS1));
