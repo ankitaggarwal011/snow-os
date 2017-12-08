@@ -4,7 +4,6 @@
 
 int main(int argc, char *argv[], char *envp[]) {
     if (argc < 2) {
-        while (1);
         return 0;
     }
     for (int i = 1; i < argc; i++) {
@@ -12,6 +11,5 @@ int main(int argc, char *argv[], char *envp[]) {
         write(1, s, strlen(s));
         write(1, " ", 1);
     }
-    while (1);
     return 0;
 }

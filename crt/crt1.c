@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
-void _start(int argc, char* argv[]) {
+void _start(int argc, char *argv[]) {
     // call main() and exit() here
-    main(argc, argv, NULL);
+    int exit_code = main(argc, argv, NULL);
+    exit(exit_code);
 }

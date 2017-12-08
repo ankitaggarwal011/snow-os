@@ -62,4 +62,7 @@ int exec_vpe(char *filename, char **argv, char **envp);
 
 void go_to_ring3_exec();
 
+int kill_kern(int pid);
+
+void exit_current_process(int status);
 #endif

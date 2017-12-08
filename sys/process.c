@@ -57,11 +57,31 @@ void scheduler() {
 }
 
 void switch_process() {
-    if (current_process != current_process->next) {
-        set_new_cr3(current_process->next->cr3);
-        set_tss_rsp(&current_process->next->k_stack[K_STACK_SIZE - 1]);
-        switch_to(&current_process, current_process->next);
+    if (current_process == current_process->next) {
+        // only one process in system. No problem.
+        return;
     }
+    // find the next process that is not a zombie and is queued.
+    kthread_t *cand = current_process->next;
+    while (cand != current_process && cand->state != QUEUED) {
+        cand = cand->next;
+    }
+    if (cand == current_process) {
+        // went around all processes. Nobody was in QUEUED state!
+        kprintf("No queued process found for running!!!\n");
+        return;
+    }
+
+    if (current_process->state == RUNNING) {
+        current_process->state = QUEUED;
+    } else if (current_process->state != ZOMBIE) {
+        kprintf("Some problem with process states: %d!! \n", current_process->state);
+        return;
+    }
+    cand->state = RUNNING;
+    set_new_cr3(cand->cr3);
+    set_tss_rsp(&cand->k_stack[K_STACK_SIZE - 1]);
+    switch_to(&current_process, cand);
 }
 
 kthread_t *init_idle_process() {
@@ -86,6 +106,7 @@ kthread_t *init_idle_process() {
     stdout_fo->ref_count++;
     idle->fds[1] = stdout_fo;
     idle->fds[2] = stdout_fo;
+    idle->state = RUNNING;
     return idle;
 }
 
@@ -102,11 +123,11 @@ kthread_t *create_process(char *filename) {
     char *tmp = filename;
     while (*tmp != 0) tmp++;
     while (*tmp != '/') tmp--;
-    
+
     char p_name[256];
     p_name[0] = 0;
     strcat((char *) p_name, filename);
-    
+
     new_process->process_name = (char *) &p_name;
     for (i = 0; (filename + i) < tmp; i++) {
         new_process->cwd[i] = *(filename + i);
@@ -128,7 +149,7 @@ kthread_t *create_process(char *filename) {
     load_file(new_process, filename);
 
     set_new_cr3(current_cr3);
-
+    new_process->state = QUEUED;
     current_process->next = new_process;
     new_process->next = current_process;
 
@@ -192,7 +213,7 @@ int ch_dir(char *path) {
 void go_to_ring3() {
     set_tss_rsp(&current_process->k_stack[K_STACK_SIZE - 1]);
     set_new_cr3(current_process->cr3);
-
+    // current_process->state will already be running;
     __asm__ __volatile__ (
     "movq %1, %%rax;"
             "pushq $0x23;"
@@ -222,7 +243,7 @@ uint64_t copy_process(kthread_t *parent_task) {
     char p_name[256];
     p_name[0] = 0;
     strcat((char *) p_name, parent_task->process_name);
-    
+
     child->process_name = (char *) &p_name;
     for (int i = 0; i < 1024; i++) child->cwd[i] = parent_task->cwd[i];
 
@@ -292,7 +313,7 @@ void fork() {
     last = current_process->next;
     current_process->next = child_task;
     child_task->next = last;
-
+    child_task->state = QUEUED;
     set_new_cr3(parent_task->cr3);
 
     for (int i = 0; i < 4096; i++) {
@@ -361,7 +382,7 @@ int exec_vpe(char *filename, char **argv, char **envp) {
     }
 
     kthread_t *new_process = (kthread_t *) kmalloc(sizeof(kthread_t));
-    
+
     new_process->pid = current_process->pid;
     new_process->ppid = current_process->ppid;
     new_process->next = NULL;
@@ -370,7 +391,7 @@ int exec_vpe(char *filename, char **argv, char **envp) {
     char p_name[256];
     p_name[0] = 0;
     strcat((char *) p_name, filename);
-    
+
     new_process->process_name = (char *) &p_name;
 
     new_process->fds[0] = current_process->fds[0];
@@ -392,25 +413,25 @@ int exec_vpe(char *filename, char **argv, char **envp) {
 
     load_file(new_process, filename_copy);
 
-    void *user_stack_ptr = (void *)(STACK_START + 4096 - 16 - sizeof(user_stack));
+    void *user_stack_ptr = (void *) (STACK_START + 4096 - 16 - sizeof(user_stack));
     memcpy(user_stack_ptr, (void *) user_stack, sizeof(user_stack));
 
-    for(int i = argc; i > 0; i--) {
-        *((uint64_t *) (user_stack_ptr - 8 * i)) = (uint64_t) user_stack_ptr + 128 * (argc - i);
+    for (int i = argc; i > 0; i--) {
+        *((uint64_t * )(user_stack_ptr - 8 * i)) = (uint64_t) user_stack_ptr + 128 * (argc - i);
     }
     user_stack_ptr = user_stack_ptr - 8 * argc;
     new_process->rsp_user = (uint64_t) user_stack_ptr;
-    
+
     kthread_t *last = current_process->next;
-    while(last->next != current_process) {
+    while (last->next != current_process) {
         last = last->next;
     }
     last->next = new_process;
     new_process->next = current_process->next;
+    // TODO free and cleanup current process here.
     current_process = new_process;
-
+    current_process->state = RUNNING;
     go_to_ring3_exec(argc, user_stack_ptr);
-
     return -1;
 }
 
@@ -419,7 +440,7 @@ void go_to_ring3_exec(uint64_t argc, void *user_stack_ptr) {
     set_new_cr3(current_process->cr3);
 
     __asm__ __volatile__ (
-            "sti;"
+    "sti;"
             "movq %0, %%rsp;"
             "movq %2, %%rax;"
             "pushq $0x23;"
@@ -432,4 +453,99 @@ void go_to_ring3_exec(uint64_t argc, void *user_stack_ptr) {
             "iretq;"
     ::"r"(current_process->rsp_val), "r"(current_process->rip), "r"(current_process->rsp_user), "r"(user_stack_ptr), "r"(argc)
     );
+}
+
+void deep_clean(kthread_t *it) {
+
+}
+
+void shallow_cleanup(kthread_t *it) {
+
+}
+
+void reap_process(kthread_t *process) {
+    kthread_t *cur = current_process;
+    if (process == cur) {
+        kprintf("Can't reap the only process!\n");
+        return;
+    }
+    kthread_t *prev = cur;
+    kthread_t *it = cur->next;
+    while (it != process) {
+        prev = it;
+        it = it->next;
+    }
+    prev->next = process->next;
+    deep_clean(process);
+    processes[process->pid] = 0;
+    kfree(process);
+    // remove from list
+    // deep clean
+    // free the data structure
+}
+
+void kill_process(kthread_t *process) {
+    kthread_t *cur = process;
+    if (cur->next == cur) {
+        kprintf("Can't exit the only process!\n");
+        return;
+    }
+    // cleanup
+    kthread_t *it = cur;
+    it = it->next;
+    while (it != cur) {
+        if (it->ppid == cur->pid) {
+            // this is my child. change it's ppid to 1
+            it->ppid = 1;
+        }
+        it = it->next;
+    }
+    // now I have to shallow clean myself up.
+    shallow_cleanup(cur);
+    // now I will remove myself from scheduling list
+    current_process->state = ZOMBIE;
+}
+
+int kill_kern(int pid) {
+    if (pid <= 0) {
+        kprintf("Invalid pid <= 0\n");
+        return -1;
+    }
+    if (pid >= MAX_P) {
+        kprintf("Pid %d out of range\n", pid);
+        return -1;
+    }
+
+    if (pid == 1) {
+        kprintf("Can't kill pid 1: kernel idle process\n");
+        return -1;
+    }
+    if (processes[pid] == 0) {
+        kprintf("No process exists with pid: %d\n", pid);
+        return -1;
+    }
+    if (current_process == current_process->next) {
+        if (current_process->pid == pid) {
+            kprintf("Can't kill the only process! pid: %d\n", pid);
+            return -1;
+        }
+    }
+    kthread_t *it = current_process->next;
+    while (it != current_process) {
+        if (it->pid == pid) {
+            return -1;
+        }
+        it = it->next;
+    }
+    if (it->pid != pid) {
+        kprintf("No process exists with pid: %d\n", pid);
+        return -1;
+    }
+    kill_process(it);
+    return 0;
+}
+
+void exit_current_process(int status) {
+    kill_process(current_process);
+    scheduler();
 }

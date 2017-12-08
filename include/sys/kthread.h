@@ -7,6 +7,11 @@
 #define PROJECT_KTHREAD_H
 #define K_STACK_SIZE 4096
 #define NUM_FDS 16
+typedef enum process_state_e {
+    RUNNING = 0x0,
+    ZOMBIE = 0x1,
+    QUEUED = 0x2
+} process_state;
 // WARNING: don't add anything at the start of kern_thread struct. Register logic assumes that the offset of rsp_val is 0.
 typedef struct kern_thread {
     uint64_t *rsp_val;
@@ -22,6 +27,7 @@ typedef struct kern_thread {
     struct kern_thread *next;
     file_object_t *fds[NUM_FDS];
     char cwd[1024];
+    process_state state;
 }__attribute__((__packed__)) kthread_t;
 
 struct vma_struct {
