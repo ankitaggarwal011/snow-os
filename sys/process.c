@@ -358,6 +358,20 @@ void get_process_state(char *buf) {
         strcat(s, num);
         strcat(s, ", name: ");
         strcat(s, it->process_name);
+        strcat(s, ", status: ");
+        char *stat_str = "";
+        switch (it->state) {
+            case RUNNING:
+                stat_str = "Running";
+                break;
+            case QUEUED:
+                stat_str = "Queued";
+                break;
+            case ZOMBIE:
+                stat_str = "Zombie";
+                break;
+        }
+        strcat(s, stat_str);
         strcat(s, "\n");
         it = it->next;
         i++;
