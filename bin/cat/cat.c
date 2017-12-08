@@ -24,6 +24,10 @@ int main(int argc, char *argv[], char *envp[]) {
         char *temp_var = "Incorrect number of command line arguments. Please try again.\n";
         if (write(1, (char *) temp_var, sizeof(char) * strlen(temp_var)) == -1) { /* Write error */ }
     }
-    while (1);
+    yield();
+    while (1) {
+        write(1, " in cat ", 8);
+        yield();
+    }
     return 0;
 }

@@ -8,7 +8,8 @@ int main(int argc, char *argv[], char *envp[]) {
     write(1, " start ", 7);
     int fork_res = fork();
     if (fork_res == 0) {
-        write(1, " child ", 7);
+        char *argv[] = {"bin/cat", "etc/test.txt"};
+        execvpe("bin/cat", argv, NULL);
         yield();
     } else {
         write(1, " parent1 ", 9);
@@ -17,6 +18,7 @@ int main(int argc, char *argv[], char *envp[]) {
         yield();
     }
     write(1, " end ", 5);
+    yield();
     while (1);
     return 0;
 }

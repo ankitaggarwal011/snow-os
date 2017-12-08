@@ -46,9 +46,6 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
             :"=m"(fork_ret_val)
             ::"%rax"
             );
-            if (fork_ret_val == 0) {
-                kprintf("Executing for child!!");
-            }
             return fork_ret_val;
         }
         case SYSCALL_READ: {
