@@ -47,7 +47,7 @@ struct mm_struct {
     struct vma_struct *vma_heap;
 }__attribute__((__packed__));
 
-void test_context_switch();
+// void test_context_switch();
 
 extern void set_rsp(uint64_t val);
 

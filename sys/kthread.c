@@ -108,8 +108,9 @@ void test_context_switch() {
     init_kthreads();
     set_rsp((uint64_t) t1->rsp_val);
 }
-*/
+
 
 kthread_t *get_cur_kthread() {
     return cur;
 }
+*/
