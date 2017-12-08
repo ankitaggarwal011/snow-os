@@ -182,7 +182,7 @@ int read_dir(uint64_t stream, char *filename) {
     if (d->current_point >= d->file_count) {
         return -1;
     }
-    for (int i = 0; i < 255; i++) {
+    for (int i = 0; i < BUF_SIZE; i++) {
         *(filename + i) = d->files[d->current_point][i];
     }
     d->current_point++;
