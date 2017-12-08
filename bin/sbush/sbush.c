@@ -78,7 +78,7 @@ int exec_binary(char *arguments[], int num_args, char *envp[]) {
     }
     else {
         if (is_background == 0) {
-            waitpid(c_pid, NULL);
+            // waitpid(c_pid, NULL);
         }
     }
     return 0;
