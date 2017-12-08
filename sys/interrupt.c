@@ -6,7 +6,7 @@
 #include <sys/physical_memory.h>
 #include <sys/paging.h>
 
-#define LIMIT_STACK 8192
+#define LIMIT_STACK 4096000
 #define PAGE_FAULT 14
 
 extern void timer_isr();
