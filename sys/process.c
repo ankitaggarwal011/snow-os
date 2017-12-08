@@ -125,8 +125,13 @@ kthread_t *create_process(char *filename) {
     while (*tmp != '/') tmp--;
 
     char p_name[256];
-    p_name[0] = 0;
-    strcat((char *) p_name, filename);
+    int len = strlen(filename);
+    for (int i = 0; i < len; i++) {
+        p_name[i] = filename[i];
+    }
+    p_name[len] = '\0';
+    //p_name[0] = 0;
+    //strcat((char *) p_name, filename);
 
     new_process->process_name = (char *) &p_name;
     for (i = 0; (filename + i) < tmp; i++) {
