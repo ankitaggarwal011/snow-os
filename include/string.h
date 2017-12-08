@@ -21,4 +21,6 @@ char *strcpy(char *dest, const char *src);
 
 void *memcpy(void *dest, void *src, int bytes);
 
+void *memset(void *a, int v, size_t b);
+
 #endif

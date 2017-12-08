@@ -198,8 +198,10 @@ int shell_execfile(char *filename, char *envp[]) {
 }
 
 int shell_init(char* envp[]) {
+    char input[BUF_SIZE], current_dir[BUF_SIZE];
     while (1) {
-        char input[BUF_SIZE], current_dir[BUF_SIZE];
+        memset(input, 0, BUF_SIZE);
+        memset(current_dir, 0, BUF_SIZE);
         is_background = 0;
         getcwd(current_dir, BUF_SIZE);
         strcat(current_dir, ": sbush> ");
