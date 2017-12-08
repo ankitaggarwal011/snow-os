@@ -236,7 +236,7 @@ void go_to_ring3() {
 
 uint64_t copy_process(kthread_t *parent_task) {
     kthread_t *child = (kthread_t *) kmalloc(sizeof(kthread_t));
-    memset(parent_task->k_stack, 0, K_STACK_SIZE);
+    memset(child->k_stack, 0, K_STACK_SIZE);
     child->rsp_val = &(child->k_stack[K_STACK_SIZE - 1]);
     child->rsp_user = parent_task->rsp_user;
     child->pid = getPID();
