@@ -9,6 +9,7 @@
 #define MASK 0xFFFFFFFFFFFFF000
 #define GET_FLAGS 0x0000000000000FFF
 #define COW_FLAG 0x0000000000000200
+#define TURN_OFF_RW 0xFFFFFFFFFFFFFFFD
 
 uint64_t *pml4_t, kernel_virtual_base;
 
@@ -294,7 +295,7 @@ uint64_t cow_page_tables() {
                             uint64_t *parent_pte = (uint64_t *)(kernel_virtual_base + (parent_pde[k] & MASK));
                             for (int l = 0; l < 512; l++) {
                                 if ((parent_pte[l] & 1UL) == 1UL) {
-                                    parent_pte[l] = parent_pte[l] ^ 2; // turning off R/W
+                                    parent_pte[l] = parent_pte[l] & TURN_OFF_RW; // turning off R/W
                                     parent_pte[l] = parent_pte[l] | COW_FLAG;
                                     child_pte[l] = parent_pte[l];
                                     uint64_t physical_addr = parent_pte[l] & MASK;
