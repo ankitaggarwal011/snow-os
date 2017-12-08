@@ -88,7 +88,7 @@ int exec_binary(char *arguments[], int num_args, char *envp[]) {
 int set_env_variables(char *arguments[], int num_args, char *envp[]) {
     if (arguments[1][0] == 'P' && arguments[1][1] == 'S' && arguments[1][2] == '1') {
         char tokens[MAX_ARGS][BUF_SIZE];
-        parse_split(tokens, arguments[1], '=');
+        parse_split((char **) tokens, arguments[1], '=');
         int k = 0;
         while(tokens[1][k]) {
             PS1[k] = tokens[1][k];
@@ -140,13 +140,13 @@ int cd(char *arguments[], int num_args, char *envp[]) {
 int execute_job(struct job job_to_execute, char* envp[]) {
     char* jobname = job_to_execute.arguments[0];
     if (strcmp(jobname, "cd") == 0) {
-        cd(job_to_execute.arguments, job_to_execute.num_args, envp);
+        cd((char **) job_to_execute.arguments, job_to_execute.num_args, envp);
     }
     else if (strcmp(jobname, "export") == 0) {
-        set_env_variables(job_to_execute.arguments, job_to_execute.num_args, envp);
+        set_env_variables((char **) job_to_execute.arguments, job_to_execute.num_args, envp);
     }
     else {
-        exec_binary(job_to_execute.arguments, job_to_execute.num_args, envp);
+        exec_binary((char **) job_to_execute.arguments, job_to_execute.num_args, envp);
     }
     return 0;
 }
@@ -154,14 +154,14 @@ int execute_job(struct job job_to_execute, char* envp[]) {
 int shell_parse(char *input, int len_input, char *envp[]) {    
     if (strcmp(input, "$PATH") == 0) {
         char print_path[BUF_SIZE];
-        print_path = strcpy(print_path, path);
+        strcpy(print_path, path);
         strcat(print_path, "\n");
         write(STDOUT, path, strlen(print_path));
         return 0;
     }
     else if (strcmp(input, "$PS1") == 0) {
         char print_PS1[BUF_SIZE];
-        print_PS1 = strcpy(print_PS1, PS1);
+        strcpy(print_PS1, PS1);
         strcat(print_PS1, "\n");
         write(STDOUT, PS1, strlen(print_PS1));
         return 0;
@@ -177,7 +177,7 @@ int shell_parse(char *input, int len_input, char *envp[]) {
 
     input = remove_white_spaces(input);
     struct job shell_job;
-    shell_job.num_args = parse_split(shell_job.arguments, input, ' ');
+    shell_job.num_args = parse_split((char **) shell_job.arguments, input, ' ');
     execute_job(shell_job, envp);
     return 0;
 }
@@ -187,7 +187,7 @@ int shell_execfile(char *filename, char *envp[]) {
     char script_file[BUF_SIZE];
     read(fp, script_file, BUF_SIZE);
     char line_read[BUF_SIZE / 2][BUF_SIZE / 4];
-    int num_lines = parse_split(line_read, script_file, '\n');
+    int num_lines = parse_split((char **) line_read, script_file, '\n');
     for (int i = 0; i < num_lines; i++) {
         if (line_read[i][0] != '#' && line_read[i][1] != '!' && (int) strlen(line_read[i]) != 0) {
             shell_parse(line_read[i], (int) strlen(line_read[i]), envp);
@@ -213,7 +213,7 @@ int shell_init(char* envp[]) {
 
         read(STDIN, input, BUF_SIZE);
 
-        if (input && *input) {
+        if (*input) {
             int len_input = strlen(input);
             if (input[len_input - 1] == '\n') {
                 input[len_input - 1] = 0;
