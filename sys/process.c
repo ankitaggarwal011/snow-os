@@ -77,7 +77,8 @@ void switch_process() {
 
     if (current_process->state == RUNNING) {
         current_process->state = QUEUED;
-    } else if (current_process->state != ZOMBIE) {
+    }
+    else if (current_process->state != ZOMBIE) {
         kprintf("Some problem with process states: %d!! \n", current_process->state);
         return;
     }
@@ -315,7 +316,6 @@ uint64_t copy_process(kthread_t *parent_task) {
 void fork() {
     uint64_t return_val = (uint64_t) __builtin_return_address(0);
     kthread_t *parent_task = current_process, *last;
-    // volatile uint64_t p_stack;
     kthread_t *child_task = (kthread_t *) copy_process(parent_task);
 
     last = current_process->next;
@@ -327,18 +327,10 @@ void fork() {
     for (int i = 0; i < 4096; i++) {
         *(child_task->k_stack + i) = *(parent_task->k_stack + i);
     }
-    /*
-    __asm__ __volatile__(
-    "movq $1f, %0;"
-            "1:\t"
-    :"=g"(child_task->rip)
-    );
-    */
 
     volatile uint64_t *var = (uint64_t * )(get_rsp_val() + 8);
     parent_task->rsp_val = (uint64_t * )(get_rsp_val() + 8);
     volatile uint64_t diff = parent_task->k_stack + K_STACK_SIZE - 1 - (var);
-    // child_task->rsp_val = child_task->k_stack + K_STACK_SIZE - 1;
     child_task->rsp_val = (uint64_t * )(((uint64_t) child_task->rsp_val) - 8 * ((uint64_t) diff));
     while (*(child_task)->rsp_val != return_val) {
         child_task->rsp_val++;
