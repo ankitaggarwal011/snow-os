@@ -67,7 +67,7 @@ int exec_binary(char *arguments[], int num_args, char *envp[]) {
         bin[i] = path[i];
     }
     bin[i++] = '/';
-    bin[i] = '\0'
+    bin[i] = '\0';
     strcat(bin, arguments[0]);
     pid_t c_pid = fork();
     if (c_pid == 0) {
