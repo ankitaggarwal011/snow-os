@@ -19,4 +19,6 @@ void itoa_cl(char *buf, int64_t val);
 
 char *strcpy(char *dest, const char *src);
 
+void *memcpy(void *dest, void *src, int bytes);
+
 #endif

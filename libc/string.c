@@ -121,3 +121,10 @@ char *strcpy(char *dest, const char *src) {
     *str = 0;
     return dest;
 }
+
+void *memcpy(void *dest, void *src, int bytes) {
+    char *ts = src, *td = dest;
+    while (bytes--)
+        *td++ = *ts++;
+    return dest;
+}
