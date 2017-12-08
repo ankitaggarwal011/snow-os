@@ -54,6 +54,7 @@ extern void page_fault_handler() {
         current_vma_stack->end += PAGE_SIZE;
     }
     else {
+        kprintf("STACK LIMIT EXCEEDED!\n");
         while(1); // Segmentation fault
     }
 }

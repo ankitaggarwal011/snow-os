@@ -16,5 +16,9 @@ int32_t atoi(char *p);
 uint64_t pow(int a, int b);
 
 size_t strlen(char *s);
+
 void itoa(char *buf, int64_t val);
+
+char *strcpy(char *dest, const char *src);
+
 #endif

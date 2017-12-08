@@ -30,4 +30,6 @@ void remove_page_table_mapping(uint64_t virt_addr);
 
 uint64_t cow_page_tables();
 
+void clean_page_tables(uint64_t cr3);
+
 #endif
