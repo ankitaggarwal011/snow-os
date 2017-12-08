@@ -86,17 +86,8 @@ void load_file(kthread_t *new_process, char *filename) {
     vma_stack->next = NULL;
     
     new_process->process_mm->vma_map = vma_map;
-    new_process->process_mm->vma_map_iter = vma_map_iter; // this and below needs to be added in copy process as well
+    new_process->process_mm->vma_map_iter = vma_map_iter;
     new_process->process_mm->vma_stack = vma_stack;
     new_process->process_mm->vma_heap = vma_heap;
-    /*
-    struct vma_struct *test = new_process->process_mm->vma_map;
-    kprintf("VMAs found: \n");
-    while (test) {
-        kprintf("VMA start: %x, VMA end: %x\n", test->start, test->end);
-        test = test->next;
-    }
-    */
-
     new_process->rsp_user = (uint64_t)((uint64_t) stack + 4096 - 16);
 }

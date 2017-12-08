@@ -110,3 +110,14 @@ size_t strlen(char *s) {
     }
     return len;
 }
+
+char *strcpy(char *dest, const char *src) {
+    char *str = dest;
+    while(*src) {
+        *str = *src;
+        src++;
+        str++;
+    }
+    *str = 0;
+    return dest;
+}

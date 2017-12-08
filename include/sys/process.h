@@ -62,4 +62,6 @@ int exec_vpe(char *filename, char **argv, char **envp);
 
 void go_to_ring3_exec();
 
+void cleanup_process(kthread_t *process);
+
 #endif

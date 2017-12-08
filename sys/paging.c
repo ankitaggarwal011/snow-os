@@ -314,3 +314,26 @@ uint64_t cow_page_tables() {
     }
     return child_cr3;   
 }
+
+void clean_page_tables(uint64_t cr3) {
+    uint64_t *pml4 = (uint64_t *)(cr3 + kernel_virtual_base);
+    for(int i = 0; i < 512; i++) {
+        if ((pml4[i] & 1UL) == 1UL) {
+            uint64_t *pdpe = (uint64_t *)(kernel_virtual_base + (pml4[i] & MASK));
+            for(int j = 0; j < 512; j++) {
+                if ((pdpe[j] & 1UL) == 1UL) {
+                    uint64_t *pde = (uint64_t *)(kernel_virtual_base + (pdpe[j] & MASK));
+                    for(int k = 0; k < 512; k++) {
+                        if ((pde[k] & 1UL) == 1UL) {
+                            uint64_t *pte = (uint64_t *)(kernel_virtual_base + (pde[k] & MASK));
+                            kfree(pte);
+                        }
+                    }
+                    kfree(pde);
+                }
+            }
+        }
+        kfree(pdpe);
+    }
+    kfree(pml4);
+}

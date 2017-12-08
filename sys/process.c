@@ -180,7 +180,7 @@ int get_cwd(char *buf, size_t size) {
     return 0;
 }
 
-int ch_dir(char *path) {
+int ch_dir(char *path) { // TODO: check if a directory exists
     int i = 0;
     for (i = 0; *(path + i) != 0; i++) {
         current_process->cwd[i] = *(path + i);
@@ -432,4 +432,27 @@ void go_to_ring3_exec(uint64_t argc, void *user_stack_ptr) {
             "iretq;"
     ::"r"(current_process->rsp_val), "r"(current_process->rip), "r"(current_process->rsp_user), "r"(user_stack_ptr), "r"(argc)
     );
+}
+
+// clean pages, clean page tables, clean vma, clean mm_struct
+void cleanup_process(kthread_t *process) {
+    struct vma_struct *v_map = process->process_mm->vma_map;
+    struct vma_struct *v_stack = process->process_mm->vma_stack;
+    struct vma_struct *v_map_next = v_map;
+    while (v_map_next != NULL) {
+        uint64_t s_addr = v_map->start;
+        while (s_addr < v_map->end) {
+            kfree(s_addr);
+            s_addr += PAGE_SIZE;
+        }
+        v_map_next = v_map->next;
+        kfree(v_map);
+    }
+    uint64_t stack_start = v_stack->start;
+    while (stack_start < v_stack->end) {
+        kfree(stack_start);
+        stack_start += PAGE_SIZE;
+    }
+    kfree(v_stack);
+    kfree(process->process_mm);
 }
