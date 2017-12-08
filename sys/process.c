@@ -442,7 +442,7 @@ void cleanup_process(kthread_t *process) {
     while (v_map_next != NULL) {
         uint64_t s_addr = v_map->start;
         while (s_addr < v_map->end) {
-            kfree(s_addr);
+            kfree((void *) s_addr);
             s_addr += PAGE_SIZE;
         }
         v_map_next = v_map->next;
@@ -450,7 +450,7 @@ void cleanup_process(kthread_t *process) {
     }
     uint64_t stack_start = v_stack->start;
     while (stack_start < v_stack->end) {
-        kfree(stack_start);
+        kfree((void *) stack_start);
         stack_start += PAGE_SIZE;
     }
     kfree(v_stack);
