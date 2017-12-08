@@ -17,4 +17,6 @@ size_t strlen(char *s);
 
 void itoa_cl(char *buf, int64_t val);
 
+char *strcpy(char *dest, const char *src);
+
 #endif

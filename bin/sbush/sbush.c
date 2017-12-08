@@ -34,6 +34,23 @@ char *remove_white_spaces(char *src) {
     return src;
 }
 
+int parse_split(char *commands[], char *input, const char delimiter) {
+    int i = 0, last = -1, n = 0;
+    while (input[i] != 0) {
+        if (input[i] == delimiter) {
+            input[i] = 0;
+            commands[n] = &input[last + 1];
+            commands[n] = remove_white_spaces(commands[n]);
+            last = i;
+            n++;
+        }
+        i++;
+    }
+    commands[n] = &input[last + 1];
+    commands[n] = remove_white_spaces(commands[n]);
+    return ++n;
+}
+
 int put_env(char *new_path, char *envp[]) {
     int i = 5;
     while(new_path[i]) {
@@ -44,7 +61,7 @@ int put_env(char *new_path, char *envp[]) {
     return 0;
 }
 
-int exec_binary(char **arguments, int num_args, char *envp[]) {
+int exec_binary(char *arguments[], int num_args, char *envp[]) {
     char bin[BUF_SIZE];
     int i = 0;
     for (i = 0; (path[i] != '/' || path[i] != '\0'); i++) {
@@ -62,13 +79,13 @@ int exec_binary(char **arguments, int num_args, char *envp[]) {
     }
     else {
         if (is_background == 0) {
-            waitpid(c_pid, NULL, 0);
+            waitpid(c_pid, NULL);
         }
     }
     return 0;
 }
 
-int set_env_variables(char **arguments, int num_args, char *envp[]) {
+int set_env_variables(char *arguments[], int num_args, char *envp[]) {
     if (arguments[1][0] == 'P' && arguments[1][1] == 'S' && arguments[1][2] == '1') {
         char tokens[MAX_ARGS][BUF_SIZE];
         parse_split(tokens, arguments[1], '=');
@@ -95,7 +112,7 @@ int set_env_variables(char **arguments, int num_args, char *envp[]) {
     return 0;
 }
 
-int cd(char **arguments, int num_args, char *envp[]) {
+int cd(char *arguments[], int num_args, char *envp[]) {
     int status;
     if (num_args == 2) {
         if (arguments[1][0] == '/') {
@@ -103,10 +120,10 @@ int cd(char **arguments, int num_args, char *envp[]) {
         }
         else {
             char cdir[BUF_SIZE];
-            cdir = getcwd(cdir, BUF_SIZE);
+            getcwd(cdir, BUF_SIZE);
             strcat(cdir, "/");
             strcat(cdir, arguments[1]);
-            status = chdir(current_dir);
+            status = chdir(cdir);
         }
         if (status != 0) {
             char* error_msg = "cd: No such file or directory\n";
@@ -134,23 +151,6 @@ int execute_job(struct job job_to_execute, char* envp[]) {
     return 0;
 }
 
-int parse_split(char **commands, char *input, const char delimiter) {
-    int i = 0, last = -1, n = 0;
-    while (input[i] != 0) {
-        if (input[i] == delimiter) {
-            input[i] = 0;
-            commands[n] = &input[last + 1];
-            commands[n] = remove_white_spaces(commands[n]);
-            last = i;
-            n++;
-        }
-        i++;
-    }
-    commands[n] = &input[last + 1];
-    commands[n] = remove_white_spaces(commands[n]);
-    return ++n;
-}
-
 int shell_parse(char *input, int len_input, char *envp[]) {    
     if (strcmp(input, "$PATH") == 0) {
         char print_path[BUF_SIZE];
@@ -167,7 +167,7 @@ int shell_parse(char *input, int len_input, char *envp[]) {
         return 0;
     }
 
-    if (input && *input) {
+    if (*input) {
         if (input[len_input - 1] == '&') {
             is_background = 1;
             input[len_input - 1] = 0;
@@ -179,6 +179,21 @@ int shell_parse(char *input, int len_input, char *envp[]) {
     struct job shell_job;
     shell_job.num_args = parse_split(shell_job.arguments, input, ' ');
     execute_job(shell_job, envp);
+    return 0;
+}
+
+int shell_execfile(char *filename, char *envp[]) {
+    int fp = open(filename, 0);
+    char script_file[BUF_SIZE];
+    read(fp, script_file, BUF_SIZE);
+    char line_read[BUF_SIZE / 2][BUF_SIZE / 4];
+    int num_lines = parse_split(line_read, script_file, '\n');
+    for (int i = 0; i < num_lines; i++) {
+        if (line_read[i][0] != '#' && line_read[i][1] != '!' && (int) strlen(line_read[i]) != 0) {
+            shell_parse(line_read[i], (int) strlen(line_read[i]), envp);
+        }
+    }
+    close(fp);
     return 0;
 }
 
@@ -226,7 +241,7 @@ int shell_init(char* envp[]) {
 
 int main(int argc, char *argv[], char *envp[]) {
     char *welcome_msg = "Welcome to SBUNIX!\n\n";
-    write(STDOUT, welcome_msg, strlen(welcome));
+    write(STDOUT, welcome_msg, strlen(welcome_msg));
     if (argc == 2) {
         shell_execfile(argv[1], envp);
     }
