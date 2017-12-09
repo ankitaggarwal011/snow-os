@@ -106,5 +106,5 @@ JamesM's kernel development tutorials (http://www.jamesmolloy.co.uk/tutorial_htm
 
 Known Limitations
 ----------------------
-1. .. and . is not handled in chdir syscall
-2. Add init process (optional)
+1. .. and . is not handled in chdir syscall.
+2. bin/init process is not used (optional).

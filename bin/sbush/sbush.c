@@ -80,7 +80,7 @@ int exec_binary(char *arguments[], int num_args, char *envp[]) {
     }
     else {
         if (is_background == 0) {
-            yield(); // waitpid(c_pid, NULL);
+            waitpid(c_pid, NULL);
         }
     }
     return 0;
@@ -115,9 +115,14 @@ int set_env_variables(char *arguments[], int num_args, char *envp[]) {
 
 int cd(char *arguments[], int num_args, char *envp[]) {
     int status;
+    int len = strlen(arguments[1]);
+    if (arguments[1][len - 1] != '/') {
+        arguments[1][len++] = '/';
+        arguments[1][len] = '\0';
+    }
     if (num_args == 2) {
         if (arguments[1][0] == '/') {
-            status = chdir(arguments[1]);
+            status = chdir(++arguments[1]);
         }
         else {
             char cdir[BUF_SIZE];
@@ -244,7 +249,7 @@ int shell_init(char* envp[]) {
 }
 
 int main(int argc, char *argv[], char *envp[]) {
-    char *welcome_msg = "Welcome to SBUNIX!\n\nPlease use the project README file for detailed information and a list of commands.\n\nA few examples are:\nls\ncat etc/test.txt\n./etc/test.sbush\nsbush etc/test.sbush\nps\necho hello\n\n";
+    char *welcome_msg = "Welcome to SBUNIX!\n\nPlease use the project README file for a list of commands.\n\nA few examples are:\nls\ncat etc/test.txt\n./etc/test.sbush\nps\n\n";
     write(STDOUT, welcome_msg, strlen(welcome_msg));
     if (argc == 2) {
         shell_execfile(argv[1], envp);

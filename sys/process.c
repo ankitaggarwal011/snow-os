@@ -493,8 +493,9 @@ void wait_all() {
 
 int wait() {
     kthread_t *it = current_process->next, *prev = current_process;
-    int child_exists = 0;
+    int child_exists;
     while (1) {
+        child_exists = 0;
         while (it != current_process) {
             if (it->ppid == current_process->pid) {
                 child_exists = 1;
@@ -504,14 +505,17 @@ int wait() {
                     it = prev->next;
                     return return_pid;
                 }
-            }
-            else {
-                prev = it;
-                it = it->next;
+                else {
+                    prev = it;
+                    it = it->next;
+                }
             }
         }
         if (child_exists) {
             scheduler();
+        }
+        else {
+            break;
         }
     }
     return -1;
@@ -519,8 +523,9 @@ int wait() {
 
 int wait_pid(int pid) {
     kthread_t *it = current_process->next, *prev = current_process;
-    int child_exists = 0;
+    int child_exists;
     while (1) {
+        child_exists = 0;
         while (it != current_process) {
             if (it->pid == pid && it->ppid == current_process->pid) {
                 child_exists = 1;
@@ -530,14 +535,17 @@ int wait_pid(int pid) {
                     it = prev->next;
                     return return_pid;
                 }
-            }
-            else {
-                prev = it;
-                it = it->next;
+                else {
+                    prev = it;
+                    it = it->next;
+                }
             }
         }
         if (child_exists) {
             scheduler();
+        }
+        else {
+            break;
         }
     }
     return -1;
