@@ -16,9 +16,9 @@ int main(int argc, char *argv[], char *envp[]) {
             write(1, err_msg, strlen(err_msg));
             return 0;
         }
-        vals[i - 1] = val;
+        vals[i - 2] = val;
     }
-    for (int i = 0; i < argc - 1; i++) {
+    for (int i = 0; i < argc - 2; i++) {
         kill(vals[i], 0);
     }
     return 0;

@@ -96,6 +96,5 @@ JamesM's kernel development tutorials (http://www.jamesmolloy.co.uk/tutorial_htm
 Known Bugs/Limitations
 ----------------------
 1. .. and . is not handled in chdir syscall
-2. Two args are not getting passed correctly to binaries via _start
-3. Test Kill and waitpid/wait, add reaper on idle process
-4. Add init process (optional)
+2. waitpid/wait, add reaper on idle process
+3. Add init process (optional)

@@ -352,7 +352,7 @@ void get_process_state(char *buf) {
     int i = 0;
     char *s = buf;
     do {
-        strcat(s, "Pid: ");
+        strcat(s, "pid: ");
         char num[10];
         itoa(num, it->pid);
         strcat(s, num);
