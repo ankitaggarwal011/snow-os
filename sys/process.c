@@ -482,7 +482,7 @@ int wait() {
     return 0;
 }
 
-int waitpid(int pid) {
+int wait_pid(int pid) {
     return 0;
 }
 
