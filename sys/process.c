@@ -493,40 +493,52 @@ void wait_all() {
 
 int wait() {
     kthread_t *it = current_process->next, *prev = current_process;
+    int child_exists = 0;
     while (1) {
         while (it != current_process) {
-            if (it->ppid == current_process->pid && it->state == ZOMBIE) {
-                uint64_t return_pid = it->pid;
-                reap_process(it);
-                it = prev->next;
-                return return_pid;
+            if (it->ppid == current_process->pid) {
+                child_exists = 1;
+                if (it->state == ZOMBIE) {
+                    uint64_t return_pid = it->pid;
+                    reap_process(it);
+                    it = prev->next;
+                    return return_pid;
+                }
             }
             else {
                 prev = it;
                 it = it->next;
             }
         }
-        scheduler();
+        if (child_exists) {
+            scheduler();
+        }
     }
     return -1;
 }
 
 int wait_pid(int pid) {
     kthread_t *it = current_process->next, *prev = current_process;
+    int child_exists = 0;
     while (1) {
         while (it != current_process) {
-            if (it->pid == pid && it->ppid == current_process->pid && it->state == ZOMBIE) {
-                uint64_t return_pid = it->pid;
-                reap_process(it);
-                it = prev->next;
-                return return_pid;
+            if (it->pid == pid && it->ppid == current_process->pid) {
+                child_exists = 1;
+                if (it->state == ZOMBIE) {
+                    uint64_t return_pid = it->pid;
+                    reap_process(it);
+                    it = prev->next;
+                    return return_pid;
+                }
             }
             else {
                 prev = it;
                 it = it->next;
             }
         }
-        scheduler();
+        if (child_exists) {
+            scheduler();
+        }
     }
     return -1;
 }
@@ -571,7 +583,7 @@ void reap_process(kthread_t *process) {
     prev->next = process->next;
     clean_page_tables(process->cr3);
     processes[process->pid] = 0;
-    kprintf("[+1] Reaped process %s with pid %d\n", current_process->process_name, current_process->pid);
+    kprintf("[+1] Reaped process %s with pid %d\n", process->process_name, process->pid);
     kfree(process);
     // remove from list
     // deep clean
