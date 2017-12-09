@@ -53,5 +53,6 @@ int close_dir(uint64_t stream);
 
 struct dir_header *get_folder(char *name);
 int substr(char *s1, char *s2);
+int dir_exists(char *filename);
 
 #endif

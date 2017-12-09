@@ -80,7 +80,7 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
             return len_read;
         }
         case SYSCALL_OPEN: {
-            char *file = (char *) get_file((char *) arg2);
+            char *file = (char *) get_file_binary((char *) arg2);
             if (file == NULL) {
                 return -1;
             }

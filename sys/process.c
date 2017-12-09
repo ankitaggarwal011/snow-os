@@ -210,7 +210,10 @@ int get_cwd(char *buf, size_t size) {
     return 0;
 }
 
-int ch_dir(char *path) { // TODO: check if a directory exists
+int ch_dir(char *path) {
+    if (dir_exists(path) == -1) {
+        return -1;
+    }
     int i = 0;
     for (i = 0; *(path + i) != 0; i++) {
         current_process->cwd[i] = *(path + i);
@@ -445,7 +448,6 @@ int exec_vpe(char *filename, char **argv, char **envp) {
     }
     last->next = new_process;
     new_process->next = current_process->next;
-    // TODO free and cleanup current process here.
     current_process = new_process;
     current_process->state = RUNNING;
     go_to_ring3_exec(argc, user_stack_ptr);

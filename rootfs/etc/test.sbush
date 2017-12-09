@@ -1,4 +1,4 @@
 #!bin/sbush
 
 ls
-cat etc/test.txt
+ps

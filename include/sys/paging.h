@@ -3,7 +3,7 @@
 
 #include <sys/defs.h>
 
-#define PAGING_KERNEL_R_W_FLAGS 0x3 // change to 0x3. 0x7 value is a hack for now
+#define PAGING_KERNEL_R_W_FLAGS 0x3
 #define PAGING_USER_R_W_FLAGS 0x7
 
 void init_paging(uint64_t kernmem, uint64_t physbase, uint64_t physfree);

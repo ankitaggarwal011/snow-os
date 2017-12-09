@@ -3,12 +3,7 @@ References used:-
 2.) Stackoverflow - https://stackoverflow.com/
 3.) AskUbuntu - https://askubuntu.com/
 
-Note:
-vma_map_iter, vma_stack, vma_heap needs to set during copy process as well for fork
-
-
 Known Bugs
-1.) calling fork second time with cow causes reboot, cleanup also cleans parent pages
-2.) TODO: in getcwd() check if directory exists before returning anything
-3.) Handle .. and . in chdir()
-4.) Investigate segfault bug on exit from fork+exec and page fault handler
+1.) Handle .. and . in chdir()
+2.) Investigate segfault bug on page fault handler
+3.) Trying multiple commands in scripts

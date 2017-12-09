@@ -80,6 +80,30 @@ void *get_file_binary(char *filename) {
     return NULL;
 }
 
+int dir_exists(char *filename) {
+    struct posix_header_ustar *s = tarfs_start;
+    do {
+        if (!s || s->name[0] == '\0') {
+            break;
+        }
+        int file_size = o_to_d(atoi(s->size));
+        char *file = (char *) (s + 1);
+
+        if (kstrcmp(filename, s->name) == 0 && atoi(s->typeflag) == 5) {
+            // kprintf("File found: Name: %s, Size: %d bytes, Type: %s\n", s->name, file_size, s->typeflag);
+            return 0;
+        }
+
+        if (file_size > 0) {
+            s += (file_size / sizeof(struct posix_header_ustar)) + 2;
+        } else {
+            s++;
+        }
+
+    } while (s < tarfs_end);
+    return -1; 
+}
+
 void init_tarfs() {
     print_all_files();
 }
