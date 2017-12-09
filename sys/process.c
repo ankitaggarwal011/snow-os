@@ -479,11 +479,11 @@ void deep_cleanup(kthread_t *process) {
 }
 
 int wait() {
-
+    return 0;
 }
 
 int waitpid(int pid) {
-
+    return 0;
 }
 
 // clean pages, clean vma, clean mm_struct
