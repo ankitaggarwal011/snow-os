@@ -379,6 +379,9 @@ void get_process_state(char *buf) {
 }
 
 int exec_vpe(char *filename, char **argv, char **envp) {
+    if(get_file_binary(filename) == NULL) {
+        return -1;
+    }
     char filename_copy[BUF_SIZE];
     memset((void *) filename_copy, 0, BUF_SIZE);
     for (int k = 0; filename[k] != 0; k++) {
@@ -425,7 +428,7 @@ int exec_vpe(char *filename, char **argv, char **envp) {
     struct mm_struct *process_mm = (struct mm_struct *) kmalloc(sizeof(struct mm_struct));
     new_process->process_mm = process_mm;
 
-    int file_exists = load_file(new_process, filename_copy);
+    load_file(new_process, filename_copy);
 
     void *user_stack_ptr = (void *) (STACK_START + 4096 - 16 - sizeof(user_stack));
     memcpy(user_stack_ptr, (void *) user_stack, sizeof(user_stack));
@@ -445,9 +448,6 @@ int exec_vpe(char *filename, char **argv, char **envp) {
     // TODO free and cleanup current process here.
     current_process = new_process;
     current_process->state = RUNNING;
-    if (file_exists == -1) {
-        return -1;
-    }
     go_to_ring3_exec(argc, user_stack_ptr);
     return -1;
 }
