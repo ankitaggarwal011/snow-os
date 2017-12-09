@@ -1,9 +1,0 @@
-References used:-
-1.) OSDev Wiki - http://wiki.osdev.org/Main_Page
-2.) Stackoverflow - https://stackoverflow.com/
-3.) AskUbuntu - https://askubuntu.com/
-
-Known Bugs
-1.) Handle .. and . in chdir()
-2.) Investigate segfault bug on page fault handler
-3.) Trying multiple commands in scripts
