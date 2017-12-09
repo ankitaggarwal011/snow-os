@@ -8,7 +8,7 @@ vma_map_iter, vma_stack, vma_heap needs to set during copy process as well for f
 
 
 Known Bugs
-1.) calling fork second time with cow causes reboot, maybe double page fault
+1.) calling fork second time with cow causes reboot, cleanup also cleans parent pages
 2.) TODO: in getcwd() check if directory exists before returning anything
 3.) Handle .. and . in chdir()
 4.) Investigate segfault bug on exit from fork+exec and page fault handler
