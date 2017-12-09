@@ -7,6 +7,8 @@
 #define PROJECT_KTHREAD_H
 #define K_STACK_SIZE 4096
 #define NUM_FDS 16
+#define BUF_SIZE 128
+
 typedef enum process_state_e {
     RUNNING = 0x0,
     ZOMBIE = 0x1,
@@ -26,7 +28,7 @@ typedef struct kern_thread {
     char *process_name;
     struct kern_thread *next;
     file_object_t *fds[NUM_FDS];
-    char cwd[1024];
+    char cwd[BUF_SIZE];
     process_state state;
 }__attribute__((__packed__)) kthread_t;
 
@@ -45,10 +47,10 @@ struct mm_struct {
     struct vma_struct *vma_heap;
 }__attribute__((__packed__));
 
-void test_context_switch();
+// void test_context_switch();
 
 extern void set_rsp(uint64_t val);
 
 extern void switch_to(kthread_t **me, kthread_t *next);
 
-#endif //PROJECT_KTHREAD_H
+#endif

@@ -9,6 +9,9 @@
 #include <sys/paging.h>
 #include <sys/gdt.h>
 
+#define BUF_SIZE 128
+#define MAX_ARGS 8
+
 kthread_t *current_process;
 
 kthread_t *get_current_process() {
@@ -20,6 +23,9 @@ extern void setup_forked_kthread_stack(uint64_t *addr);
 extern uint64_t get_rsp_val();
 
 extern void put_in_rax();
+
+void wait_all();
+void reap_process(kthread_t *process);
 
 int getPID() {
     for (int i = 1; i < MAX_P; i++) {
@@ -47,12 +53,13 @@ void init_processes() {
 
 void init_scheduler() {
     while (1) {
-        kprintf(" _idle_t_ ");
+        // kprintf(" _idle_t_ ");
         scheduler();
     }
 }
 
 void scheduler() {
+    wait_all();
     switch_process();
 }
 
@@ -68,13 +75,15 @@ void switch_process() {
     }
     if (cand == current_process) {
         // went around all processes. Nobody was in QUEUED state!
-        kprintf("No queued process found for running!!!\n");
+        kprintf("No process found for running. Restarting shell!\n");
+        create_process("bin/sbush");
         return;
     }
 
     if (current_process->state == RUNNING) {
         current_process->state = QUEUED;
-    } else if (current_process->state != ZOMBIE) {
+    }
+    else if (current_process->state != ZOMBIE) {
         kprintf("Some problem with process states: %d!! \n", current_process->state);
         return;
     }
@@ -124,14 +133,12 @@ kthread_t *create_process(char *filename) {
     while (*tmp != 0) tmp++;
     while (*tmp != '/') tmp--;
 
-    char p_name[256];
+    char p_name[BUF_SIZE];
     int len = strlen(filename);
     for (int i = 0; i < len; i++) {
         p_name[i] = filename[i];
     }
     p_name[len] = '\0';
-    //p_name[0] = 0;
-    //strcat((char *) p_name, filename);
 
     new_process->process_name = (char *) &p_name;
     for (i = 0; (filename + i) < tmp; i++) {
@@ -206,7 +213,10 @@ int get_cwd(char *buf, size_t size) {
     return 0;
 }
 
-int ch_dir(char *path) { // TODO: check if a directory exists
+int ch_dir(char *path) {
+    if (dir_exists(path) == -1) {
+        return -1;
+    }
     int i = 0;
     for (i = 0; *(path + i) != 0; i++) {
         current_process->cwd[i] = *(path + i);
@@ -233,7 +243,7 @@ void go_to_ring3() {
 
 uint64_t copy_process(kthread_t *parent_task) {
     kthread_t *child = (kthread_t *) kmalloc(sizeof(kthread_t));
-    memset(parent_task->k_stack, 0, K_STACK_SIZE);
+    memset(child->k_stack, 0, K_STACK_SIZE);
     child->rsp_val = &(child->k_stack[K_STACK_SIZE - 1]);
     child->rsp_user = parent_task->rsp_user;
     child->pid = getPID();
@@ -245,12 +255,12 @@ uint64_t copy_process(kthread_t *parent_task) {
     stdin_fo->ref_count++;
     child->fds[0] = stdin_fo;
 
-    char p_name[256];
+    char p_name[BUF_SIZE];
     p_name[0] = 0;
     strcat((char *) p_name, parent_task->process_name);
 
     child->process_name = (char *) &p_name;
-    for (int i = 0; i < 1024; i++) child->cwd[i] = parent_task->cwd[i];
+    for (int i = 0; i < BUF_SIZE; i++) child->cwd[i] = parent_task->cwd[i];
 
     file_object_t *stdout_fo = get_stdout_fo();
     stdout_fo->ref_count++;
@@ -312,7 +322,6 @@ uint64_t copy_process(kthread_t *parent_task) {
 void fork() {
     uint64_t return_val = (uint64_t) __builtin_return_address(0);
     kthread_t *parent_task = current_process, *last;
-    // volatile uint64_t p_stack;
     kthread_t *child_task = (kthread_t *) copy_process(parent_task);
 
     last = current_process->next;
@@ -324,18 +333,10 @@ void fork() {
     for (int i = 0; i < 4096; i++) {
         *(child_task->k_stack + i) = *(parent_task->k_stack + i);
     }
-    /*
-    __asm__ __volatile__(
-    "movq $1f, %0;"
-            "1:\t"
-    :"=g"(child_task->rip)
-    );
-    */
 
     volatile uint64_t *var = (uint64_t * )(get_rsp_val() + 8);
     parent_task->rsp_val = (uint64_t * )(get_rsp_val() + 8);
     volatile uint64_t diff = parent_task->k_stack + K_STACK_SIZE - 1 - (var);
-    // child_task->rsp_val = child_task->k_stack + K_STACK_SIZE - 1;
     child_task->rsp_val = (uint64_t * )(((uint64_t) child_task->rsp_val) - 8 * ((uint64_t) diff));
     while (*(child_task)->rsp_val != return_val) {
         child_task->rsp_val++;
@@ -353,7 +354,7 @@ void get_process_state(char *buf) {
     int i = 0;
     char *s = buf;
     do {
-        strcat(s, "Pid: ");
+        strcat(s, "pid: ");
         char num[10];
         itoa(num, it->pid);
         strcat(s, num);
@@ -384,14 +385,17 @@ void get_process_state(char *buf) {
 }
 
 int exec_vpe(char *filename, char **argv, char **envp) {
-    char filename_copy[256];
-    memset((void *) filename_copy, 0, 256);
+    if(get_file_binary(filename) == NULL) {
+        return -1;
+    }
+    char filename_copy[BUF_SIZE];
+    memset((void *) filename_copy, 0, BUF_SIZE);
     for (int k = 0; filename[k] != 0; k++) {
         filename_copy[k] = filename[k];
     }
     uint64_t argc = 0;
-    char user_stack[16][128];
-    memset((void *) user_stack, 0, 16 * 128);
+    char user_stack[MAX_ARGS][BUF_SIZE];
+    memset((void *) user_stack, 0, MAX_ARGS * BUF_SIZE);
     if (argv != NULL) {
         for (int i = 0; argv[i] != NULL; i++, argc++) {
             for (int j = 0; argv[i][j] != 0; j++) {
@@ -407,7 +411,7 @@ int exec_vpe(char *filename, char **argv, char **envp) {
     new_process->next = NULL;
     new_process->num_child = 0;
 
-    char p_name[256];
+    char p_name[BUF_SIZE];
     p_name[0] = 0;
     strcat((char *) p_name, filename);
 
@@ -417,7 +421,7 @@ int exec_vpe(char *filename, char **argv, char **envp) {
     new_process->fds[1] = current_process->fds[1];
     new_process->fds[2] = current_process->fds[2];
 
-    for (int i = 0; i < 1024; i++) {
+    for (int i = 0; i < BUF_SIZE; i++) {
         new_process->cwd[i] = current_process->cwd[i];
     }
 
@@ -436,7 +440,7 @@ int exec_vpe(char *filename, char **argv, char **envp) {
     memcpy(user_stack_ptr, (void *) user_stack, sizeof(user_stack));
 
     for (int i = argc; i > 0; i--) {
-        *((uint64_t * )(user_stack_ptr - 8 * i)) = (uint64_t) user_stack_ptr + 128 * (argc - i);
+        *((uint64_t * )(user_stack_ptr - 8 * i)) = (uint64_t) user_stack_ptr + BUF_SIZE * (argc - i);
     }
     user_stack_ptr = user_stack_ptr - 8 * argc;
     new_process->rsp_user = (uint64_t) user_stack_ptr;
@@ -447,7 +451,6 @@ int exec_vpe(char *filename, char **argv, char **envp) {
     }
     last->next = new_process;
     new_process->next = current_process->next;
-    // TODO free and cleanup current process here.
     current_process = new_process;
     current_process->state = RUNNING;
     go_to_ring3_exec(argc, user_stack_ptr);
@@ -474,8 +477,74 @@ void go_to_ring3_exec(uint64_t argc, void *user_stack_ptr) {
     );
 }
 
-void deep_cleanup(kthread_t *process) {
+void wait_all() {
+    kthread_t *it = current_process->next, *prev = current_process;
+    while (it != current_process) {
+        if (it->state == ZOMBIE) {
+            reap_process(it);
+            it = prev->next;
+        }
+        else {
+            prev = it;
+            it = it->next;
+        }
+    }
+}
 
+int wait() {
+    kthread_t *it = current_process->next, *prev = current_process;
+    int child_exists;
+    while (1) {
+        child_exists = 0;
+        while (it != current_process) {
+            if (it->ppid == current_process->pid) {
+                child_exists = 1;
+                if (it->state == ZOMBIE) {
+                    uint64_t return_pid = it->pid;
+                    reap_process(it);
+                    it = prev->next;
+                    return return_pid;
+                }
+            }
+            prev = it;
+            it = it->next;
+        }
+        if (child_exists) {
+            scheduler();
+        }
+        else {
+            break;
+        }
+    }
+    return -1;
+}
+
+int wait_pid(int pid) {
+    kthread_t *it = current_process->next, *prev = current_process;
+    int child_exists;
+    while (1) {
+        child_exists = 0;
+        while (it != current_process) {
+            if (it->pid == pid && it->ppid == current_process->pid) {
+                child_exists = 1;
+                if (it->state == ZOMBIE) {
+                    uint64_t return_pid = it->pid;
+                    reap_process(it);
+                    it = prev->next;
+                    return return_pid;
+                }
+            }
+            prev = it;
+            it = it->next;
+        }
+        if (child_exists) {
+            scheduler();
+        }
+        else {
+            break;
+        }
+    }
+    return -1;
 }
 
 // clean pages, clean vma, clean mm_struct
@@ -516,8 +585,9 @@ void reap_process(kthread_t *process) {
         it = it->next;
     }
     prev->next = process->next;
-    deep_cleanup(process);
+    clean_page_tables(process->cr3);
     processes[process->pid] = 0;
+    kprintf("[+1] Reaped process %s with pid %d\n", process->process_name, process->pid);
     kfree(process);
     // remove from list
     // deep clean
@@ -542,6 +612,7 @@ void kill_process(kthread_t *process) {
     }
     current_process->state = ZOMBIE;
     shallow_cleanup(current_process);
+    kprintf("[+1] Killed process %s with pid %d\n", current_process->process_name, current_process->pid);
     // cleanup happens in page tables
 }
 

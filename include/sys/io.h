@@ -11,10 +11,6 @@
 #define PIC_S_DATA (PIC_S + 1)
 #define PIC_EOI 0x20
 
-#define IRQ0 32
-#define IRQ1 33
-#define SOFT_INTR 128
-
 void output_b(uint16_t p, uint8_t v);
 uint8_t input_b(uint16_t p);
 void output_l(uint16_t p, uint32_t v);

@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[], char *envp[]) {
     if (argc < 2) {
-        char *err_msg = "Sleep must have atleast 1 argument\n";
+        char *err_msg = "Sleep must have at least 1 argument\n";
         write(1, err_msg, strlen(err_msg));
         return -1;
     }

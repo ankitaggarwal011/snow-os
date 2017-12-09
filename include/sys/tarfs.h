@@ -5,6 +5,9 @@
 extern char _binary_tarfs_start;
 extern char _binary_tarfs_end;
 
+#define BUF_SIZE 128
+#define FILES_ALLOWED 64
+
 struct posix_header_ustar {
     char name[100];
     char mode[8];
@@ -28,7 +31,7 @@ struct posix_header_ustar {
 struct dir_header {
     int current_point;
     int file_count;
-    char files[100][256]; // can have 1000 files for now
+    char files[FILES_ALLOWED][BUF_SIZE];
     int dir_exists;
 }__attribute__((__packed__));
 
@@ -50,5 +53,6 @@ int close_dir(uint64_t stream);
 
 struct dir_header *get_folder(char *name);
 int substr(char *s1, char *s2);
+int dir_exists(char *filename);
 
 #endif

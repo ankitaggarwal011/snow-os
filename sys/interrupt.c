@@ -6,9 +6,6 @@
 #include <sys/physical_memory.h>
 #include <sys/paging.h>
 
-#define LIMIT_STACK 4096000
-#define PAGE_FAULT 14
-
 extern void timer_isr();
 
 extern void keyboard_isr();
@@ -26,12 +23,12 @@ struct idt_struct idt_t[256];
 extern void page_fault_handler() {
     volatile uint64_t addr;
     __asm__ volatile("mov %%cr2, %0" : "=r" (addr));
-    kprintf("Page fault at %x\n", addr);
+    // kprintf("Page fault at %x\n", addr);
 
     addr = (addr / PAGE_SIZE) * PAGE_SIZE;
 
     uint64_t physical_addr_flags = get_flags(addr);
-    if (((physical_addr_flags >> 9) & 1UL) == 1) { // COW
+    if (((physical_addr_flags >> 9) & 1UL) == 1UL) { // COW
         uint64_t physical_addr = walk_page_table(addr);
         if (get_page_ref_count(physical_addr) == 2) {
             uint64_t v_page = (uint64_t) kmalloc(PAGE_SIZE);
@@ -47,8 +44,6 @@ extern void page_fault_handler() {
     }
 
     kthread_t *current_process = get_current_process();
-    // struct vma_struct *current_vma_map = current_process->process_mm->vma_map;
-    // struct vma_struct *current_vma_heap = current_process->process_mm->vma_heap;
     struct vma_struct *current_vma_stack = current_process->process_mm->vma_stack;
 
     // Auto-growing stack
@@ -60,8 +55,7 @@ extern void page_fault_handler() {
         }
     } else {
         kprintf("Segmentation fault in process %d!. Exiting.\n", current_process->pid);
-//        exit_current_process(0); // TODO CHANGE THIS
-        while (1);
+        exit_current_process(0);
     }
 }
 
@@ -74,6 +68,7 @@ void init_idt() {
     set_irq(IRQ1, (uint64_t) keyboard_isr, (uint16_t) 0x8, 0x8E);
     set_irq(SOFT_INTR, (uint64_t) syscall_isr, (uint16_t) 0x8, 0xEE);
     set_irq(PAGE_FAULT, (uint64_t) page_fault_isr, (uint16_t) 0x8, 0x8E);
+    set_irq(DOUBLE_PAGE_FAULT, (uint64_t) page_fault_isr, (uint16_t) 0x8, 0x8E);
     _x86_load_idt((uint64_t) & idtr_t);
     // kprintf("Initialized IDT.\n");
 }

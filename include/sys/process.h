@@ -18,7 +18,7 @@
 #define PW 0x2
 #define PX 0x1
 
-#define MAX_P 50
+#define MAX_P 1000
 
 int processes[MAX_P];
 
@@ -65,4 +65,9 @@ void go_to_ring3_exec();
 int kill_kern(int pid);
 
 void exit_current_process(int status);
+
+int wait_pid(int pid);
+
+int wait();
+
 #endif

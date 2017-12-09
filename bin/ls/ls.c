@@ -23,16 +23,18 @@ int main(int argc, char *argv[], char *envp[]) {
         char *err_msg = "No directory found with name: ";
         write(1, err_msg, strlen(err_msg));
         write(1, dir_to_open, strlen(dir_to_open));
+        write(1, "\n", 1);
         return -1;
     }
     struct dirent *dirent;
-    write(1, " ", 1);
+    write(1, "    ", 1);
     while (1) {
         dirent = readdir(dir);
         write(1, (char *) dirent->d_name, strlen(dirent->d_name));
-        write(1, " ", 1);
+        write(1, "    ", 1);
         if (dirent == NULL) break;
     }
+    write(1, "\n", 1);
     closedir(dir);
     return 0;
 }

@@ -49,7 +49,6 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
             return fork_ret_val;
         }
         case SYSCALL_READ: {
-            //hack
             kthread_t *cur_kt = get_current_process();
             if (arg2 < 0 || arg2 >= NUM_FDS) {
                 kprintf("Invalid FD #, must be between %d and %d\n", 0, NUM_FDS);
@@ -80,7 +79,7 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
             return len_read;
         }
         case SYSCALL_OPEN: {
-            char *file = (char *) get_file((char *) arg2);
+            char *file = (char *) get_file_binary((char *) arg2);
             if (file == NULL) {
                 return -1;
             }
@@ -166,6 +165,10 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
             break;
         case SYSCALL_KILL:
             return kill_kern((int) arg2);
+        case SYSCALL_WAITPID:
+            return wait_pid((int) arg2);
+        case SYSCALL_WAIT:
+            return wait();
         default:
             kprintf("Arg1: %x, Arg2: %x, Arg3: %x \n", code, arg2, arg3);
             kprintf("Arg4: %x, Arg5: %x, Arg6: %x \n", arg4, arg5, arg6);

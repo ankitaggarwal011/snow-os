@@ -9,6 +9,7 @@
 #define MASK 0xFFFFFFFFFFFFF000
 #define GET_FLAGS 0x0000000000000FFF
 #define COW_FLAG 0x0000000000000200
+#define TURN_OFF_RW 0xFFFFFFFFFFFFFFFD
 
 uint64_t *pml4_t, kernel_virtual_base;
 
@@ -259,11 +260,11 @@ void remove_page_table_mapping(uint64_t virt_addr) {
 
 // takes virtual address as an input
 void kfree(void *ptr) {
-    memset(ptr, 0, PAGE_SIZE);
     uint64_t phy_addr = walk_page_table((uint64_t) ptr);
-    if (phy_addr == 0) {
-        return; // no mapping found
+    if (phy_addr == 0 || get_page_ref_count(phy_addr) > 0) {
+        return; // no mapping found or page is referenced by more than one process
     }
+    memset(ptr, 0, PAGE_SIZE);
     add_back_free_pages(phy_addr, 1);
     update_max_pages(1);
     remove_page_table_mapping((uint64_t) ptr); // remove page table mapping
@@ -274,7 +275,8 @@ uint64_t cow_page_tables() {
     uint64_t child_cr3 = get_free_page();
     uint64_t *child_pml4 = (uint64_t *) (child_cr3 + kernel_virtual_base);
     uint64_t *parent_pml4 = (uint64_t *)(get_cr3() + kernel_virtual_base);
-    for(int i = 0; i < 512; i++) {
+    child_pml4[511] = parent_pml4[511];
+    for(int i = 0; i < 511; i++) {
         if ((parent_pml4[i] & 1UL) == 1UL) {
             uint64_t pdpe = get_free_page();
             child_pml4[i] = pdpe | (parent_pml4[i] & GET_FLAGS);
@@ -294,7 +296,7 @@ uint64_t cow_page_tables() {
                             uint64_t *parent_pte = (uint64_t *)(kernel_virtual_base + (parent_pde[k] & MASK));
                             for (int l = 0; l < 512; l++) {
                                 if ((parent_pte[l] & 1UL) == 1UL) {
-                                    parent_pte[l] = parent_pte[l] ^ 2; // turning off R/W
+                                    parent_pte[l] = parent_pte[l] & TURN_OFF_RW; // turning off R/W
                                     parent_pte[l] = parent_pte[l] | COW_FLAG;
                                     child_pte[l] = parent_pte[l];
                                     uint64_t physical_addr = parent_pte[l] & MASK;

@@ -11,19 +11,19 @@ extern void set_rsp_arg1(uint64_t rsp_val, uint64_t arg1);
 
 extern void _jump_usermode(void *starting_func_addr);
 
+/*
 extern uint64_t test_syscall();
 
 void test_func_1();
 
 void test_func_2();
 
-void schedule();
-
 void user_test_func();
+
+void schedule();
 
 kthread_t *t1, *t2;
 kthread_t *cur = NULL;
-//kthread_t *last = NULL;
 
 void test_func_1() {
     unsigned int i = 0;
@@ -103,14 +103,7 @@ void init_kthreads() {
     t2->fds[1] = stdout_fo;
 }
 
-void user_test_func() {
-    // char *str = "hellio";
-    // kprintf("In user space\n");
-    // write(1, (void *) str, strlen(str));
-}
-
 void test_context_switch() {
-//    last = &t1;
     kprintf("Getting here\n");
     init_kthreads();
     set_rsp((uint64_t) t1->rsp_val);
@@ -120,3 +113,4 @@ void test_context_switch() {
 kthread_t *get_cur_kthread() {
     return cur;
 }
+*/

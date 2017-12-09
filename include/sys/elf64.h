@@ -43,6 +43,6 @@ typedef struct {
   Elf64_Xword   p_align;
 } Elf64_Phdr;
 
-void load_file(kthread_t* new_process, char *filename);
+int load_file(kthread_t* new_process, char *filename);
 
 #endif

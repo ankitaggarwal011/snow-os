@@ -42,7 +42,6 @@ syscall_isr:
     pop %rbx
     pop %rdx
     pop %rcx
-    cli
     iretq
 
 .global test_syscall

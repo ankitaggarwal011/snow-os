@@ -29,7 +29,7 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
     for (smap = (struct smap_t *) (modulep + 2);
          smap < (struct smap_t *) ((char *) modulep + modulep[1] + 2 * 4); ++smap) {
         if (smap->type == 1 /* memory */ && smap->length != 0) {
-            kprintf("Available Physical Memory [%p-%p]\n", smap->base, smap->base + smap->length);
+            // kprintf("Available Physical Memory [%p-%p]\n", smap->base, smap->base + smap->length);
             if (smap->base <= (uint64_t) physfree && smap->base + smap->length > (uint64_t) physfree) {
                 base = smap->base;
                 length = smap->length;
@@ -37,30 +37,17 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
         }
     }
 
-    kprintf("physfree %p\n", (uint64_t) physfree);
-    kprintf("tarfs in [%p:%p]\n", &_binary_tarfs_start, &_binary_tarfs_end);
+    // kprintf("physfree %p\n", (uint64_t) physfree);
+    // kprintf("tarfs in [%p:%p]\n", &_binary_tarfs_start, &_binary_tarfs_end);
 
     init_physical_memory((uint64_t) physfree, base, length);
     init_paging((uint64_t) & kernmem, (uint64_t) physbase, (uint64_t) physfree);
 
-    kprintf("Paging works!\n");
-
-    char *test = (char *) kmalloc(2);
-    test[0] = 'a';
-    test[1] = '\0';
-    kprintf("Testing kmalloc: %s\n", test);
-    kprintf("kmalloc works!\n");
-    kfree(test);
-
-    // test_context_switch();
-    // init_tarfs();
     init_processes();
     kthread_t *idle = init_idle_process();
     create_process("bin/sbush");
-    // kprintf("User task RIP: %p\n", user_task->rip);
     set_rsp((uint64_t) idle->rsp_val);
-
-
+    
     while (1);
 }
 
