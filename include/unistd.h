@@ -47,7 +47,6 @@ void get_process_state(char *buf);
 
 void exit(int status);
 
-int kill(int pid);
 // OPTIONAL: implement for ``on-disk r/w file system (+10 pts)''
 //off_t lseek(int fd, off_t offset, int whence);
 //int mkdir(const char *pathname, mode_t mode);

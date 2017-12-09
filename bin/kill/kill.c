@@ -19,7 +19,7 @@ int main(int argc, char *argv[], char *envp[]) {
         vals[i - 1] = val;
     }
     for (int i = 0; i < argc - 1; i++) {
-        kill(vals[i]);
+        kill(vals[i], 0);
     }
     return 0;
 }
