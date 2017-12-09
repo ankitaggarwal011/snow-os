@@ -27,11 +27,11 @@ int main(int argc, char *argv[], char *envp[]) {
         return -1;
     }
     struct dirent *dirent;
-    write(1, " ", 1);
+    write(1, "    ", 1);
     while (1) {
         dirent = readdir(dir);
         write(1, (char *) dirent->d_name, strlen(dirent->d_name));
-        write(1, " ", 1);
+        write(1, "    ", 1);
         if (dirent == NULL) break;
     }
     write(1, "\n", 1);

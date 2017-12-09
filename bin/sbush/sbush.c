@@ -244,7 +244,7 @@ int shell_init(char* envp[]) {
 }
 
 int main(int argc, char *argv[], char *envp[]) {
-    char *welcome_msg = "Welcome to SBUNIX!\n\n";
+    char *welcome_msg = "Welcome to SBUNIX!\nPlease read the README file associated with the project for detailed information and list of commands.\nSome of the example commands are:\nls\ncat etc/test.txt\n./etc/test.sbush\nsbush etc/test.sbush\nls etc\nps\necho hello\nexport PS1=SHELL\n\n";
     write(STDOUT, welcome_msg, strlen(welcome_msg));
     if (argc == 2) {
         shell_execfile(argv[1], envp);

@@ -19,7 +19,8 @@ Auto growing stack and dynamic heap allocation
 Shell with PATH, PS1, cd, and &
 Script handling with shebang (#!)
 Reaper/Idle process to cleanup zombie processes
-Reusable PIDs
+Reused PIDs
+Background processes: (for cooperative scheduling, background process are added to the scheduling queue and are executed when the parent process yield)
 
 
 Shell support:
@@ -54,6 +55,14 @@ ls etc
 ps
 echo hello
 export PS1=SHELL
+
+Example files:
+--------------
+Under the rootfs/etc/ folder, the following test files can be found:
+
+-- test.txt: simple text file for cat
+-- test.sbush: simple sbush script
+-- stress_test.sbush: stress test sbush script with 60+ commands to spawn 60+ processes, system remains stable
 
 
 Syscalls Implemented:

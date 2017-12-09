@@ -492,11 +492,43 @@ void wait_all() {
 }
 
 int wait() {
-    return 0;
+    kthread_t *it = current_process->next, *prev = current_process;
+    while (1) {
+        while (it != current_process) {
+            if (it->ppid == current_process->pid && it->state == ZOMBIE) {
+                uint64_t return_pid = it->pid;
+                reap_process(it);
+                it = prev->next;
+                return return_pid;
+            }
+            else {
+                prev = it;
+                it = it->next;
+            }
+        }
+        scheduler();
+    }
+    return -1;
 }
 
 int wait_pid(int pid) {
-    return 0;
+    kthread_t *it = current_process->next, *prev = current_process;
+    while (1) {
+        while (it != current_process) {
+            if (it->pid == pid && it->ppid == current_process->pid && it->state == ZOMBIE) {
+                uint64_t return_pid = it->pid;
+                reap_process(it);
+                it = prev->next;
+                return return_pid;
+            }
+            else {
+                prev = it;
+                it = it->next;
+            }
+        }
+        scheduler();
+    }
+    return -1;
 }
 
 // clean pages, clean vma, clean mm_struct
@@ -539,6 +571,7 @@ void reap_process(kthread_t *process) {
     prev->next = process->next;
     clean_page_tables(process->cr3);
     processes[process->pid] = 0;
+    kprintf("[+1] Reaped process %s with pid %d\n", current_process->process_name, current_process->pid);
     kfree(process);
     // remove from list
     // deep clean
@@ -563,6 +596,7 @@ void kill_process(kthread_t *process) {
     }
     current_process->state = ZOMBIE;
     shallow_cleanup(current_process);
+    kprintf("[+1] Killed process %s with pid %d\n", current_process->process_name, current_process->pid);
     // cleanup happens in page tables
 }
 
