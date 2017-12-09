@@ -24,6 +24,8 @@ extern uint64_t get_rsp_val();
 
 extern void put_in_rax();
 
+void wait_all();
+
 int getPID() {
     for (int i = 1; i < MAX_P; i++) {
         if (processes[i] == 0) {

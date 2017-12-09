@@ -18,6 +18,7 @@ kprintf, IDT, keyboard, timer
 Auto growing stack and dynamic heap allocation
 Shell with PATH, PS1, cd, and &
 Script handling with shebang (#!)
+Reaper/Idle process to cleanup zombie processes
 
 
 Shell support:
