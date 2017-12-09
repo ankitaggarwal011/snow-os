@@ -6,6 +6,8 @@
 #include <sys/physical_memory.h>
 #include <sys/paging.h>
 
+#define DOUBLE_PAGE_FAULT 8
+
 extern void timer_isr();
 
 extern void keyboard_isr();
@@ -71,6 +73,7 @@ void init_idt() {
     set_irq(IRQ1, (uint64_t) keyboard_isr, (uint16_t) 0x8, 0x8E);
     set_irq(SOFT_INTR, (uint64_t) syscall_isr, (uint16_t) 0x8, 0xEE);
     set_irq(PAGE_FAULT, (uint64_t) page_fault_isr, (uint16_t) 0x8, 0x8E);
+    set_irq(DOUBLE_PAGE_FAULT, (uint64_t) page_fault_isr, (uint16_t) 0x8, 0x8E);
     _x86_load_idt((uint64_t) & idtr_t);
     // kprintf("Initialized IDT.\n");
 }
