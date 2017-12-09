@@ -19,6 +19,7 @@ int main(int argc, char *argv[], char *envp[]) {
                 break;
             }
         }
+        write(1, "\n", 1);
         close(fd);
     }
     else {

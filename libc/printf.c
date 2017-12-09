@@ -85,7 +85,7 @@ void printSpecial(int argNumber, format_type ft) {
     }
 }
 
-void kprintf(const char *fmt, ...) {
+int printf(const char *fmt, ...) {
     va_start(args, fmt);
     const char *c = fmt;
     int argNumber = 0;
@@ -124,4 +124,5 @@ void kprintf(const char *fmt, ...) {
         }
     }
     va_end(args);
+    return 0;
 }
