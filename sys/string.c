@@ -28,8 +28,12 @@ int atoi(char *str) {
     int sign = 1;
     if (*(str) == '-') {
         sign = -1;
+        str++;
     }
-    str++;
+    else if (*(str) == '+') {
+        sign = 1;
+        str++;
+    }
     int ans = 0;
     while (*str) {
         if ((int) (*str) >= 48 && (int) (*str) <= 57) {

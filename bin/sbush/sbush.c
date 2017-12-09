@@ -128,12 +128,12 @@ int cd(char *arguments[], int num_args, char *envp[]) {
         }
         if (status != 0) {
             char *error_msg = "cd: No such file or directory\n";
-            write(STDIN, error_msg, strlen(error_msg));
+            write(STDOUT, error_msg, strlen(error_msg));
         }
     }
     else {
         char *error_msg = "cd: Incorrect number of arguments\n";
-        write(STDIN, error_msg, strlen(error_msg));
+        write(STDOUT, error_msg, strlen(error_msg));
     }
     return 0;
 }
