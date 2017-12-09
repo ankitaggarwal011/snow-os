@@ -175,6 +175,11 @@ int shell_parse(char *input, int len_input, char *envp[]) {
 
 int shell_execfile(char *filename, char *envp[]) {
     int fp = open(filename, 0);
+    if (fp < 0) {
+        char *err_msg = "File not found\n";
+        write(1, err_msg, strlen(err_msg));
+        return 0;
+    }
     char script_file[BUF_SIZE * 4];
     read(fp, script_file, BUF_SIZE);
     char *line_read[MAX_LINES];

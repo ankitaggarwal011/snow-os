@@ -71,7 +71,8 @@ void switch_process() {
     }
     if (cand == current_process) {
         // went around all processes. Nobody was in QUEUED state!
-        kprintf("No queued process found for running!!!\n");
+        kprintf("No process found for running. Restarting shell!\n");
+        create_process("bin/sbush");
         return;
     }
 

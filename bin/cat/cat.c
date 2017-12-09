@@ -6,12 +6,17 @@
 int main(int argc, char *argv[], char *envp[]) {
     if (argc == 2) {
         int fd = open(argv[1], 0);
+        if (fd < 0) {
+            char *err_msg = "File not found\n";
+            write(1, err_msg, strlen(err_msg));
+            return 0;
+        }
         char buf[BUF_SIZE];
         while (1) {
             ssize_t len_read = read(fd, buf, BUF_SIZE);
             if (len_read == -1) {
                 char *err_msg = "Failed to read from file\n";
-                write(1, "Failed to read from file\n", strlen(err_msg));
+                write(1, err_msg, strlen(err_msg));
                 break;
             }
             write(1, buf, len_read);
@@ -23,8 +28,8 @@ int main(int argc, char *argv[], char *envp[]) {
         close(fd);
     }
     else {
-        char *temp_var = "Incorrect number of command line arguments. Please try again.\n";
-        write(1, (char *) temp_var, strlen(temp_var));
+        char *err_msg = "Incorrect number of command line arguments. Please try again.\n";
+        write(1, err_msg, strlen(err_msg));
     }
     return 0;
 }
