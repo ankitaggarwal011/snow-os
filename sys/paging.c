@@ -275,7 +275,8 @@ uint64_t cow_page_tables() {
     uint64_t child_cr3 = get_free_page();
     uint64_t *child_pml4 = (uint64_t *) (child_cr3 + kernel_virtual_base);
     uint64_t *parent_pml4 = (uint64_t *)(get_cr3() + kernel_virtual_base);
-    for(int i = 0; i < 512; i++) {
+    child_pml4[511] = parent_pml4[511];
+    for(int i = 0; i < 511; i++) {
         if ((parent_pml4[i] & 1UL) == 1UL) {
             uint64_t pdpe = get_free_page();
             child_pml4[i] = pdpe | (parent_pml4[i] & GET_FLAGS);
