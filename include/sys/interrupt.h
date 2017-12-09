@@ -5,6 +5,7 @@
 #define IRQ0 32
 #define IRQ1 33
 #define SOFT_INTR 128
+#define DOUBLE_PAGE_FAULT 8
 
 struct idtr_struct {
     uint16_t limit;

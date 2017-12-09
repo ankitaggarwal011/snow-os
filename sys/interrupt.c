@@ -6,8 +6,6 @@
 #include <sys/physical_memory.h>
 #include <sys/paging.h>
 
-#define DOUBLE_PAGE_FAULT 8
-
 extern void timer_isr();
 
 extern void keyboard_isr();
@@ -30,7 +28,7 @@ extern void page_fault_handler() {
     addr = (addr / PAGE_SIZE) * PAGE_SIZE;
 
     uint64_t physical_addr_flags = get_flags(addr);
-    if (((physical_addr_flags >> 9) & 1UL) == 1) { // COW
+    if (((physical_addr_flags >> 9) & 1UL) == 1UL) { // COW
         uint64_t physical_addr = walk_page_table(addr);
         if (get_page_ref_count(physical_addr) == 2) {
             uint64_t v_page = (uint64_t) kmalloc(PAGE_SIZE);

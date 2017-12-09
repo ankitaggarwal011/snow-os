@@ -126,12 +126,12 @@ int cd(char *arguments[], int num_args, char *envp[]) {
             status = chdir(cdir);
         }
         if (status != 0) {
-            char* error_msg = "cd: No such file or directory\n";
+            char *error_msg = "cd: No such file or directory\n";
             write(STDIN, error_msg, strlen(error_msg));
         }
     }
     else {
-        char* error_msg = "cd: Incorrect number of arguments\n";
+        char *error_msg = "cd: Incorrect number of arguments\n";
         write(STDIN, error_msg, strlen(error_msg));
     }
     return 0;
@@ -174,11 +174,19 @@ int shell_parse(char *input, int len_input, char *envp[]) {
 }
 
 int shell_execfile(char *filename, char *envp[]) {
-    int fp = open(filename, 0);
-    char script_file[BUF_SIZE];
+    char bin[BUF_SIZE];
+    int i = 0;
+    for (i = 0; (path[i] != '/' && path[i] != '\0'); i++) {
+        bin[i] = path[i];
+    }
+    bin[i++] = '/';
+    bin[i] = '\0';
+    strcat(bin, filename);
+    int fp = open(bin, 0);
+    char script_file[BUF_SIZE * 4];
     read(fp, script_file, BUF_SIZE);
-    char line_read[BUF_SIZE / 2][BUF_SIZE / 4];
-    int num_lines = parse_split((char **) line_read, script_file, '\n');
+    char *line_read[];
+    int num_lines = parse_split(line_read, script_file, '\n');
     for (int i = 0; i < num_lines; i++) {
         if (line_read[i][0] != '#' && line_read[i][1] != '!' && (int) strlen(line_read[i]) != 0) {
             shell_parse(line_read[i], (int) strlen(line_read[i]), envp);
