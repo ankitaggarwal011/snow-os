@@ -7,8 +7,11 @@
 #include <sys/elf64.h>
 #include <sys/process.h>
 
-void load_file(kthread_t *new_process, char *filename) {
+int load_file(kthread_t *new_process, char *filename) {
     void *location = get_file_binary(filename);
+    if (location == NULL) {
+        return -1;
+    }
     // kprintf("Location of %s: %p\n", filename, location);
     // kprintf("Reading ELF64 header:\n");
 
@@ -90,4 +93,5 @@ void load_file(kthread_t *new_process, char *filename) {
     new_process->process_mm->vma_stack = vma_stack;
     new_process->process_mm->vma_heap = vma_heap;
     new_process->rsp_user = (uint64_t)((uint64_t) stack + 4096 - 16);
+    return 0;
 }

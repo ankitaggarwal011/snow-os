@@ -379,6 +379,9 @@ void get_process_state(char *buf) {
 }
 
 int exec_vpe(char *filename, char **argv, char **envp) {
+    if(get_file_binary(filename) == NULL) {
+        return -1;
+    }
     char filename_copy[BUF_SIZE];
     memset((void *) filename_copy, 0, BUF_SIZE);
     for (int k = 0; filename[k] != 0; k++) {
