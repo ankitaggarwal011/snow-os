@@ -1,5 +1,5 @@
 #include <unistd.h>
 
 pid_t wait(int *status) {
-    return syscall2(SYSCALL_WAIT);
+    return syscall1(SYSCALL_WAIT);
 }
