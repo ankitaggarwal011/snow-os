@@ -48,7 +48,8 @@ int parse_split(char *commands[], char *input, const char delimiter) {
     }
     commands[n] = &input[last + 1];
     commands[n] = remove_white_spaces(commands[n]);
-    return ++n;
+    commands[++n] = 0;
+    return n;
 }
 
 int put_env(char *new_path, char *envp[]) {
