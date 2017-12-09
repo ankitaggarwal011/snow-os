@@ -262,8 +262,8 @@ void remove_page_table_mapping(uint64_t virt_addr) {
 void kfree(void *ptr) {
     memset(ptr, 0, PAGE_SIZE);
     uint64_t phy_addr = walk_page_table((uint64_t) ptr);
-    if (phy_addr == 0) {
-        return; // no mapping found
+    if (phy_addr == 0 || (get_page_ref_count(phy_addr) > 1)) {
+        return; // no mapping found or page is referenced by more than one process
     }
     add_back_free_pages(phy_addr, 1);
     update_max_pages(1);
