@@ -505,11 +505,9 @@ int wait() {
                     it = prev->next;
                     return return_pid;
                 }
-                else {
-                    prev = it;
-                    it = it->next;
-                }
             }
+            prev = it;
+            it = it->next;
         }
         if (child_exists) {
             scheduler();
@@ -535,11 +533,9 @@ int wait_pid(int pid) {
                     it = prev->next;
                     return return_pid;
                 }
-                else {
-                    prev = it;
-                    it = it->next;
-                }
             }
+            prev = it;
+            it = it->next;
         }
         if (child_exists) {
             scheduler();
