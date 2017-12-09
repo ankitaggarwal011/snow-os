@@ -175,15 +175,7 @@ int shell_parse(char *input, int len_input, char *envp[]) {
 }
 
 int shell_execfile(char *filename, char *envp[]) {
-    char bin[BUF_SIZE];
-    int i = 0;
-    for (i = 0; (path[i] != '/' && path[i] != '\0'); i++) {
-        bin[i] = path[i];
-    }
-    bin[i++] = '/';
-    bin[i] = '\0';
-    strcat(bin, filename);
-    int fp = open(bin, 0);
+    int fp = open(filename, 0);
     char script_file[BUF_SIZE * 4];
     read(fp, script_file, BUF_SIZE);
     char *line_read[MAX_LINES];
