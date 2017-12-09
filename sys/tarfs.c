@@ -76,7 +76,7 @@ void *get_file_binary(char *filename) {
 
     } while (s < tarfs_end);
 
-    kprintf("File not found.\n");
+    // kprintf("File not found.\n");
     return NULL;
 }
 
