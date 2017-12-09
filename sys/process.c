@@ -56,6 +56,7 @@ void init_scheduler() {
 }
 
 void scheduler() {
+    wait_all();
     switch_process();
 }
 
@@ -135,8 +136,6 @@ kthread_t *create_process(char *filename) {
         p_name[i] = filename[i];
     }
     p_name[len] = '\0';
-    //p_name[0] = 0;
-    //strcat((char *) p_name, filename);
 
     new_process->process_name = (char *) &p_name;
     for (i = 0; (filename + i) < tmp; i++) {
@@ -475,8 +474,18 @@ void go_to_ring3_exec(uint64_t argc, void *user_stack_ptr) {
     );
 }
 
-void deep_cleanup(kthread_t *process) {
-
+void wait_all() {
+    kthread_t *it = current_process->next, *prev = current_process;
+    while (it != current_process) {
+        if (it->state == ZOMBIE) {
+            reap_process(it);
+            it = prev->next;
+        }
+        else {
+            prev = it;
+            it = it->next;
+        }
+    }
 }
 
 int wait() {
@@ -525,7 +534,7 @@ void reap_process(kthread_t *process) {
         it = it->next;
     }
     prev->next = process->next;
-    deep_cleanup(process);
+    clean_page_tables(process->cr3);
     processes[process->pid] = 0;
     kfree(process);
     // remove from list

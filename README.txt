@@ -93,8 +93,7 @@ AskUbuntu (https://askubuntu.com)
 JamesM's kernel development tutorials (http://www.jamesmolloy.co.uk/tutorial_html)
 
 
-Known Bugs/Limitations
+Known Limitations
 ----------------------
 1. .. and . is not handled in chdir syscall
-2. waitpid/wait, add reaper on idle process
-3. Add init process (optional)
+2. Add init process (optional)
