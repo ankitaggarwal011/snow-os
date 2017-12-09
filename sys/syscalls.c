@@ -49,7 +49,6 @@ handle_syscall(syscall_code_t code, uint64_t arg2, uint64_t arg3, uint64_t arg4,
             return fork_ret_val;
         }
         case SYSCALL_READ: {
-            //hack
             kthread_t *cur_kt = get_current_process();
             if (arg2 < 0 || arg2 >= NUM_FDS) {
                 kprintf("Invalid FD #, must be between %d and %d\n", 0, NUM_FDS);

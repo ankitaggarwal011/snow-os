@@ -23,7 +23,7 @@ struct idt_struct idt_t[256];
 extern void page_fault_handler() {
     volatile uint64_t addr;
     __asm__ volatile("mov %%cr2, %0" : "=r" (addr));
-    kprintf("Page fault at %x\n", addr);
+    // kprintf("Page fault at %x\n", addr);
 
     addr = (addr / PAGE_SIZE) * PAGE_SIZE;
 
@@ -44,8 +44,6 @@ extern void page_fault_handler() {
     }
 
     kthread_t *current_process = get_current_process();
-    // struct vma_struct *current_vma_map = current_process->process_mm->vma_map;
-    // struct vma_struct *current_vma_heap = current_process->process_mm->vma_heap;
     struct vma_struct *current_vma_stack = current_process->process_mm->vma_stack;
 
     // Auto-growing stack
@@ -57,8 +55,7 @@ extern void page_fault_handler() {
         }
     } else {
         kprintf("Segmentation fault in process %d!. Exiting.\n", current_process->pid);
-        // exit_current_process(0); // TODO CHANGE THIS
-        while (1);
+        exit_current_process(0);
     }
 }
 

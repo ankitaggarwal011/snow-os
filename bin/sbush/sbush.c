@@ -7,7 +7,7 @@
 #define STDOUT 1
 #define STDERR 2
 
-#define BUF_SIZE 128
+#define BUF_SIZE 256
 #define MAX_ARGS 8
 #define MAX_LINES 64
 
