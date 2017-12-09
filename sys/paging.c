@@ -261,7 +261,7 @@ void remove_page_table_mapping(uint64_t virt_addr) {
 // takes virtual address as an input
 void kfree(void *ptr) {
     uint64_t phy_addr = walk_page_table((uint64_t) ptr);
-    if (phy_addr == 0 || (((get_flags(ptr) >> 9) & 1UL) == 1)) {
+    if (phy_addr == 0 || ((((uint64_t) get_flags(ptr) >> 9) & 1UL) == 1)) {
         return; // no mapping found or page is referenced by more than one process
     }
     memset(ptr, 0, PAGE_SIZE);
