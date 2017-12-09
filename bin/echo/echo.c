@@ -11,5 +11,6 @@ int main(int argc, char *argv[], char *envp[]) {
         write(1, s, strlen(s));
         write(1, " ", 1);
     }
+    write(1, "\n", 1);
     return 0;
 }

@@ -1,7 +1,7 @@
 #include<unistd.h>
 #include<string.h>
 
-#define BUF_SIZE 1000
+#define BUF_SIZE 1024
 
 int main(int argc, char *argv[], char *envp[]) {
     if (argc == 2) {
@@ -20,9 +20,10 @@ int main(int argc, char *argv[], char *envp[]) {
             }
         }
         close(fd);
-    } else {
+    }
+    else {
         char *temp_var = "Incorrect number of command line arguments. Please try again.\n";
-        if (write(1, (char *) temp_var, sizeof(char) * strlen(temp_var)) == -1) { /* Write error */ }
+        write(1, (char *) temp_var, strlen(temp_var));
     }
     return 0;
 }
