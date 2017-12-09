@@ -25,6 +25,7 @@ extern uint64_t get_rsp_val();
 extern void put_in_rax();
 
 void wait_all();
+void reap_process(kthread_t *process);
 
 int getPID() {
     for (int i = 1; i < MAX_P; i++) {

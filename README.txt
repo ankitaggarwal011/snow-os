@@ -19,6 +19,7 @@ Auto growing stack and dynamic heap allocation
 Shell with PATH, PS1, cd, and &
 Script handling with shebang (#!)
 Reaper/Idle process to cleanup zombie processes
+Reusable PIDs
 
 
 Shell support:
