@@ -144,6 +144,7 @@ kthread_t *create_process(char *filename) {
     for (i = 0; (filename + i) < tmp; i++) {
         new_process->cwd[i] = *(filename + i);
     }
+    new_process->cwd[i++] = '/';
     new_process->cwd[i] = 0;
     new_process->cr3 = setup_user_page_tables();
     uint64_t current_cr3 = get_cr3();
@@ -587,7 +588,7 @@ void reap_process(kthread_t *process) {
     prev->next = process->next;
     clean_page_tables(process->cr3);
     processes[process->pid] = 0;
-    kprintf("[+1] Reaped process %s with pid %d\n", process->process_name, process->pid);
+    // kprintf("[1]+ Reaped process %s with pid %d\n", process->process_name, process->pid);
     kfree(process);
     // remove from list
     // deep clean
@@ -612,7 +613,7 @@ void kill_process(kthread_t *process) {
     }
     current_process->state = ZOMBIE;
     shallow_cleanup(current_process);
-    kprintf("[+1] Killed process %s with pid %d\n", current_process->process_name, current_process->pid);
+    // kprintf("[1]+ Done (exited) %s: %d\n", current_process->process_name, current_process->pid);
     // cleanup happens in page tables
 }
 

@@ -71,6 +71,26 @@ int exec_binary(char *arguments[], int num_args, char *envp[]) {
     bin[i++] = '/';
     bin[i] = '\0';
     strcat(bin, arguments[0]);
+    if ((strcmp(arguments[0], "cat") == 0 || strcmp(arguments[0], "ls") == 0) && arguments[1] != 0) {
+        char cdir[BUF_SIZE];
+        char len = strlen(arguments[1]);
+        if (arguments[1][0] == '/') {
+            int i;
+            for (i = 1; i < len; i++) {
+                arguments[1][i - 1] = arguments[1][i];
+            }
+            arguments[1][i - 1] = '\0';
+        }
+        else {
+            getcwd(cdir, BUF_SIZE);
+            strcat(cdir, arguments[1]);
+            int i = 0;
+            for (i = 0; i < strlen(cdir); i++) {
+                arguments[1][i] = cdir[i];
+            }
+            arguments[1][i] = '\0';
+        }
+    }
     pid_t c_pid = fork();
     if (c_pid == 0) {
         execvpe(bin, arguments, envp);
@@ -81,6 +101,14 @@ int exec_binary(char *arguments[], int num_args, char *envp[]) {
     else {
         if (is_background == 0) {
             waitpid(c_pid, NULL);
+        }
+        else {
+            char *back_start = "[1] ";
+            write(STDOUT, back_start, strlen(back_start));
+            char pid_s[20];
+            itoa_cl(pid_s, c_pid);
+            write(STDOUT, pid_s, strlen(pid_s));
+            write(STDOUT, "\n", 1);
         }
     }
     return 0;
@@ -127,7 +155,6 @@ int cd(char *arguments[], int num_args, char *envp[]) {
         else {
             char cdir[BUF_SIZE];
             getcwd(cdir, BUF_SIZE);
-            strcat(cdir, "/");
             strcat(cdir, arguments[1]);
             status = chdir(cdir);
         }
@@ -180,6 +207,7 @@ int shell_parse(char *input, int len_input, char *envp[]) {
 }
 
 int shell_execfile(char *filename, char *envp[]) {
+    if (filename[0] == '/') filename++;
     int fp = open(filename, 0);
     if (fp < 0) {
         char *err_msg = "File not found\n";
@@ -191,7 +219,7 @@ int shell_execfile(char *filename, char *envp[]) {
     char *line_read[MAX_LINES];
     int num_lines = parse_split(line_read, script_file, '\n');
     for (int i = 0; i < num_lines; i++) {
-        if (line_read[i][0] != '#' && line_read[i][1] != '!' && (int) strlen(line_read[i]) != 0) {
+        if (line_read[i][0] != '#' && line_read[i][1] != '!' && strlen(line_read[i]) != 0) {
             shell_parse(line_read[i], (int) strlen(line_read[i]), envp);
         }
     }
@@ -228,8 +256,7 @@ int shell_init(char* envp[]) {
                 continue;
             }
             else if (strcmp(input, "exit") == 0) {
-                char *exit_msg = "Shell will not be excited since it is the primary process, and exiting it will shutdown the system.\n";
-                write(STDOUT, exit_msg, strlen(exit_msg));
+                continue;
             }
             else if (input[0] == '.' && input[1] == '/') {
                 shell_execfile(&input[2], envp);
@@ -249,8 +276,14 @@ int shell_init(char* envp[]) {
 }
 
 int main(int argc, char *argv[], char *envp[]) {
-    char *welcome_msg = "Welcome to SBUNIX!\n\nPlease use the project README file for a list of commands.\n\nA few examples are:\nls\ncat etc/test.txt\n./etc/test.sbush\nps\n\n";
+    char *welcome_msg = "Welcome to SBUNIX (SNOW OS)!\n\nPlease use the project README file for a list of commands.\n\nA few examples are:\nls\ncat /etc/test.txt\nsbush /etc/test.sbush\nps\n\n";
     write(STDOUT, welcome_msg, strlen(welcome_msg));
+    if (envp != NULL && envp[0] != NULL && strcmp(envp[0], "PATH:") > 0) {
+        int i;
+        for (i = 5; i < strlen(envp[0]); i++) path[i - 5] = envp[0][i];
+        if (envp[0][i - 1] != '/')  envp[0][i++] = '/';
+        envp[0][i] = 0;
+    }
     if (argc == 2) {
         shell_execfile(argv[1], envp);
     }

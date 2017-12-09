@@ -1,4 +1,4 @@
-SBUNIX: CSE 506 Project
+SBUNIX (SNOW OS): CSE 506 Project
 -----------------------
 Cooperative multi-tasking w/ all functional requirements (50 points)
 
@@ -18,8 +18,10 @@ kprintf, IDT, keyboard, timer
 Auto growing stack and dynamic heap allocation
 Shell with PATH, PS1, cd, and &
 Script handling with shebang (#!)
+bin/init user process to launch shell using /etc/rc
 Reaper/Idle process to cleanup zombie processes
 Reused PIDs
+Binaries implemented: init, echo, sleep, cat, ls, kill -9, ps
 Background processes: (for cooperative scheduling, background process are added to the scheduling queue and are executed when the parent process yield)
 
 
@@ -48,10 +50,10 @@ qemu-system-x86_64 -curses -drive id=boot,format=raw,file=$USER.img,if=none -dri
 Examples:
 ---------
 ls
-cat etc/test.txt
-./etc/test.sbush
-sbush etc/test.sbush
-ls etc
+cat /etc/test.txt
+.//etc/test.sbush
+sbush /etc/test.sbush
+ls /etc
 ps
 echo hello
 export PS1=SHELL
@@ -60,6 +62,7 @@ Example files:
 --------------
 Under the rootfs/etc/ folder, the following test files can be found:
 
+-- test: test directory for cd
 -- test.txt: simple text file for cat
 -- test.sbush: simple sbush script
 -- stress_test.sbush: stress test sbush script with 60+ commands to spawn 60+ processes, system remains stable
@@ -107,4 +110,3 @@ JamesM's kernel development tutorials (http://www.jamesmolloy.co.uk/tutorial_htm
 Known Limitations
 ----------------------
 1. .. and . is not handled in chdir syscall.
-2. bin/init process is not used (optional).

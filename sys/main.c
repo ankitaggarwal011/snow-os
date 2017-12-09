@@ -45,7 +45,7 @@ void start(uint32_t *modulep, void *physbase, void *physfree) {
 
     init_processes();
     kthread_t *idle = init_idle_process();
-    create_process("bin/sbush");
+    create_process("bin/init"); // add init user process
     set_rsp((uint64_t) idle->rsp_val);
     
     while (1);
