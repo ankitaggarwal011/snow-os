@@ -87,7 +87,6 @@ int dir_exists(char *filename) {
             break;
         }
         int file_size = o_to_d(atoi(s->size));
-        char *file = (char *) (s + 1);
 
         if (kstrcmp(filename, s->name) == 0 && atoi(s->typeflag) == 5) {
             // kprintf("File found: Name: %s, Size: %d bytes, Type: %s\n", s->name, file_size, s->typeflag);
