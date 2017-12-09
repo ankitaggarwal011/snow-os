@@ -9,6 +9,7 @@
 
 #define BUF_SIZE 128
 #define MAX_ARGS 8
+#define MAX_LINES 64
 
 struct job {
     char jobname[BUF_SIZE];
@@ -185,7 +186,7 @@ int shell_execfile(char *filename, char *envp[]) {
     int fp = open(bin, 0);
     char script_file[BUF_SIZE * 4];
     read(fp, script_file, BUF_SIZE);
-    char *line_read[];
+    char *line_read[MAX_LINES];
     int num_lines = parse_split(line_read, script_file, '\n');
     for (int i = 0; i < num_lines; i++) {
         if (line_read[i][0] != '#' && line_read[i][1] != '!' && (int) strlen(line_read[i]) != 0) {
