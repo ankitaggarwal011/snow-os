@@ -478,6 +478,14 @@ void deep_cleanup(kthread_t *process) {
 
 }
 
+int wait() {
+
+}
+
+int waitpid(int pid) {
+
+}
+
 // clean pages, clean vma, clean mm_struct
 void shallow_cleanup(kthread_t *process) {
     struct vma_struct *v_map = process->process_mm->vma_map;
