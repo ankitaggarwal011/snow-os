@@ -2,7 +2,7 @@
 #define _DEFS_H
 
 #define NULL ((void*)0)
-
+static const int EOF = -1;
 typedef unsigned long  uint64_t;
 typedef          long   int64_t;
 typedef unsigned int   uint32_t;
@@ -18,5 +18,9 @@ typedef int64_t ssize_t;
 typedef uint64_t off_t;
 
 typedef uint32_t pid_t;
+
+void* memset(void* a, int v, size_t b);
+void* memset_byte(void* a, uint64_t v, uint64_t b);
+void* memcpy(void *dest, void *src, int bytes);
 
 #endif
